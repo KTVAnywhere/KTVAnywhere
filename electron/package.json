@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/weiquany/KTVAnywhere/issues"
   },
-  "homepage": "https://github.com/weiquany/KTVAnywhere#readme"
+  "homepage": "https://github.com/weiquany/KTVAnywhere#readme",
+  "devDependencies": {
+    "electron": "^18.2.3"
+  }
 }

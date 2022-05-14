@@ -1,18 +1,15 @@
-const electron = require('electron');
-const url = require('url');
-const path = require('path');
 
-const {app, BrowserWindow} = electron;
+const { BrowserWindow, app } = require('electron');
 
-let mainWindow;
+const createWindow = () => {
+    const win = new BrowserWindow({
+        width: 800,
+        height: 800
+    })
 
-app.on('ready', function() {
-    //create new window
-    mainWindow = new BrowserWindow({});
-    //load html into window
-    mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'mainWindow.html'),
-        protocol: 'file',
-        slashes: true
-    })); 
+    win.loadFile("mainWindow.html")
+}
+
+app.whenReady().then(() => {
+    createWindow();
 });
