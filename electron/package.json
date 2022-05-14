@@ -1,0 +1,19 @@
+{
+  "name": "ktvanywhere",
+  "version": "1.0.0",
+  "description": "KTV anywhere desktop app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weiquany/KTVAnywhere.git"
+  },
+  "author": "Tan Ming Wei & Yew Wei Quan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/weiquany/KTVAnywhere/issues"
+  },
+  "homepage": "https://github.com/weiquany/KTVAnywhere#readme"
+}
