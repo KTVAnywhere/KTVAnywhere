@@ -7,10 +7,6 @@ jobs:
   release:
     runs-on: ${{ matrix.os }}
     
-    defaults:
-      run:
-        working-directory: electron-frontend
-
     strategy:
       matrix:
         os: [macos-latest, windows-2019, ubuntu-18.04]
