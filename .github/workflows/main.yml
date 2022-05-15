@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
+          cache: npm
 
       - name: npm install
         run: |
@@ -28,7 +29,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run package-ci
+          npm run package
           npm run lint
           npm run ts
         working-directory: electron-frontend
