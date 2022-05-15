@@ -1,0 +1,25 @@
+# ELECTRON
+# dependency libaries
+electron-frontend/node_modules
+
+# Logs
+electron-frontend/logs
+electron-frontend/*.log
+
+# Runtime data
+electron-frontend/pids
+electron-frontend/*.pid
+electron-frontend/*.seed
+
+# Coverage directory used by tools like istanbul
+electron-frontend/coverage
+electron-frontend/.eslintcache
+
+electron-frontend/release/app/dist
+electron-frontend/release/build
+electron-frontend/.erb/dll
+
+electron-frontend/npm-debug.log.*
+electron-frontend/*.css.d.ts
+electron-frontend/*.sass.d.ts
+electron-frontend/*.scss.d.ts
