@@ -9,7 +9,7 @@ jobs:
     
     defaults:
       run:
-        working-directory: ../electron-frontend
+        working-directory: electron-frontend
 
     strategy:
       matrix:
