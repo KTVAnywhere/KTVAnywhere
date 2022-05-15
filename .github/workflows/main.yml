@@ -6,10 +6,14 @@ on: push
 jobs:
   release:
     runs-on: ${{ matrix.os }}
+    
+    defaults:
+      run:
+        working-directory: ./electron-frontend
 
     strategy:
       matrix:
-        os: [macos-10.14, windows-2019, ubuntu-18.04]
+        os: [macos-latest, windows-2019, ubuntu-18.04]
 
     steps:
       - name: Check out Git repository
