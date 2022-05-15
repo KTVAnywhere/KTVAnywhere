@@ -22,6 +22,7 @@ jobs:
       - name: npm install
         run: |
           npm install
+        working-directory: electron-frontend
 
       - name: npm test
         env:
