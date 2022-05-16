@@ -1,6 +1,8 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
 import icon from '../../assets/icon.svg';
 import './App.css';
+import { SongProps, SongUpload, SongLibrary } from '../components/SongItem';
 
 const Hello = () => {
   return (
@@ -39,11 +41,21 @@ const Hello = () => {
   );
 };
 
+const SongTest = () => {
+  const [songs, setSongList] = useState<SongProps[]>([]);
+  return (
+    <>
+      <SongUpload songs={songs} setSongList={setSongList} />
+      <SongLibrary songs={songs} />
+    </>
+  );
+};
+
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<SongTest />} />
       </Routes>
     </Router>
   );
