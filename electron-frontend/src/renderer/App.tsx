@@ -3,6 +3,7 @@ import { useState } from 'react';
 import icon from '../../assets/icon.svg';
 import './App.css';
 import { SongProps, SongUpload, SongLibrary } from '../components/SongItem';
+import { SongsQueueManager } from '../components/SongsQueue';
 
 const Hello = () => {
   return (
@@ -43,10 +44,12 @@ const Hello = () => {
 
 const SongTest = () => {
   const [songs, setSongList] = useState<SongProps[]>([]);
+  const [queue, setQueue] = useState<SongProps[]>([]);
   return (
     <>
       <SongUpload songs={songs} setSongList={setSongList} />
       <SongLibrary songs={songs} />
+      <SongsQueueManager songs={songs} queue={queue} setQueue={setQueue} />
     </>
   );
 };
@@ -55,7 +58,14 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<SongTest />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <SongTest />
+            </>
+          }
+        />
       </Routes>
     </Router>
   );
