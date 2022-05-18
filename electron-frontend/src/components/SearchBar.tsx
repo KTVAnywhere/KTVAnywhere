@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Select, { SingleValue } from 'react-select';
 import { SongProps } from './SongItem';
 
 export const QueueSearchBar = ({
