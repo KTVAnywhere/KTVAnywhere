@@ -1,6 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { SongProps } from './SongItem';
-import { QueueSearchBar } from './SearchBar';
 
 const QueueList = ({
   queue,
@@ -148,7 +147,6 @@ export const SongsQueueManager = ({
             ))}
           </select>
         </label>
-        <QueueSearchBar songs={songs} setQueueItem={setQueueItem} />
         <input type="submit" value="Add" />
       </form>
       <QueueList
