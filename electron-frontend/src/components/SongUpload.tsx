@@ -87,6 +87,7 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
                 <input
                   type="text"
                   required
+                  data-testid="song-name-input"
                   value={songName}
                   onChange={(event) =>
                     this.handleChange(event, {
@@ -101,6 +102,7 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
                 Artist:
                 <input
                   type="text"
+                  data-testid="artist-input"
                   value={artist}
                   onChange={(event) =>
                     this.handleChange(event, {
@@ -140,6 +142,7 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
                 <input type="text" readOnly value={getFileName(lyricsPath)} />
                 <button
                   type="button"
+                  data-testid="lyrics-picker-button"
                   onClick={() =>
                     this.handleChooseFile(
                       this.lyricsUploadOptions,

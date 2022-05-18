@@ -30,7 +30,7 @@ const QueueList = ({
                 <tr>
                   <td>{index + 1}</td>
                   <td>{song.songName}</td>
-                  <td>{song.singer}</td>
+                  <td>{song.artist}</td>
                   <td>{song.songPath}</td>
                   <td>{song.lyricsPath}</td>
                   <td>
