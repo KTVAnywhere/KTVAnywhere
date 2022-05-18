@@ -1,15 +1,36 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { SongProps } from './SongItem';
 
-const QueueList = ({
+export const QueueList = ({
   queue,
-  shiftSongUp,
-  deleteSongFromQueue,
+  setQueue,
 }: {
   queue: SongProps[];
-  shiftSongUp: (index: number) => void;
-  deleteSongFromQueue: (index: number) => void;
+  setQueue: Dispatch<SetStateAction<SongProps[]>>;
 }) => {
+  const deleteSongFromQueue = (index: number): void => {
+    const newQueue = [...queue.slice(0, index), ...queue.slice(index + 1)];
+    setQueue(newQueue);
+  };
+
+  const shiftSongUp = (index: number): void => {
+    if (queue.length === 0 || queue.length === 1 || index === 0) {
+      return;
+    }
+    if (index === 1) {
+      const newQueue = [queue[1], queue[0], ...queue.slice(2)];
+      setQueue(newQueue);
+      return;
+    }
+    const newQueue = [
+      ...queue.slice(0, index - 1),
+      queue[index],
+      queue[index - 1],
+      ...queue.slice(index + 1),
+    ];
+    setQueue(newQueue);
+  };
+
   return (
     <div>
       {queue.length > 0 ? (
@@ -26,26 +47,24 @@ const QueueList = ({
           </thead>
           <tbody>
             {queue.map((song, index) => (
-              <>
-                <tr>
-                  <td>{index + 1}</td>
-                  <td>{song.songName}</td>
-                  <td>{song.artist}</td>
-                  <td>{song.songPath}</td>
-                  <td>{song.lyricsPath}</td>
-                  <td>
-                    <button type="button" onClick={() => shiftSongUp(index)}>
-                      Up
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteSongFromQueue(index)}
-                    >
-                      delete
-                    </button>
-                  </td>
-                </tr>
-              </>
+              <tr key={song.songId}>
+                <td>{index + 1}</td>
+                <td>{song.songName}</td>
+                <td>{song.artist}</td>
+                <td>{song.songPath}</td>
+                <td>{song.lyricsPath}</td>
+                <td>
+                  <button type="button" onClick={() => shiftSongUp(index)}>
+                    Up
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteSongFromQueue(index)}
+                  >
+                    delete
+                  </button>
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
@@ -107,29 +126,6 @@ export const SongsQueueManager = ({
     setQueueItem(songs[parseInt(event.target.value, 10)]);
   };
 
-  const deleteSongFromQueue = (index: number): void => {
-    const newQueue = [...queue.slice(0, index), ...queue.slice(index + 1)];
-    setQueue(newQueue);
-  };
-
-  const shiftSongUp = (index: number): void => {
-    if (queue.length === 0 || queue.length === 1 || index === 0) {
-      return;
-    }
-    if (index === 1) {
-      const newQueue = [queue[1], queue[0], ...queue.slice(2)];
-      setQueue(newQueue);
-      return;
-    }
-    const newQueue = [
-      ...queue.slice(0, index - 1),
-      queue[index],
-      queue[index - 1],
-      ...queue.slice(index + 1),
-    ];
-    setQueue(newQueue);
-  };
-
   return (
     <>
       <div>
@@ -139,21 +135,16 @@ export const SongsQueueManager = ({
         <label htmlFor="songName">
           Choose a song:
           <select onChange={handleDropDownChange}>
-            <option> </option>
-            {songs.map((song, index) => (
-              <option key={song.songName} value={index}>
-                {song.songName}
-              </option>
-            ))}
+            <option key="none"> </option>
+            {React.Children.toArray(
+              songs.map((song, index) => (
+                <option value={index}>{song.songName}</option>
+              ))
+            )}
           </select>
         </label>
         <input type="submit" value="Add" />
       </form>
-      <QueueList
-        queue={queue}
-        shiftSongUp={shiftSongUp}
-        deleteSongFromQueue={deleteSongFromQueue}
-      />
     </>
   );
 };

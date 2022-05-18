@@ -1,7 +1,7 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import './App.css';
-import { SongsQueueManager } from '../components/SongsQueue';
+import { SongsQueueManager, QueueList } from '../components/SongsQueue';
 import { SongProps, SongLibrary } from '../components/SongItem';
 import SongUpload from '../components/SongUpload';
 
@@ -13,6 +13,7 @@ const SongTest = () => {
       <SongUpload setSongList={setSongList} />
       <SongLibrary songs={songs} />
       <SongsQueueManager songs={songs} queue={queue} setQueue={setQueue} />
+      <QueueList queue={queue} setQueue={setQueue} />
     </>
   );
 };
