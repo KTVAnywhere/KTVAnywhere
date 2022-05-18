@@ -3,13 +3,15 @@ import { useState } from 'react';
 import './App.css';
 import { SongProps, SongUpload, SongLibrary } from '../components/SongItem';
 import { SongsQueueManager } from '../components/SongsQueue';
+import { SongProps, SongLibrary } from '../components/SongItem';
+import SongUpload from '../components/SongUpload';
 
 const SongTest = () => {
   const [songs, setSongList] = useState<SongProps[]>([]);
   const [queue, setQueue] = useState<SongProps[]>([]);
   return (
     <>
-      <SongUpload songs={songs} setSongList={setSongList} />
+      <SongUpload setSongList={setSongList} />
       <SongLibrary songs={songs} />
       <SongsQueueManager songs={songs} queue={queue} setQueue={setQueue} />
     </>

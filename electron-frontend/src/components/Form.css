@@ -1,0 +1,25 @@
+label {
+  display: inline-block;
+  clear: right;
+  width: 250px;
+  text-align: right;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+input {
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+input:hover {
+  overflow:visible;
+}
+
+button {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}

@@ -1,25 +1,42 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
+
+import Popup from './Popup';
 
 export interface SongProps {
+  songId: string;
   songName: string;
-  singer: string;
+  artist: string;
   songPath: string;
   lyricsPath: string;
 }
 
-const SongComponent = (song: SongProps) => {
-  const { songName, singer, songPath, lyricsPath } = song;
+const SongComponent = ({ song }: { song: SongProps }) => {
+  const { songName, artist, songPath, lyricsPath } = song;
   return (
     <div>
-      <p>{songName}</p>
-      <p>{singer}</p>
-      <p>{songPath}</p>
-      <p>{lyricsPath}</p>
+      <p>
+        <strong>Name: </strong>
+        {songName}
+      </p>
+      <p>
+        <strong>Artist: </strong>
+        {artist}
+      </p>
+      <p>
+        <strong>Path: </strong>
+        {songPath}
+      </p>
+      <p>
+        <strong>Lyrics: </strong>
+        {lyricsPath}
+      </p>
     </div>
   );
 };
 
 export const SongLibrary = ({ songs }: { songs: SongProps[] }) => {
+  const [songPopup, setSongPopup] = useState<boolean>(false);
+  const [openSong, setOpenSong] = useState<SongProps>({} as SongProps);
   return (
     <div>
       <h2>Song library</h2>
@@ -28,97 +45,44 @@ export const SongLibrary = ({ songs }: { songs: SongProps[] }) => {
           <tr>
             <th>No.</th>
             <th>Song</th>
-            <th>Singer</th>
+            <th>Artist</th>
             <th>Song path</th>
             <th>Lyrics path</th>
           </tr>
         </thead>
         <tbody>
           {songs.map((song, index) => (
-            <tr>
-              <td>{index + 1}</td>
-              <td>{song.songName}</td>
-              <td>{song.singer}</td>
+            <tr key={song.songId}>
+              <td>{index}</td>
+              <td>
+                <div
+                  role="button"
+                  onClick={() => {
+                    setSongPopup(true);
+                    setOpenSong(song);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      setSongPopup(true);
+                      setOpenSong(song);
+                    }
+                  }}
+                  tabIndex={index}
+                >
+                  {song.songName}
+                </div>
+              </td>
+              <td>{song.artist}</td>
               <td>{song.songPath}</td>
               <td>{song.lyricsPath}</td>
             </tr>
           ))}
         </tbody>
       </table>
+      <Popup trigger={songPopup} setTrigger={setSongPopup}>
+        <SongComponent song={openSong} />
+      </Popup>
     </div>
-  );
-};
-
-export const SongUpload = ({
-  songs,
-  setSongList,
-}: {
-  songs: SongProps[];
-  setSongList: Dispatch<SetStateAction<SongProps[]>>;
-}) => {
-  const [song, setSong] = useState<SongProps>({} as SongProps);
-
-  const handleSongUpload = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSongList([...songs, song]);
-    setSong({ songName: '', singer: '', songPath: '', lyricsPath: '' });
-  };
-
-  return (
-    <>
-      <div>
-        <h2>Add new song</h2>
-        <form onSubmit={handleSongUpload}>
-          <fieldset>
-            <label htmlFor="songName">
-              Song name:
-              <input
-                type="text"
-                value={song?.songName}
-                onChange={(event) =>
-                  setSong({ ...song, songName: event.target.value })
-                }
-              />
-            </label>
-            <br />
-            <label htmlFor="singer">
-              Singer:
-              <input
-                type="text"
-                value={song?.singer}
-                onChange={(event) =>
-                  setSong({ ...song, singer: event.target.value })
-                }
-              />
-            </label>
-            <br />
-            <label htmlFor="songPath">
-              Song path:
-              <input
-                type="text"
-                value={song?.songPath}
-                onChange={(event) =>
-                  setSong({ ...song, songPath: event.target.value })
-                }
-              />
-            </label>
-            <br />
-            <label htmlFor="Lyrics path">
-              Lyrics path:
-              <input
-                type="text"
-                value={song?.lyricsPath}
-                onChange={(event) =>
-                  setSong({ ...song, lyricsPath: event.target.value })
-                }
-              />
-            </label>
-          </fieldset>
-
-          <input type="submit" value="Upload" />
-        </form>
-      </div>
-    </>
   );
 };
 
