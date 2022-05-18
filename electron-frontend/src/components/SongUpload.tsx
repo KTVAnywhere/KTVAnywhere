@@ -158,7 +158,6 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
                 </button>
               </label>
             </fieldset>
-
             <input type="submit" value="Upload" />
           </form>
         </div>

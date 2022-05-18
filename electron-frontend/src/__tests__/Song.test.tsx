@@ -7,7 +7,7 @@ describe('SongUpload', () => {
     global.window.electron = {
       ...window.electron,
       dialog: {
-        openFile: () => Promise.resolve('C:\\dir\\file.mp3'),
+        openFile: async () => 'C:\\dir\\file.mp3',
       },
     };
   });
@@ -34,11 +34,13 @@ describe('SongUpload', () => {
     const artistInput = screen.getByTestId('artist-input');
     const songPickerButton = screen.getByTestId('song-picker-button');
     const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
+    const submitButton = screen.getByRole('button', { name: /Upload/i });
 
     fireEvent.change(songNameInput, { target: { value: 'Test song' } });
     fireEvent.change(artistInput, { target: { value: 'Test artist' } });
     fireEvent.click(songPickerButton);
     fireEvent.click(lyricsPickerButton);
+    fireEvent.click(submitButton);
 
     await waitFor(() => expect(mockFn).toHaveBeenCalledTimes(1));
   });
