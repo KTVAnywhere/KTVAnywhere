@@ -177,7 +177,7 @@
   },
   "build": {
     "productName": "KTVAnywhere",
-    "appId": "org.erb.KTVAnywhere",
+    "appId": "org.rainyday.KTVAnywhere",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -235,12 +235,12 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "weiquany",
+      "repo": "KTVAnywhere"
     }
   },
   "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
+    "url": "https://github.com/weiquany/KTVAnywhere#readme"
   },
   "devEngines": {
     "node": ">=14.x",
