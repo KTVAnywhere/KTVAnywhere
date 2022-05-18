@@ -11,8 +11,10 @@ declare global {
         ): (() => void) | undefined;
         once(channel: string, func: (...args: unknown[]) => void): void;
       };
+      dialog: {
+        openFile(config: Electron.OpenDialogOptions): Promise<string>;
+      };
     };
   }
 }
-
 export {};

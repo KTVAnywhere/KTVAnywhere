@@ -21,11 +21,11 @@ body {
 
 button {
   background-color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
+  padding: 4px 8px;
+  border-radius: 5px;
   border: none;
   appearance: none;
-  font-size: 1.3rem;
+  font-size: 0.8rem;
   box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
     0px 18px 88px -4px rgba(24, 39, 75, 0.14);
   transition: all ease-in 0.1s;
@@ -40,6 +40,19 @@ button:hover {
 
 li {
   list-style: none;
+}
+
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 800px;
+  align-items: center;
+}
+td {
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  text-align:center
 }
 
 a {
