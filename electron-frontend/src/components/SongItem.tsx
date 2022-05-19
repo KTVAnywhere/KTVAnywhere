@@ -53,7 +53,7 @@ export const SongLibrary = ({ songs }: { songs: SongProps[] }) => {
         <tbody>
           {songs.map((song, index) => (
             <tr key={song.songId}>
-              <td>{index}</td>
+              <td>{index + 1}</td>
               <td>
                 <div
                   role="button"
