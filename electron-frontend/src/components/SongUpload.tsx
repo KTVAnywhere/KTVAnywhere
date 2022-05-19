@@ -7,7 +7,16 @@ export interface SongUploadProps {
   setSongList: Dispatch<SetStateAction<SongProps[]>>;
 }
 
-class SongUpload extends Component<SongUploadProps, SongProps> {
+interface FormErrorProps {
+  songName: string;
+  songPath: string;
+  cancelled: string;
+}
+
+class SongUpload extends Component<
+  SongUploadProps,
+  { song: SongProps; error: FormErrorProps }
+> {
   songUploadOptions: Electron.OpenDialogOptions = {
     filters: [
       {
@@ -28,53 +37,83 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
     properties: ['openFile'],
   };
 
-  constructor(props: SongUploadProps) {
-    super(props);
-    this.state = {
+  emptyState: { song: SongProps; error: FormErrorProps } = {
+    song: {
       songId: '',
       songName: '',
       artist: '',
       songPath: '',
       lyricsPath: '',
-    };
+    },
+    error: {
+      songName: '',
+      songPath: '',
+      cancelled: '',
+    },
+  };
+
+  constructor(props: SongUploadProps) {
+    super(props);
+    this.state = this.emptyState;
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChooseFile = this.handleChooseFile.bind(this);
   }
 
-  handleChange(_: React.ChangeEvent<HTMLInputElement>, newSong: SongProps) {
-    this.setState(newSong);
+  handleChange(newSong: SongProps) {
+    this.setState((state) => ({ ...state, song: newSong }));
   }
 
   handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const { setSongList } = this.props;
+    const { song } = this.state;
 
-    setSongList((songList) => [
-      ...songList,
-      { ...this.state, songId: uniqid() },
-    ]);
-    this.setState({
-      songId: '',
-      songName: '',
-      artist: '',
-      songPath: '',
-      lyricsPath: '',
-    });
+    if (!this.handleValidation()) {
+      setSongList((songList) => {
+        return [...songList, { ...song, songId: uniqid() }];
+      });
+      this.setState(this.emptyState);
+    }
+  }
+
+  handleValidation() {
+    const { song } = this.state;
+    const { songName, songPath } = song;
+    const error = { songName: '', songPath: '', cancelled: '' };
+    let formIsInvalid = false;
+    if (!songName) {
+      formIsInvalid = true;
+      error.songName = 'Please enter a song name';
+    }
+
+    if (!songPath) {
+      formIsInvalid = true;
+      error.songPath = 'Please select a song';
+    }
+    this.setState({ song, error });
+    return formIsInvalid;
   }
 
   handleChooseFile = async (
     config: Electron.OpenDialogOptions,
     setPathFn: (arg0: string) => void
   ) => {
+    const { error } = this.state;
     window.electron.dialog
       .openFile(config)
       .then((result) => setPathFn(result))
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        this.setState((state) => ({
+          ...state,
+          error: { ...error, cancelled: err.message },
+        }))
+      );
   };
 
   render() {
-    const { songName, artist, songPath, lyricsPath } = this.state;
+    const { song, error } = this.state;
     const getFileName = (str: string) => str.replace(/^.*(\\|\/|:)/, '');
     return (
       <>
@@ -83,15 +122,17 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
             <h2>Add new song</h2>
             <fieldset>
               <label htmlFor="songName">
+                <div style={{ color: 'red', textAlign: 'center' }}>
+                  {error.songName}
+                </div>
                 Name:
                 <input
                   type="text"
-                  required
                   data-testid="song-name-input"
-                  value={songName}
+                  value={song.songName}
                   onChange={(event) =>
-                    this.handleChange(event, {
-                      ...this.state,
+                    this.handleChange({
+                      ...song,
                       songName: event.target.value,
                     })
                   }
@@ -103,10 +144,10 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
                 <input
                   type="text"
                   data-testid="artist-input"
-                  value={artist}
+                  value={song.artist}
                   onChange={(event) =>
-                    this.handleChange(event, {
-                      ...this.state,
+                    this.handleChange({
+                      ...song,
                       artist: event.target.value,
                     })
                   }
@@ -114,13 +155,16 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
               </label>
               <br />
               <label htmlFor="songPath">
+                <div style={{ color: 'red', textAlign: 'center' }}>
+                  {error.songPath}
+                </div>
                 Song file:
                 <input
                   type="text"
                   data-testid="song-picker-input"
                   required
                   readOnly
-                  value={getFileName(songPath)}
+                  value={getFileName(song.songPath)}
                 />
                 <button
                   type="button"
@@ -129,7 +173,7 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
                     this.handleChooseFile(
                       this.songUploadOptions,
                       (path: string) =>
-                        this.setState((state) => ({ ...state, songPath: path }))
+                        this.handleChange({ ...song, songPath: path })
                     )
                   }
                 >
@@ -139,7 +183,12 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
               <br />
               <label htmlFor="Lyrics path">
                 Lyrics file:
-                <input type="text" readOnly value={getFileName(lyricsPath)} />
+                <input
+                  type="text"
+                  data-testid="lyrics-picker-input"
+                  readOnly
+                  value={getFileName(song.lyricsPath)}
+                />
                 <button
                   type="button"
                   data-testid="lyrics-picker-button"
@@ -147,10 +196,7 @@ class SongUpload extends Component<SongUploadProps, SongProps> {
                     this.handleChooseFile(
                       this.lyricsUploadOptions,
                       (path: string) =>
-                        this.setState((state) => ({
-                          ...state,
-                          lyricsPath: path,
-                        }))
+                        this.handleChange({ ...song, lyricsPath: path })
                     )
                   }
                 >

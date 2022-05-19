@@ -7,13 +7,17 @@ describe('SongUpload', () => {
     global.window.electron = {
       ...window.electron,
       dialog: {
-        openFile: async () => 'C:\\dir\\file.mp3',
+        openFile: jest
+          .fn()
+          .mockResolvedValueOnce('C:\\dir\\file.mp3')
+          .mockResolvedValueOnce('C:\\dir\\lyrics.lrc'),
       },
     };
   });
 
   test('should render', () => {
     const mockFn = jest.fn();
+
     expect(render(<SongUpload setSongList={mockFn} />)).toBeTruthy();
   });
 
@@ -38,10 +42,18 @@ describe('SongUpload', () => {
 
     fireEvent.change(songNameInput, { target: { value: 'Test song' } });
     fireEvent.change(artistInput, { target: { value: 'Test artist' } });
-    fireEvent.click(songPickerButton);
-    fireEvent.click(lyricsPickerButton);
-    fireEvent.click(submitButton);
 
+    fireEvent.click(songPickerButton);
+    await waitFor(() =>
+      expect(screen.getByTestId('song-picker-input')).toHaveValue('file.mp3')
+    );
+    fireEvent.click(lyricsPickerButton);
+    await waitFor(() =>
+      expect(screen.getByTestId('lyrics-picker-input')).toHaveValue(
+        'lyrics.lrc'
+      )
+    );
+    fireEvent.click(submitButton);
     await waitFor(() => expect(mockFn).toHaveBeenCalledTimes(1));
   });
 });
