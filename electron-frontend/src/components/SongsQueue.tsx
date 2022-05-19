@@ -148,25 +148,20 @@ export const SongsQueueManager = ({
   queue: QueueItemProps[];
   setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
 }) => {
-  const [queueItem, setQueueItem] = useState<QueueItemProps>(
-    {} as QueueItemProps
-  );
+  const [songItem, setSongItem] = useState<SongProps>({} as SongProps);
 
   const dropDownAddSongToQueue = (
     event: React.FormEvent<HTMLFormElement>
   ): void => {
     event.preventDefault();
-    if (queueItem === undefined || Object.keys(queueItem).length === 0) return;
-    setQueue([...queue, queueItem]);
+    if (songItem === undefined || Object.keys(songItem).length === 0) return;
+    setQueue([...queue, { song: songItem, queueItemId: uniqid() }]);
   };
 
   const handleDropDownChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setQueueItem({
-      song: songs[parseInt(event.target.value, 10)],
-      queueItemId: uniqid(),
-    });
+    setSongItem(songs[parseInt(event.target.value, 10)]);
   };
 
   return (
