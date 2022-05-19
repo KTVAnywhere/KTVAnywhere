@@ -1,6 +1,9 @@
 name: Electron
 
-on: push
+on:
+  push:
+    paths:
+      - electron-frontend/**
 
 jobs:
   release:
@@ -8,17 +11,18 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-10.14, windows-2019, ubuntu-18.04]
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Install Node.js and NPM
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: npm
+          cache-dependency-path: electron-frontend/package-lock.json
 
       - name: npm install
         run: |
@@ -35,6 +39,15 @@ jobs:
           npm test
         working-directory: electron-frontend
 
-# Failing beacuse virtual framebuffer not installed
-#          npm run build-e2e
-#          npm test-e2e
+      - name: Publish releases
+        if: matrix.os == 'macos-latest'
+        env:
+          # These values are used for auto updates signing
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          # This is used for uploading release assets to github
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run postinstall
+          npm run build
+          npm exec electron-builder -- --publish always --win --mac --linux
+        working-directory: electron-frontend
