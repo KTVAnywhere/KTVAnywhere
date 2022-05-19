@@ -1,4 +1,10 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from 'react-beautiful-dnd';
 import { SongProps } from './SongItem';
 
 export const QueueList = ({
@@ -12,7 +18,6 @@ export const QueueList = ({
     const newQueue = [...queue.slice(0, index), ...queue.slice(index + 1)];
     setQueue(newQueue);
   };
-
   const shiftSongUp = (index: number): void => {
     if (queue.length === 0 || queue.length === 1 || index === 0) {
       return;
@@ -31,43 +36,77 @@ export const QueueList = ({
     setQueue(newQueue);
   };
 
+  const handleOnDragEnd = (result: DropResult): void => {
+    if (!result.destination) return;
+
+    const items = Array.from(queue);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setQueue(items);
+  };
+
   return (
-    <div>
+    <div className="QueueList">
+      <header>songs queue</header>
       {queue.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>Song</th>
-              <th>Artist</th>
-              <th>Song path</th>
-              <th>Lyrics path</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {queue.map((song, index) => (
-              <tr key={song.songId}>
-                <td>{index + 1}</td>
-                <td>{song.songName}</td>
-                <td>{song.artist}</td>
-                <td>{song.songPath}</td>
-                <td>{song.lyricsPath}</td>
-                <td>
-                  <button type="button" onClick={() => shiftSongUp(index)}>
-                    Up
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => deleteSongFromQueue(index)}
-                  >
-                    delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+          <Droppable droppableId="songsQueue">
+            {(provided) => (
+              <ul
+                className="songsQueue"
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                {queue.map((song, index) => {
+                  return (
+                    <Draggable
+                      key={song.songId}
+                      draggableId={song.songId}
+                      index={index}
+                    >
+                      {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
+                      {(provided) => (
+                        <li
+                          ref={provided.innerRef}
+                          // eslint-disable-next-line react/jsx-props-no-spreading
+                          {...provided.dragHandleProps}
+                          // eslint-disable-next-line react/jsx-props-no-spreading
+                          {...provided.draggableProps}
+                        >
+                          <div>
+                            <p>
+                              {index + 1}
+                              {song.songName}
+                              {song.artist}
+                              {song.songPath}
+                              {song.lyricsPath}
+                              <button
+                                type="button"
+                                data-testid="move-song-up-in-queue-button"
+                                onClick={() => shiftSongUp(index)}
+                              >
+                                Up
+                              </button>
+                              <button
+                                type="button"
+                                data-testid="delete-song-from-queue-button"
+                                onClick={() => deleteSongFromQueue(index)}
+                              >
+                                delete
+                              </button>
+                            </p>
+                          </div>
+                        </li>
+                      )}
+                    </Draggable>
+                  );
+                })}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
       ) : (
         <p>No songs in queue</p>
       )}
@@ -75,31 +114,24 @@ export const QueueList = ({
   );
 };
 
-export const EnqueueSong = ({
-  queue,
-  setQueue,
-  song,
-}: {
-  queue: SongProps[];
-  setQueue: Dispatch<SetStateAction<SongProps[]>>;
-  song: SongProps;
-}): void => {
+export function EnqueueSong(
+  queue: SongProps[],
+  setQueue: Dispatch<SetStateAction<SongProps[]>>,
+  song: SongProps
+): void {
   setQueue([...queue, song]);
-};
+}
 
-export const DequeueSong = ({
-  queue,
-  setQueue,
-}: {
-  queue: SongProps[];
-  setQueue: Dispatch<SetStateAction<SongProps[]>>;
-}): SongProps | null => {
+export function DequeueSong(
+  queue: SongProps[],
+  setQueue: Dispatch<SetStateAction<SongProps[]>>
+): SongProps | null {
   const nextSong = queue.length > 0 ? queue[0] : null;
   if (queue.length > 0) {
-    setQueue(queue.slice(1));
+    setQueue([...queue.slice(1)]);
   }
   return nextSong;
-};
+}
 
 export const SongsQueueManager = ({
   songs,
