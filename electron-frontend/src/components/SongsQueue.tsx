@@ -5,14 +5,20 @@ import {
   Draggable,
   DropResult,
 } from 'react-beautiful-dnd';
+import uniqid from 'uniqid';
 import { SongProps } from './SongItem';
+
+export interface QueueItemProps {
+  song: SongProps;
+  queueItemId: string;
+}
 
 export const QueueList = ({
   queue,
   setQueue,
 }: {
-  queue: SongProps[];
-  setQueue: Dispatch<SetStateAction<SongProps[]>>;
+  queue: QueueItemProps[];
+  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
 }) => {
   const deleteSongFromQueue = (index: number): void => {
     const newQueue = [...queue.slice(0, index), ...queue.slice(index + 1)];
@@ -58,11 +64,11 @@ export const QueueList = ({
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {queue.map((song, index) => {
+                {queue.map((queueItem, index) => {
                   return (
                     <Draggable
-                      key={song.songId}
-                      draggableId={song.songId}
+                      key={queueItem.queueItemId}
+                      draggableId={queueItem.queueItemId}
                       index={index}
                     >
                       {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
@@ -77,10 +83,10 @@ export const QueueList = ({
                           <div>
                             <p>
                               {index + 1}
-                              {song.songName}
-                              {song.artist}
-                              {song.songPath}
-                              {song.lyricsPath}
+                              {queueItem.song.songName}
+                              {queueItem.song.artist}
+                              {queueItem.song.songPath}
+                              {queueItem.song.lyricsPath}
                               <button
                                 type="button"
                                 data-testid="move-song-up-in-queue-button"
@@ -115,18 +121,18 @@ export const QueueList = ({
 };
 
 export function EnqueueSong(
-  queue: SongProps[],
-  setQueue: Dispatch<SetStateAction<SongProps[]>>,
+  queue: QueueItemProps[],
+  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>,
   song: SongProps
 ): void {
-  setQueue([...queue, song]);
+  setQueue([...queue, { song, queueItemId: uniqid() }]);
 }
 
 export function DequeueSong(
-  queue: SongProps[],
-  setQueue: Dispatch<SetStateAction<SongProps[]>>
+  queue: QueueItemProps[],
+  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>
 ): SongProps | null {
-  const nextSong = queue.length > 0 ? queue[0] : null;
+  const nextSong = queue.length > 0 ? queue[0].song : null;
   if (queue.length > 0) {
     setQueue([...queue.slice(1)]);
   }
@@ -139,10 +145,12 @@ export const SongsQueueManager = ({
   setQueue,
 }: {
   songs: SongProps[];
-  queue: SongProps[];
-  setQueue: Dispatch<SetStateAction<SongProps[]>>;
+  queue: QueueItemProps[];
+  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
 }) => {
-  const [queueItem, setQueueItem] = useState<SongProps>({} as SongProps);
+  const [queueItem, setQueueItem] = useState<QueueItemProps>(
+    {} as QueueItemProps
+  );
 
   const dropDownAddSongToQueue = (
     event: React.FormEvent<HTMLFormElement>
@@ -155,7 +163,10 @@ export const SongsQueueManager = ({
   const handleDropDownChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setQueueItem(songs[parseInt(event.target.value, 10)]);
+    setQueueItem({
+      song: songs[parseInt(event.target.value, 10)],
+      queueItemId: uniqid(),
+    });
   };
 
   return (
