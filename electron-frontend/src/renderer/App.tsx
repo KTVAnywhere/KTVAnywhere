@@ -7,11 +7,18 @@ import {
   QueueList,
   QueueItemProps,
 } from '../components/SongsQueue';
-import { SongProps, SongLibrary } from '../components/SongItem';
+import SongComponent, {
+  emptySongProps,
+  SongProps,
+} from '../components/SongItem';
+import SongLibrary from '../components/SongLibrary';
 import SongUpload from '../components/SongUpload';
+import Popup from '../components/Popup';
 
 const SongTest = () => {
   const [songs, setSongList] = useState<SongProps[]>([]);
+  const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
+  const [songPopupTriggered, setSongPopupTriggered] = useState<boolean>(false);
   const [queue, setQueue] = useState<QueueItemProps[]>([]);
   const [leftSidebarTrigger, setLeftSidebarTrigger] = useState<boolean>(false);
   const [rightSidebarTrigger, setRightSidebarTrigger] =
@@ -24,7 +31,14 @@ const SongTest = () => {
         trigger={leftSidebarTrigger}
       >
         <SongUpload setSongList={setSongList} />
-        <SongLibrary songs={songs} />
+        <SongLibrary
+          songs={songs}
+          setPopupTriggered={setSongPopupTriggered}
+          setOpenSong={setOpenSong}
+        />
+        <Popup trigger={songPopupTriggered} setTrigger={setSongPopupTriggered}>
+          <SongComponent song={openSong} />
+        </Popup>
       </LeftSidebar>
       <RightSidebar
         setTrigger={setRightSidebarTrigger}

@@ -1,7 +1,14 @@
 import '@testing-library/jest-dom';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import { SongProps } from 'components/SongItem';
+import {
+  render,
+  fireEvent,
+  screen,
+  within,
+  waitFor,
+} from '@testing-library/react';
+import SongComponent, { SongProps } from '../components/SongItem';
 import SongUpload from '../components/SongUpload';
+import SongLibrary from '../components/SongLibrary';
 
 const testSong: SongProps = {
   songId: expect.any(String),
@@ -18,6 +25,11 @@ const testSong2: SongProps = {
   songPath: 'C:\\dir\\file2.mp3',
   lyricsPath: 'C:\\dir\\lyrics2.lrc',
 };
+
+const testLibrary: SongProps[] = [
+  { ...testSong, songId: '1' },
+  { ...testSong2, songId: '2' },
+];
 
 describe('SongUpload', () => {
   beforeEach(() => {
@@ -158,5 +170,58 @@ describe('SongUpload', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(mockFn).toBeCalledTimes(0));
+  });
+});
+
+describe('SongLibrary', () => {
+  test('song library should display list of songs', async () => {
+    const mockSetPopup = jest.fn();
+    const mockSetOpenSong = jest.fn();
+    render(
+      <SongLibrary
+        songs={testLibrary}
+        setPopupTriggered={mockSetPopup}
+        setOpenSong={mockSetOpenSong}
+      />
+    );
+    const { getAllByRole } = within(
+      screen.getByRole('rowgroup', { name: /data/i })
+    );
+
+    expect(getAllByRole('row').length).toEqual(2);
+  });
+
+  test('click song name should open popup', async () => {
+    const mockSetPopup = jest.fn();
+    const mockSetOpenSong = jest.fn();
+    render(
+      <SongLibrary
+        songs={testLibrary}
+        setPopupTriggered={mockSetPopup}
+        setOpenSong={mockSetOpenSong}
+      />
+    );
+
+    const song1button = screen.getByRole('button', {
+      name: testLibrary[0].songName,
+    });
+    fireEvent.click(song1button);
+
+    expect(mockSetPopup).toBeCalledWith(true);
+    expect(mockSetOpenSong).toBeCalledWith({
+      ...testLibrary[0],
+      songId: expect.any(String),
+    });
+  });
+});
+
+describe('SongItem', () => {
+  test('song item should display song name, artist and paths', async () => {
+    render(<SongComponent song={testSong} />);
+
+    expect(screen.getByText(testSong.songName)).toBeInTheDocument();
+    expect(screen.getByText(testSong.artist)).toBeInTheDocument();
+    expect(screen.getByText(testSong.songPath)).toBeInTheDocument();
+    expect(screen.getByText(testSong.lyricsPath)).toBeInTheDocument();
   });
 });
