@@ -26,7 +26,7 @@ jobs:
 
       - name: npm install
         run: |
-          npm install
+          npm ci
         working-directory: electron-frontend
 
       - name: npm test
@@ -44,7 +44,6 @@ jobs:
         env:
           # These values are used for auto updates signing
           CSC_IDENTITY_AUTO_DISCOVERY: false
-          # This is used for uploading release assets to github
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run postinstall
