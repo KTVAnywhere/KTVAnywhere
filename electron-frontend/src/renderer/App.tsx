@@ -2,11 +2,7 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import './App.css';
-import {
-  SongsQueueManager,
-  QueueList,
-  QueueItemProps,
-} from '../components/SongsQueue';
+import { QueueList, QueueItemProps } from '../components/SongsQueue';
 import SongComponent, {
   emptySongProps,
   SongProps,
@@ -35,6 +31,8 @@ const SongTest = () => {
           songs={songs}
           setPopupTriggered={setSongPopupTriggered}
           setOpenSong={setOpenSong}
+          queue={queue}
+          setQueue={setQueue}
         />
         <Popup trigger={songPopupTriggered} setTrigger={setSongPopupTriggered}>
           <SongComponent song={openSong} />
@@ -44,7 +42,6 @@ const SongTest = () => {
         setTrigger={setRightSidebarTrigger}
         trigger={rightSidebarTrigger}
       >
-        <SongsQueueManager songs={songs} queue={queue} setQueue={setQueue} />
         <QueueList queue={queue} setQueue={setQueue} />
       </RightSidebar>
     </>

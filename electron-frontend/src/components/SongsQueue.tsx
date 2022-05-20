@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import {
   DragDropContext,
   Droppable,
@@ -54,6 +54,7 @@ export const QueueList = ({
 
   return (
     <div className="QueueList">
+      <h2>Songs Queue</h2>
       {queue.length > 0 ? (
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Droppable droppableId="songsQueue">
@@ -81,25 +82,29 @@ export const QueueList = ({
                           {...provided.draggableProps}
                         >
                           <div>
-                            <p>
-                              {index + 1} {queueItem.song.songName}
-                              {' by '}
+                            <pre>
+                              <strong>{index + 1}</strong>
+                              {'   '}
+                              {queueItem.song.songName}
+                              {'  by  '}
                               {queueItem.song.artist}
-                              <button
-                                type="button"
-                                data-testid="move-song-up-in-queue-button"
-                                onClick={() => shiftSongUp(index)}
-                              >
-                                up
-                              </button>
-                              <button
-                                type="button"
-                                data-testid="delete-song-from-queue-button"
-                                onClick={() => deleteSongFromQueue(index)}
-                              >
-                                delete
-                              </button>
-                            </p>
+                              {'   '}
+                            </pre>
+                            <button
+                              type="button"
+                              data-testid="move-song-up-in-queue-button"
+                              onClick={() => shiftSongUp(index)}
+                            >
+                              up
+                            </button>{' '}
+                            <button
+                              className="delete-song-from-queue-button"
+                              type="button"
+                              data-testid="delete-song-from-queue-button"
+                              onClick={() => deleteSongFromQueue(index)}
+                            >
+                              remove
+                            </button>
                           </div>
                         </li>
                       )}
@@ -137,52 +142,4 @@ export function DequeueSong(
   return nextSong;
 }
 
-export const SongsQueueManager = ({
-  songs,
-  queue,
-  setQueue,
-}: {
-  songs: SongProps[];
-  queue: QueueItemProps[];
-  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
-}) => {
-  const [songItem, setSongItem] = useState<SongProps>({} as SongProps);
-
-  const dropDownAddSongToQueue = (
-    event: React.FormEvent<HTMLFormElement>
-  ): void => {
-    event.preventDefault();
-    if (songItem === undefined || Object.keys(songItem).length === 0) return;
-    setQueue([...queue, { song: songItem, queueItemId: uniqid() }]);
-  };
-
-  const handleDropDownChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setSongItem(songs[parseInt(event.target.value, 10)]);
-  };
-
-  return (
-    <>
-      <div>
-        <h2>Songs queue</h2>
-        <form onSubmit={dropDownAddSongToQueue}>
-          <label htmlFor="songName">
-            Choose a song:
-            <select onChange={handleDropDownChange}>
-              <option key="none"> </option>
-              {React.Children.toArray(
-                songs.map((song, index) => (
-                  <option value={index}>{song.songName}</option>
-                ))
-              )}
-            </select>
-          </label>
-          <input type="submit" value="Add" />
-        </form>
-      </div>
-    </>
-  );
-};
-
-export default SongsQueueManager;
+export default QueueList;

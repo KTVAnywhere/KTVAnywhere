@@ -1,14 +1,19 @@
 import { Dispatch, SetStateAction } from 'react';
 import { SongProps } from './SongItem';
+import { EnqueueSong, QueueItemProps } from './SongsQueue';
 
 const SongLibrary = ({
   songs,
   setPopupTriggered,
   setOpenSong,
+  queue,
+  setQueue,
 }: {
   songs: SongProps[];
   setPopupTriggered: Dispatch<SetStateAction<boolean>>;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
+  queue: QueueItemProps[];
+  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
 }) => {
   return (
     <div>
@@ -21,6 +26,7 @@ const SongLibrary = ({
             <th>Artist</th>
             <th>Song path</th>
             <th>Lyrics path</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody aria-label="data">
@@ -48,6 +54,14 @@ const SongLibrary = ({
               <td>{song.artist}</td>
               <td>{song.songPath}</td>
               <td>{song.lyricsPath}</td>
+              <td>
+                <button
+                  type="button"
+                  onClick={() => EnqueueSong(queue, setQueue, song)}
+                >
+                  Enqueue
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

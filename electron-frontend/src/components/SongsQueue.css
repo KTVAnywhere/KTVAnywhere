@@ -1,12 +1,14 @@
-ul li {
+li {
   display: flex;
-  justify-content: space-between;
+  justify-content: left;
   align-items: center;
-  margin: 4px auto;
+  margin: 10px auto;
   color: #fff;
   background: linear-gradient(90deg, rgb(94, 43, 7) 0%, rgb(194, 64, 13) 100%);
+  overflow-x: auto;
 
   padding: 16px;
+  max-width: 250px;
   width: 90%;
 }
 
@@ -24,4 +26,18 @@ li:nth-of-type(4n + 2) {
 
 li:nth-of-type(4n + 3) {
   background: linear-gradient(90deg, rgb(3, 29, 48) 0%, rgb(12, 65, 136) 100%);
+}
+
+li button {
+  background-color: black;
+  color: white;
+  padding: 6px 15px;
+}
+
+.delete-song-from-queue-button {
+  background-color: rgb(212, 4, 4);
+}
+
+ul {
+  padding: 0;
 }
