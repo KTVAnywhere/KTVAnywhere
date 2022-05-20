@@ -1,7 +1,3 @@
-import { useState } from 'react';
-
-import Popup from './Popup';
-
 export interface SongProps {
   songId: string;
   songName: string;
@@ -9,6 +5,14 @@ export interface SongProps {
   songPath: string;
   lyricsPath: string;
 }
+
+export const emptySongProps = {
+  songId: '',
+  songName: '',
+  artist: '',
+  songPath: '',
+  lyricsPath: '',
+};
 
 const SongComponent = ({ song }: { song: SongProps }) => {
   const { songName, artist, songPath, lyricsPath } = song;
@@ -30,58 +34,6 @@ const SongComponent = ({ song }: { song: SongProps }) => {
         <strong>Lyrics: </strong>
         {lyricsPath}
       </p>
-    </div>
-  );
-};
-
-export const SongLibrary = ({ songs }: { songs: SongProps[] }) => {
-  const [songPopup, setSongPopup] = useState<boolean>(false);
-  const [openSong, setOpenSong] = useState<SongProps>({} as SongProps);
-  return (
-    <div>
-      <h2>Song library</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Song</th>
-            <th>Artist</th>
-            <th>Song path</th>
-            <th>Lyrics path</th>
-          </tr>
-        </thead>
-        <tbody>
-          {songs.map((song, index) => (
-            <tr key={song.songId}>
-              <td>{index + 1}</td>
-              <td>
-                <div
-                  role="button"
-                  onClick={() => {
-                    setSongPopup(true);
-                    setOpenSong(song);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      setSongPopup(true);
-                      setOpenSong(song);
-                    }
-                  }}
-                  tabIndex={index}
-                >
-                  {song.songName}
-                </div>
-              </td>
-              <td>{song.artist}</td>
-              <td>{song.songPath}</td>
-              <td>{song.lyricsPath}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <Popup trigger={songPopup} setTrigger={setSongPopup}>
-        <SongComponent song={openSong} />
-      </Popup>
     </div>
   );
 };

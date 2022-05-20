@@ -1,6 +1,6 @@
 import React, { Component, Dispatch, SetStateAction } from 'react';
 import uniqid from 'uniqid';
-import { SongProps } from './SongItem';
+import { emptySongProps, SongProps } from './SongItem';
 import './Form.css';
 
 export interface SongUploadProps {
@@ -38,13 +38,7 @@ class SongUpload extends Component<
   };
 
   emptyState: { song: SongProps; error: FormErrorProps } = {
-    song: {
-      songId: '',
-      songName: '',
-      artist: '',
-      songPath: '',
-      lyricsPath: '',
-    },
+    song: emptySongProps,
     error: {
       songName: '',
       songPath: '',
