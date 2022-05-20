@@ -18,4 +18,9 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
   },
+  dialog: {
+    openFile(config: Electron.OpenDialogOptions) {
+      return ipcRenderer.invoke('dialog:openFile', config);
+    },
+  },
 });

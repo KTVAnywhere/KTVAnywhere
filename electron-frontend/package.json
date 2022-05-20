@@ -1,4 +1,6 @@
 {
+  "name": "ktvanywhere",
+  "version": "0.2.3",
   "description": "A karaoke song software",
   "keywords": [
     "electron",
@@ -29,7 +31,7 @@
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install electron-frontend/.husky",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
@@ -94,15 +96,19 @@
     ],
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"
-    }
+    },
+    "resetMocks": false
   },
   "dependencies": {
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.7",
     "electron-updater": "^5.0.1",
+    "lodash.uniq": "^4.5.0",
     "react": "^18.1.0",
+    "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^18.1.0",
-    "react-router-dom": "^6.3.0"
+    "react-router-dom": "^6.3.0",
+    "uniqid": "^5.4.0"
   },
   "devDependencies": {
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.6",
@@ -112,9 +118,11 @@
     "@types/jest": "^27.5.1",
     "@types/node": "17.0.33",
     "@types/react": "^18.0.9",
+    "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-dom": "^18.0.4",
     "@types/react-test-renderer": "^18.0.0",
     "@types/terser-webpack-plugin": "^5.0.4",
+    "@types/uniqid": "^5.3.2",
     "@types/webpack-bundle-analyzer": "^4.4.1",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",
@@ -173,7 +181,7 @@
   },
   "build": {
     "productName": "KTVAnywhere",
-    "appId": "org.erb.KTVAnywhere",
+    "appId": "org.rainyday.KTVAnywhere",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -213,7 +221,8 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "verifyUpdateCodeSignature": false
     },
     "linux": {
       "target": [
@@ -231,12 +240,12 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "weiquany",
+      "repo": "KTVAnywhere"
     }
   },
   "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
+    "url": "https://github.com/weiquany/KTVAnywhere#readme"
   },
   "devEngines": {
     "node": ">=14.x",

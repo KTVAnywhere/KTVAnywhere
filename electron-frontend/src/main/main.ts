@@ -11,8 +11,7 @@
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
-
+import { resolveHtmlPath, handleFileOpen } from './util';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -97,7 +96,6 @@ const createWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
-
 };
 
 /**
@@ -115,6 +113,7 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
+    ipcMain.handle('dialog:openFile', (_, config) => handleFileOpen(config));
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
