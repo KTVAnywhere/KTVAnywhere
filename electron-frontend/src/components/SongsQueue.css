@@ -1,0 +1,27 @@
+ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px auto;
+  color: #fff;
+  background: linear-gradient(90deg, rgb(94, 43, 7) 0%, rgb(194, 64, 13) 100%);
+
+  padding: 16px;
+  width: 90%;
+}
+
+li:nth-child(4n + 1) {
+  background: linear-gradient(
+    90deg,
+    rgba(37, 3, 105, 0.938) 0%,
+    rgba(155, 0, 250, 1) 100%
+  );
+}
+
+li:nth-of-type(4n + 2) {
+  background: linear-gradient(90deg, rgb(110, 6, 105) 0%, rgb(158, 7, 88) 100%);
+}
+
+li:nth-of-type(4n + 3) {
+  background: linear-gradient(90deg, rgb(3, 29, 48) 0%, rgb(12, 65, 136) 100%);
+}

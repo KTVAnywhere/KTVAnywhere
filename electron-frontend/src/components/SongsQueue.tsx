@@ -7,6 +7,7 @@ import {
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
 import { SongProps } from './SongItem';
+import './SongsQueue.css';
 
 export interface QueueItemProps {
   song: SongProps;
@@ -53,7 +54,6 @@ export const QueueList = ({
 
   return (
     <div className="QueueList">
-      <header>songs queue</header>
       {queue.length > 0 ? (
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Droppable droppableId="songsQueue">
@@ -82,17 +82,15 @@ export const QueueList = ({
                         >
                           <div>
                             <p>
-                              {index + 1}
-                              {queueItem.song.songName}
+                              {index + 1} {queueItem.song.songName}
+                              {' by '}
                               {queueItem.song.artist}
-                              {queueItem.song.songPath}
-                              {queueItem.song.lyricsPath}
                               <button
                                 type="button"
                                 data-testid="move-song-up-in-queue-button"
                                 onClick={() => shiftSongUp(index)}
                               >
-                                Up
+                                up
                               </button>
                               <button
                                 type="button"
@@ -168,21 +166,21 @@ export const SongsQueueManager = ({
     <>
       <div>
         <h2>Songs queue</h2>
+        <form onSubmit={dropDownAddSongToQueue}>
+          <label htmlFor="songName">
+            Choose a song:
+            <select onChange={handleDropDownChange}>
+              <option key="none"> </option>
+              {React.Children.toArray(
+                songs.map((song, index) => (
+                  <option value={index}>{song.songName}</option>
+                ))
+              )}
+            </select>
+          </label>
+          <input type="submit" value="Add" />
+        </form>
       </div>
-      <form onSubmit={dropDownAddSongToQueue}>
-        <label htmlFor="songName">
-          Choose a song:
-          <select onChange={handleDropDownChange}>
-            <option key="none"> </option>
-            {React.Children.toArray(
-              songs.map((song, index) => (
-                <option value={index}>{song.songName}</option>
-              ))
-            )}
-          </select>
-        </label>
-        <input type="submit" value="Add" />
-      </form>
     </>
   );
 };
