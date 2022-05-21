@@ -6,30 +6,10 @@ import {
   within,
   waitFor,
 } from '@testing-library/react';
-import SongComponent, { SongProps } from '../components/SongItem';
+import SongComponent from '../components/SongItem';
 import SongUpload from '../components/SongUpload';
 import SongLibrary from '../components/SongLibrary';
-
-const testSong: SongProps = {
-  songId: expect.any(String),
-  songName: 'Test song',
-  artist: 'Test artist',
-  songPath: 'C:\\dir\\file.mp3',
-  lyricsPath: 'C:\\dir\\lyrics.lrc',
-};
-
-const testSong2: SongProps = {
-  songId: expect.any(String),
-  songName: 'Test song 2',
-  artist: 'Test artist 2',
-  songPath: 'C:\\dir\\file2.mp3',
-  lyricsPath: 'C:\\dir\\lyrics2.lrc',
-};
-
-const testLibrary: SongProps[] = [
-  { ...testSong, songId: '1' },
-  { ...testSong2, songId: '2' },
-];
+import { testSong, testSong2, testLibrary } from '../__testsData__/testData';
 
 describe('SongUpload', () => {
   beforeEach(() => {
