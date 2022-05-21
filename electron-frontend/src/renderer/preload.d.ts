@@ -1,3 +1,5 @@
+import { SongProps } from 'components/SongItem';
+import { QueueItemProps } from 'components/SongsQueue';
 import { Channels } from 'main/preload';
 
 declare global {
@@ -13,6 +15,16 @@ declare global {
       };
       dialog: {
         openFile(config: Electron.OpenDialogOptions): Promise<string>;
+      };
+      store: {
+        songs: {
+          getSong(songId: string): SongProps;
+          setSong(song: SongProps): void;
+          deleteSong(song: SongProps): void;
+          getAllSongs(): SongProps[];
+          setAllSongs(songs: SongProps[]): void;
+        };
+        queueItems: { getAllQueueItems(): QueueItemProps[] };
       };
     };
   }

@@ -1,3 +1,5 @@
+import { SongProps } from 'components/SongItem';
+import { QueueItemProps } from 'components/SongsQueue';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels = 'ipc-example';
@@ -21,6 +23,45 @@ contextBridge.exposeInMainWorld('electron', {
   dialog: {
     openFile(config: Electron.OpenDialogOptions) {
       return ipcRenderer.invoke('dialog:openFile', config);
+    },
+  },
+  store: {
+    songs: {
+      getSong(songId: string) {
+        return ipcRenderer.sendSync('store:getSong', songId);
+      },
+      setSong(song: SongProps) {
+        ipcRenderer.send('store:setSong', song);
+      },
+      addSong(song: SongProps) {
+        ipcRenderer.send('store:addSong', song);
+      },
+      deleteSong(song: SongProps) {
+        ipcRenderer.send('store:deleteSong', song);
+      },
+      getAllSongs() {
+        return ipcRenderer.sendSync('store:getAllSongs');
+      },
+      setAllSongs(songs: SongProps[]) {
+        ipcRenderer.send('store:setAllSongs', songs);
+      },
+    },
+    queueItems: {
+      getQueueItem(key: string) {
+        return ipcRenderer.sendSync('store:getQueueItem', key);
+      },
+      addQueueItem(queue: QueueItemProps) {
+        ipcRenderer.send('store:addQueueItem', queue);
+      },
+      setQueueItem(queue: QueueItemProps) {
+        ipcRenderer.send('store:setQueueItem', queue);
+      },
+      getAllQueueItems() {
+        return ipcRenderer.sendSync('store:getAllQueueItems');
+      },
+      setAllQueueItems(queueItems: QueueItemProps[]) {
+        ipcRenderer.send('store:setAllQueueItems', queueItems);
+      },
     },
   },
 });
