@@ -10,11 +10,14 @@ import SongComponent from '../components/SongItem';
 import SongUpload from '../components/SongUpload';
 import SongLibrary from '../components/SongLibrary';
 import { testSong, testSong2, testLibrary } from '../__testsData__/testData';
+import mockedElectron from '../__testsData__/mocks';
 
 describe('SongUpload', () => {
+  const mockAdd = jest.fn();
+  const mockGetAll = () => testLibrary;
   beforeEach(() => {
     global.window.electron = {
-      ...window.electron,
+      ...mockedElectron,
       dialog: {
         openFile: jest
           .fn()
@@ -23,9 +26,16 @@ describe('SongUpload', () => {
           .mockResolvedValueOnce(testSong2.songPath)
           .mockResolvedValueOnce(testSong2.lyricsPath),
       },
+      store: {
+        ...mockedElectron.store,
+        songs: {
+          ...mockedElectron.store.songs,
+          addSong: mockAdd,
+          getAllSongs: mockGetAll,
+        },
+      },
     };
   });
-
   afterEach(() => {
     jest.restoreAllMocks();
     jest.resetAllMocks();
@@ -33,8 +43,7 @@ describe('SongUpload', () => {
   });
 
   test('song picker should set input value to name of file', async () => {
-    const mockFn = jest.fn();
-    render(<SongUpload setSongList={mockFn} />);
+    render(<SongUpload />);
     const songPickerButton = screen.getByTestId('song-picker-button');
     const songPickerInput = screen.getByTestId('song-picker-input');
     fireEvent.click(songPickerButton);
@@ -43,8 +52,7 @@ describe('SongUpload', () => {
   });
 
   test('song object should be returned on submit', async () => {
-    const mockFn = jest.fn();
-    render(<SongUpload setSongList={mockFn} />);
+    render(<SongUpload />);
     const songNameInput = screen.getByTestId('song-name-input');
     const artistInput = screen.getByTestId('artist-input');
     const songPickerButton = screen.getByTestId('song-picker-button');
@@ -63,55 +71,11 @@ describe('SongUpload', () => {
     );
     fireEvent.click(submitButton);
 
-    await waitFor(() =>
-      expect(mockFn.mock.calls[0][0]([])).toContainEqual(testSong)
-    );
-  });
-
-  test('submitting new songs should not override previous array', async () => {
-    const mockFn = jest.fn();
-    render(<SongUpload setSongList={mockFn} />);
-    const songNameInput = screen.getByTestId('song-name-input');
-    const artistInput = screen.getByTestId('artist-input');
-    const songPickerButton = screen.getByTestId('song-picker-button');
-    const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
-    const submitButton = screen.getByRole('button', { name: /Upload/i });
-
-    // Test Song 1
-    fireEvent.change(songNameInput, { target: { value: testSong.songName } });
-    fireEvent.change(artistInput, { target: { value: testSong.artist } });
-    fireEvent.click(songPickerButton);
-    await waitFor(() =>
-      expect(screen.getByTestId('song-picker-input')).toHaveValue()
-    );
-    fireEvent.click(lyricsPickerButton);
-    await waitFor(() =>
-      expect(screen.getByTestId('lyrics-picker-input')).toHaveValue()
-    );
-    fireEvent.click(submitButton);
-
-    // Test song 2
-    fireEvent.change(songNameInput, { target: { value: testSong2.songName } });
-    fireEvent.change(artistInput, { target: { value: testSong2.artist } });
-    fireEvent.click(songPickerButton);
-    await waitFor(() =>
-      expect(screen.getByTestId('song-picker-input')).toHaveValue()
-    );
-    fireEvent.click(lyricsPickerButton);
-    await waitFor(() =>
-      expect(screen.getByTestId('lyrics-picker-input')).toHaveValue()
-    );
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(mockFn.mock.calls[0][0]([])).toContainEqual(testSong);
-      expect(mockFn.mock.calls[1][0]([])).toContainEqual(testSong2);
-    });
+    await waitFor(() => expect(mockAdd).toBeCalledWith(testSong));
   });
 
   test('form should not submit if song name is not filled in', async () => {
-    const mockFn = jest.fn();
-    render(<SongUpload setSongList={mockFn} />);
+    render(<SongUpload />);
     const artistInput = screen.getByTestId('artist-input');
     const songPickerButton = screen.getByTestId('song-picker-button');
     const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
@@ -130,12 +94,11 @@ describe('SongUpload', () => {
     );
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(mockFn).toBeCalledTimes(0));
+    await waitFor(() => expect(mockAdd).toBeCalledTimes(0));
   });
 
   test('form should not submit if song is not picked', async () => {
-    const mockFn = jest.fn();
-    render(<SongUpload setSongList={mockFn} />);
+    render(<SongUpload />);
     const songNameInput = screen.getByTestId('song-name-input');
     const artistInput = screen.getByTestId('artist-input');
     const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
@@ -149,7 +112,7 @@ describe('SongUpload', () => {
     );
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(mockFn).toBeCalledTimes(0));
+    await waitFor(() => expect(mockAdd).toBeCalledTimes(0));
   });
 });
 
@@ -160,7 +123,6 @@ describe('SongLibrary', () => {
     const mockFn = jest.fn();
     render(
       <SongLibrary
-        songs={testLibrary}
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
         queue={[]}
@@ -180,7 +142,6 @@ describe('SongLibrary', () => {
     const mockFn = jest.fn();
     render(
       <SongLibrary
-        songs={testLibrary}
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
         queue={[]}

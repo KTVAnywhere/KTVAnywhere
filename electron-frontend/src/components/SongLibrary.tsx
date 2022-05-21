@@ -3,13 +3,11 @@ import { SongProps } from './SongItem';
 import { EnqueueSong, QueueItemProps } from './SongsQueue';
 
 const SongLibrary = ({
-  songs,
   setPopupTriggered,
   setOpenSong,
   queue,
   setQueue,
 }: {
-  songs: SongProps[];
   setPopupTriggered: Dispatch<SetStateAction<boolean>>;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
   queue: QueueItemProps[];
@@ -30,7 +28,7 @@ const SongLibrary = ({
           </tr>
         </thead>
         <tbody aria-label="data">
-          {songs.map((song, index) => (
+          {window.electron.store.songs.getAllSongs().map((song, index) => (
             <tr key={song.songId}>
               <td>{index + 1}</td>
               <td>

@@ -45,6 +45,9 @@ contextBridge.exposeInMainWorld('electron', {
       setAllSongs(songs: SongProps[]) {
         ipcRenderer.send('store:setAllSongs', songs);
       },
+      onChange: (
+        callback: (_event: IpcRendererEvent, results: SongProps[]) => void
+      ) => ipcRenderer.on('store:onSongsChange', callback),
     },
     queueItems: {
       getQueueItem(key: string) {
@@ -62,6 +65,9 @@ contextBridge.exposeInMainWorld('electron', {
       setAllQueueItems(queueItems: QueueItemProps[]) {
         ipcRenderer.send('store:setAllQueueItems', queueItems);
       },
+      onChange: (
+        callback: (_event: IpcRendererEvent, results: QueueItemProps[]) => void
+      ) => ipcRenderer.on('store:onQueueItemsChange', callback),
     },
   },
 });

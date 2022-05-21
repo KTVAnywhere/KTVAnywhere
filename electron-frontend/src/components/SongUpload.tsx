@@ -1,11 +1,8 @@
-import React, { Component, Dispatch, SetStateAction } from 'react';
+/* eslint-disable @typescript-eslint/ban-types */
+import React, { Component } from 'react';
 import uniqid from 'uniqid';
 import { emptySongProps, SongProps } from './SongItem';
 import './Form.css';
-
-export interface SongUploadProps {
-  setSongList: Dispatch<SetStateAction<SongProps[]>>;
-}
 
 interface FormErrorProps {
   songName: string;
@@ -14,7 +11,7 @@ interface FormErrorProps {
 }
 
 class SongUpload extends Component<
-  SongUploadProps,
+  {},
   { song: SongProps; error: FormErrorProps }
 > {
   songUploadOptions: Electron.OpenDialogOptions = {
@@ -46,7 +43,7 @@ class SongUpload extends Component<
     },
   };
 
-  constructor(props: SongUploadProps) {
+  constructor(props: {}) {
     super(props);
     this.state = this.emptyState;
 
@@ -61,13 +58,11 @@ class SongUpload extends Component<
 
   handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const { setSongList } = this.props;
     const { song } = this.state;
 
     if (!this.handleValidation()) {
-      setSongList((songList) => {
-        return [...songList, { ...song, songId: uniqid() }];
-      });
+      window.electron.store.songs.addSong({ ...song, songId: uniqid() });
+
       this.setState(this.emptyState);
     }
   }

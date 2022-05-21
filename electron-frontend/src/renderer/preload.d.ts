@@ -1,6 +1,7 @@
 import { SongProps } from 'components/SongItem';
 import { QueueItemProps } from 'components/SongsQueue';
 import { Channels } from 'main/preload';
+import { IpcRenderer } from 'electron';
 
 declare global {
   interface Window {
@@ -20,11 +21,25 @@ declare global {
         songs: {
           getSong(songId: string): SongProps;
           setSong(song: SongProps): void;
+          addSong(song: SongProps): void;
           deleteSong(song: SongProps): void;
           getAllSongs(): SongProps[];
           setAllSongs(songs: SongProps[]): void;
+          onChange(
+            callback: (_event: IpcRenderer, results: SongProps[]) => void
+          ): IpcRenderer;
         };
-        queueItems: { getAllQueueItems(): QueueItemProps[] };
+        queueItems: {
+          getQueueItem(queueItemId: string): QueueItemProps;
+          setQueueItem(queueItem: QueueItemProps): void;
+          addQueueItem(queueItem: QueueItemProps): void;
+          deleteQueueItem(queueItem: QueueItemProps): void;
+          getAllQueueItems(): QueueItemProps[];
+          setAllQueueItems(queueItems: QueueItemProps[]): void;
+          onChange(
+            callback: (_event: IpcRenderer, results: QueueItemProps[]) => void
+          ): IpcRenderer;
+        };
       };
     };
   }

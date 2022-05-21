@@ -161,6 +161,10 @@ app
       setAllSongs(songsStore, songs);
     });
 
+    songsStore.onDidChange('songs', (results) =>
+      mainWindow?.webContents.send('store:onSongsChange', results)
+    );
+
     ipcMain.on('store:getQueueItem', async (event, queueItemId) => {
       event.returnValue = getQueueItem(queueItemsStore, queueItemId);
     });
@@ -181,5 +185,9 @@ app
     ipcMain.on('store:getAllQueueItems', async (_, queueItems) => {
       setAllQueueItems(queueItemsStore, queueItems);
     });
+
+    queueItemsStore.onDidChange('queueItems', (results) =>
+      mainWindow?.webContents.send('store:onQueueItemsChange', results)
+    );
   })
   .catch(console.log);
