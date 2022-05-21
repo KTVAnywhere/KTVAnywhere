@@ -177,11 +177,14 @@ describe('SongLibrary', () => {
   test('song library should display list of songs', async () => {
     const mockSetPopup = jest.fn();
     const mockSetOpenSong = jest.fn();
+    const mockFn = jest.fn();
     render(
       <SongLibrary
         songs={testLibrary}
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
+        queue={[]}
+        setQueue={mockFn}
       />
     );
     const { getAllByRole } = within(
@@ -194,11 +197,14 @@ describe('SongLibrary', () => {
   test('click song name should open popup', async () => {
     const mockSetPopup = jest.fn();
     const mockSetOpenSong = jest.fn();
+    const mockFn = jest.fn();
     render(
       <SongLibrary
         songs={testLibrary}
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
+        queue={[]}
+        setQueue={mockFn}
       />
     );
 

@@ -1,11 +1,8 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
+import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import './App.css';
-import {
-  SongsQueueManager,
-  QueueList,
-  QueueItemProps,
-} from '../components/SongsQueue';
+import { QueueList, QueueItemProps } from '../components/SongsQueue';
 import SongComponent, {
   emptySongProps,
   SongProps,
@@ -19,19 +16,34 @@ const SongTest = () => {
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
   const [songPopupTriggered, setSongPopupTriggered] = useState<boolean>(false);
   const [queue, setQueue] = useState<QueueItemProps[]>([]);
+  const [leftSidebarTrigger, setLeftSidebarTrigger] = useState<boolean>(false);
+  const [rightSidebarTrigger, setRightSidebarTrigger] =
+    useState<boolean>(false);
+
   return (
     <>
-      <SongUpload setSongList={setSongList} />
-      <SongLibrary
-        songs={songs}
-        setPopupTriggered={setSongPopupTriggered}
-        setOpenSong={setOpenSong}
-      />
-      <Popup trigger={songPopupTriggered} setTrigger={setSongPopupTriggered}>
-        <SongComponent song={openSong} />
-      </Popup>
-      <SongsQueueManager songs={songs} queue={queue} setQueue={setQueue} />
-      <QueueList queue={queue} setQueue={setQueue} />
+      <LeftSidebar
+        setTrigger={setLeftSidebarTrigger}
+        trigger={leftSidebarTrigger}
+      >
+        <SongUpload setSongList={setSongList} />
+        <SongLibrary
+          songs={songs}
+          setPopupTriggered={setSongPopupTriggered}
+          setOpenSong={setOpenSong}
+          queue={queue}
+          setQueue={setQueue}
+        />
+        <Popup trigger={songPopupTriggered} setTrigger={setSongPopupTriggered}>
+          <SongComponent song={openSong} />
+        </Popup>
+      </LeftSidebar>
+      <RightSidebar
+        setTrigger={setRightSidebarTrigger}
+        trigger={rightSidebarTrigger}
+      >
+        <QueueList queue={queue} setQueue={setQueue} />
+      </RightSidebar>
     </>
   );
 };
