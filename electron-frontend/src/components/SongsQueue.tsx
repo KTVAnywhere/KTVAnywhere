@@ -25,6 +25,11 @@ export const QueueList = ({
     const newQueue = [...queue.slice(0, index), ...queue.slice(index + 1)];
     setQueue(newQueue);
   };
+
+  const clearQueue = (): void => {
+    setQueue([]);
+  };
+
   const shiftSongUp = (index: number): void => {
     if (queue.length === 0 || queue.length === 1 || index === 0) {
       return;
@@ -43,6 +48,18 @@ export const QueueList = ({
     setQueue(newQueue);
   };
 
+  const sendSongToFrontOfQueue = (index: number): void => {
+    if (queue.length === 0 || queue.length === 1 || index === 0) {
+      return;
+    }
+    const newQueue = [
+      queue[index],
+      ...queue.slice(0, index),
+      ...queue.slice(index + 1),
+    ];
+    setQueue(newQueue);
+  };
+
   const handleOnDragEnd = (result: DropResult): void => {
     if (!result.destination) return;
 
@@ -55,6 +72,14 @@ export const QueueList = ({
   return (
     <div className="QueueList">
       <h2>Songs Queue</h2>
+      <button
+        className="delete-song-from-queue-button"
+        type="button"
+        data-testid="clear-queue-button"
+        onClick={() => clearQueue()}
+      >
+        Clear queue
+      </button>
       {queue.length > 0 ? (
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Droppable droppableId="songsQueue">
@@ -80,6 +105,7 @@ export const QueueList = ({
                           {...provided.dragHandleProps}
                           // eslint-disable-next-line react/jsx-props-no-spreading
                           {...provided.draggableProps}
+                          data-testid="draggable-queue-item"
                         >
                           <div>
                             <pre>
@@ -90,6 +116,13 @@ export const QueueList = ({
                               {queueItem.song.artist}
                               {'   '}
                             </pre>
+                            <button
+                              type="button"
+                              data-testid="play-now-button"
+                              onClick={() => null}
+                            >
+                              play
+                            </button>{' '}
                             <button
                               type="button"
                               data-testid="move-song-up-in-queue-button"
@@ -104,6 +137,13 @@ export const QueueList = ({
                               onClick={() => deleteSongFromQueue(index)}
                             >
                               remove
+                            </button>{' '}
+                            <button
+                              type="button"
+                              data-testid="send-to-front-of-queue-button"
+                              onClick={() => sendSongToFrontOfQueue(index)}
+                            >
+                              first
                             </button>
                           </div>
                         </li>

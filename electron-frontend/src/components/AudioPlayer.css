@@ -1,0 +1,7 @@
+.audio-controls {
+  background-color: greenyellow;
+}
+
+.audio-player {
+  display: flex;
+}
