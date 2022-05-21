@@ -1,7 +1,26 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { QueueItemProps } from '../components/SongsQueue';
+import { SongProps } from '../components/SongItem';
+
+export const testSong: SongProps = {
+  songId: expect.any(String),
+  songName: 'Test song',
+  artist: 'Test artist',
+  songPath: 'C:\\dir\\file.mp3',
+  lyricsPath: 'C:\\dir\\lyrics.lrc',
+};
+
+export const testSong2: SongProps = {
+  songId: expect.any(String),
+  songName: 'Test song 2',
+  artist: 'Test artist 2',
+  songPath: 'C:\\dir\\file2.mp3',
+  lyricsPath: 'C:\\dir\\lyrics2.lrc',
+};
+
+export const testLibrary: SongProps[] = [
+  { ...testSong, songId: '1' },
+  { ...testSong2, songId: '2' },
+];
 
 export const queueWithFourSongs = [
   {

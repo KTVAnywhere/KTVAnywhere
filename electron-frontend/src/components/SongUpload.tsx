@@ -94,14 +94,13 @@ class SongUpload extends Component<
     config: Electron.OpenDialogOptions,
     setPathFn: (arg0: string) => void
   ) => {
-    const { error } = this.state;
     window.electron.dialog
       .openFile(config)
       .then((result) => setPathFn(result))
       .catch((err) =>
         this.setState((state) => ({
           ...state,
-          error: { ...error, cancelled: err.message },
+          error: { ...state.error, cancelled: err.message },
         }))
       );
   };
