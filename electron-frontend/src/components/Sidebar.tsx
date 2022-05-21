@@ -14,6 +14,7 @@ export const LeftSidebar = ({ children, trigger, setTrigger }: SidebarProps) =>
       <button
         type="button"
         className="toggle-btn"
+        data-testid="toggle-sidebar-button"
         onClick={() => setTrigger(!trigger)}
       >
         ◀
@@ -24,6 +25,7 @@ export const LeftSidebar = ({ children, trigger, setTrigger }: SidebarProps) =>
       <button
         type="button"
         className="toggle-btn"
+        data-testid="toggle-sidebar-button"
         onClick={() => setTrigger(!trigger)}
       >
         ▶
@@ -37,6 +39,7 @@ export const RightSidebar = ({ children, trigger, setTrigger }: SidebarProps) =>
       <button
         type="button"
         className="toggle-btn"
+        data-testid="toggle-sidebar-button"
         onClick={() => setTrigger(!trigger)}
       >
         ▶
@@ -48,6 +51,7 @@ export const RightSidebar = ({ children, trigger, setTrigger }: SidebarProps) =>
       <button
         type="button"
         className="toggle-btn"
+        data-testid="toggle-sidebar-button"
         onClick={() => setTrigger(!trigger)}
       >
         ◀
