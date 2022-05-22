@@ -1,6 +1,6 @@
-import { SongProps } from 'components/SongItem';
-import { QueueItemProps } from 'components/SongsQueue';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { SongProps } from '../components/SongItem';
+import { QueueItemProps } from '../components/SongsQueue';
 
 export type Channels = 'ipc-example';
 

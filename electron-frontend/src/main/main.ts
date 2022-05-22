@@ -182,7 +182,7 @@ app
       event.returnValue = getAllQueueItems(queueItemsStore);
     });
 
-    ipcMain.on('store:getAllQueueItems', async (_, queueItems) => {
+    ipcMain.on('store:setAllQueueItems', async (_, queueItems) => {
       setAllQueueItems(queueItemsStore, queueItems);
     });
 

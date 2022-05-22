@@ -9,79 +9,105 @@ import {
 } from 'react-beautiful-dnd-test-utils';
 import { DequeueSong, EnqueueSong, QueueList } from '../components/SongsQueue';
 import {
-  emptyQueue,
-  originalQueue,
-  queueWithFourSongs,
   queueAfterDel,
-  queueAfterDequeue,
   queueAfterEnqueue,
   queueAfterPositionSwap,
-  songItemDequeued,
-  songItemToEnqueue,
   sendItemToFrontQueue,
+  testSong2,
+  testSong,
+  queueWithFourSongs,
+  queueWithOneSong,
 } from '../__testsData__/testData';
+import mockedElectron from '../__testsData__/mocks';
 
 describe('QueueList buttons', () => {
-  const mockFn = jest.fn();
+  const mockGetAllQueueItems = () => queueWithFourSongs;
+  const mockSetAllQueueItems = jest.fn();
 
+  beforeEach(() => {
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          getAllQueueItems: mockGetAllQueueItems,
+          setAllQueueItems: mockSetAllQueueItems,
+        },
+      },
+    };
+  });
   afterEach(() => {
-    mockFn.mockClear();
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   test('clear queue button should empty the queue', () => {
-    render(<QueueList queue={queueWithFourSongs} setQueue={mockFn} />);
+    render(<QueueList />);
     const clearQueueButton = screen.getByTestId('clear-queue-button');
     fireEvent.click(clearQueueButton);
 
-    expect(mockFn.mock.calls[0][0]).toEqual([]);
+    expect(mockSetAllQueueItems).toBeCalledWith([]);
   });
 
   test('delete button should delete song from queue', () => {
-    render(<QueueList queue={queueWithFourSongs} setQueue={mockFn} />);
+    render(<QueueList />);
     const deleteSongInQueueButton = screen.getAllByTestId(
       'delete-song-from-queue-button'
     )[1];
     fireEvent.click(deleteSongInQueueButton);
 
-    expect(mockFn.mock.calls[0][0]).toEqual(queueAfterDel);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueAfterDel);
   });
 
   test('up button should move song up in queue', () => {
-    render(<QueueList queue={queueWithFourSongs} setQueue={mockFn} />);
+    render(<QueueList />);
     const swapSongPositionInQueueButton = screen.getAllByTestId(
       'move-song-up-in-queue-button'
     )[1];
     fireEvent.click(swapSongPositionInQueueButton);
 
-    expect(mockFn.mock.calls[0][0]).toEqual(queueAfterPositionSwap);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueAfterPositionSwap);
   });
 
   test('send to front of queue button should move song to first item in queue', () => {
-    render(<QueueList queue={queueWithFourSongs} setQueue={mockFn} />);
+    render(<QueueList />);
     const sendToFrontInQueueButton = screen.getAllByTestId(
       'send-to-front-of-queue-button'
     )[3];
     fireEvent.click(sendToFrontInQueueButton);
 
-    expect(mockFn.mock.calls[0][0]).toEqual(sendItemToFrontQueue);
+    expect(mockSetAllQueueItems).toBeCalledWith(sendItemToFrontQueue);
   });
 });
 
 describe('Drag and Drop QueueList', () => {
-  const mockFn = jest.fn();
+  const mockGetAllQueueItems = () => queueWithFourSongs;
+  const mockSetAllQueueItems = jest.fn();
 
   beforeEach(() => {
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          getAllQueueItems: mockGetAllQueueItems,
+          setAllQueueItems: mockSetAllQueueItems,
+        },
+      },
+    };
     mockGetComputedStyle();
   });
-
   afterEach(() => {
-    mockFn.mockClear();
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   test('drag and drop second song in queue to first', async () => {
-    const { container } = render(
-      <QueueList queue={queueWithFourSongs} setQueue={mockFn} />
-    );
+    const { container } = render(<QueueList />);
     mockDndSpacing(container);
 
     await makeDnd({
@@ -93,33 +119,60 @@ describe('Drag and Drop QueueList', () => {
       positions: 1,
     });
 
-    expect(mockFn.mock.calls[0][0]).toEqual(queueAfterPositionSwap);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueAfterPositionSwap);
   });
 });
 
 describe('Enqueue and Dequeue', () => {
-  const mockFn = jest.fn();
+  const mockGetAllQueueItems = () => queueWithOneSong;
+  const mockSetAllQueueItems = jest.fn();
 
+  beforeEach(() => {
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          getAllQueueItems: mockGetAllQueueItems,
+          setAllQueueItems: mockSetAllQueueItems,
+        },
+      },
+    };
+  });
   afterEach(() => {
-    mockFn.mockClear();
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   test('enqueue song', () => {
-    EnqueueSong(originalQueue, mockFn, songItemToEnqueue);
+    EnqueueSong(testSong2);
 
-    expect(mockFn.mock.calls[0][0]).toEqual(queueAfterEnqueue);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueAfterEnqueue);
   });
 
   test('dequeue song', () => {
-    const dequeuedItem = DequeueSong(queueAfterEnqueue, mockFn);
+    const dequeuedItem = DequeueSong();
 
-    expect(mockFn.mock.calls[0][0]).toEqual(queueAfterDequeue);
-    expect(dequeuedItem).toEqual(songItemDequeued);
+    expect(mockSetAllQueueItems).toBeCalledWith([]);
+    expect(dequeuedItem).toEqual(testSong);
   });
 
   test('dequeue empty queue', () => {
-    // mockFn will not be called within DequeueSong if queue is empty
-    const dequeuedItem = DequeueSong(emptyQueue, mockFn);
-    expect(dequeuedItem).toEqual(null);
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          getAllQueueItems: () => [],
+          setAllQueueItems: mockSetAllQueueItems,
+        },
+      },
+    };
+    // mockSetAllQueueItems will not be called within DequeueSong if queue is empty
+    const dequeuedItem = DequeueSong();
+    expect(dequeuedItem).toBeNull();
   });
 });

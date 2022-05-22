@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
 import {
   DragDropContext,
   Droppable,
@@ -14,13 +13,13 @@ export interface QueueItemProps {
   queueItemId: string;
 }
 
-export const QueueList = ({
-  queue,
-  setQueue,
-}: {
-  queue: QueueItemProps[];
-  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
-}) => {
+const setQueue = (queueList: QueueItemProps[]) => {
+  window.electron.store.queueItems.setAllQueueItems(queueList);
+};
+
+export const QueueList = () => {
+  const queue = window.electron.store.queueItems.getAllQueueItems();
+
   const deleteSongFromQueue = (index: number): void => {
     const newQueue = [...queue.slice(0, index), ...queue.slice(index + 1)];
     setQueue(newQueue);
@@ -62,7 +61,6 @@ export const QueueList = ({
 
   const handleOnDragEnd = (result: DropResult): void => {
     if (!result.destination) return;
-
     const items = Array.from(queue);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
@@ -163,18 +161,13 @@ export const QueueList = ({
   );
 };
 
-export function EnqueueSong(
-  queue: QueueItemProps[],
-  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>,
-  song: SongProps
-): void {
+export function EnqueueSong(song: SongProps): void {
+  const queue = window.electron.store.queueItems.getAllQueueItems();
   setQueue([...queue, { song, queueItemId: uniqid() }]);
 }
 
-export function DequeueSong(
-  queue: QueueItemProps[],
-  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>
-): SongProps | null {
+export function DequeueSong(): SongProps | null {
+  const queue = window.electron.store.queueItems.getAllQueueItems();
   const nextSong = queue.length > 0 ? queue[0].song : null;
   if (queue.length > 0) {
     setQueue([...queue.slice(1)]);
