@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import React, { Component } from 'react';
 import uniqid from 'uniqid';
-import { emptySongProps, SongProps } from './SongItem';
+import {
+  emptySongProps,
+  lyricsUploadOptions,
+  SongProps,
+  songUploadOptions,
+} from './SongItem';
 import './Form.css';
 
 interface FormErrorProps {
@@ -14,26 +19,6 @@ class SongUpload extends Component<
   {},
   { song: SongProps; error: FormErrorProps }
 > {
-  songUploadOptions: Electron.OpenDialogOptions = {
-    filters: [
-      {
-        name: 'Audio',
-        extensions: ['mp3', 'wav', 'm4a', 'wma'],
-      },
-    ],
-    properties: ['openFile'],
-  };
-
-  lyricsUploadOptions: Electron.OpenDialogOptions = {
-    filters: [
-      {
-        name: 'Lyrics',
-        extensions: ['txt', 'lrc'],
-      },
-    ],
-    properties: ['openFile'],
-  };
-
   emptyState: { song: SongProps; error: FormErrorProps } = {
     song: emptySongProps,
     error: {
@@ -158,10 +143,8 @@ class SongUpload extends Component<
                   type="button"
                   data-testid="song-picker-button"
                   onClick={() =>
-                    this.handleChooseFile(
-                      this.songUploadOptions,
-                      (path: string) =>
-                        this.handleChange({ ...song, songPath: path })
+                    this.handleChooseFile(songUploadOptions, (path: string) =>
+                      this.handleChange({ ...song, songPath: path })
                     )
                   }
                 >
@@ -181,10 +164,8 @@ class SongUpload extends Component<
                   type="button"
                   data-testid="lyrics-picker-button"
                   onClick={() =>
-                    this.handleChooseFile(
-                      this.lyricsUploadOptions,
-                      (path: string) =>
-                        this.handleChange({ ...song, lyricsPath: path })
+                    this.handleChooseFile(lyricsUploadOptions, (path: string) =>
+                      this.handleChange({ ...song, lyricsPath: path })
                     )
                   }
                 >

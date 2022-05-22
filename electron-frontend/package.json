@@ -1,6 +1,6 @@
 {
   "name": "ktvanywhere",
-  "version": "0.2.4",
+  "version": "0.3.2",
   "description": "A karaoke song software",
   "keywords": [
     "electron",
@@ -109,6 +109,7 @@
     "react": "^18.1.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^18.1.0",
+    "react-edit-text": "^4.4.0",
     "react-router-dom": "^6.3.0",
     "uniqid": "^5.4.0"
   },
@@ -123,6 +124,7 @@
     "@types/react": "^18.0.9",
     "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-dom": "^18.0.4",
+    "@types/react-edit-text": "^4.4.0",
     "@types/react-test-renderer": "^18.0.0",
     "@types/terser-webpack-plugin": "^5.0.4",
     "@types/uniqid": "^5.3.2",

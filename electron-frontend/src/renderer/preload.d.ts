@@ -22,7 +22,7 @@ declare global {
           getSong(songId: string): SongProps;
           setSong(song: SongProps): void;
           addSong(song: SongProps): void;
-          deleteSong(song: SongProps): void;
+          deleteSong(songId: string): void;
           getAllSongs(): SongProps[];
           setAllSongs(songs: SongProps[]): void;
           onChange(
@@ -33,7 +33,7 @@ declare global {
           getQueueItem(queueItemId: string): QueueItemProps;
           setQueueItem(queueItem: QueueItemProps): void;
           addQueueItem(queueItem: QueueItemProps): void;
-          deleteQueueItem(queueItem: QueueItemProps): void;
+          deleteQueueItem(queueItemId: string): void;
           getAllQueueItems(): QueueItemProps[];
           setAllQueueItems(queueItems: QueueItemProps[]): void;
           onChange(

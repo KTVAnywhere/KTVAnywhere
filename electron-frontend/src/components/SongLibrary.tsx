@@ -13,6 +13,9 @@ const SongLibrary = ({
   queue: QueueItemProps[];
   setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
 }) => {
+  const handleDelete = (songId: string) => {
+    window.electron.store.songs.deleteSong(songId);
+  };
   return (
     <div>
       <h2>Song library</h2>
@@ -58,6 +61,9 @@ const SongLibrary = ({
                   onClick={() => EnqueueSong(queue, setQueue, song)}
                 >
                   Enqueue
+                </button>
+                <button type="button" onClick={() => handleDelete(song.songId)}>
+                  Delete
                 </button>
               </td>
             </tr>
