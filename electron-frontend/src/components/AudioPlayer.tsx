@@ -1,20 +1,14 @@
-import { useState, Dispatch, SetStateAction } from 'react';
+import { useState } from 'react';
 import './AudioPlayer.css';
-import { QueueItemProps, DequeueSong } from './SongsQueue';
+import { DequeueSong } from './SongsQueue';
 
-export const AudioPlayer = ({
-  queue,
-  setQueue,
-}: {
-  queue: QueueItemProps[];
-  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
-}) => {
+export const AudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSongLocation, setCurrentSongLocation] = useState<string>();
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
-    const song = DequeueSong(queue, setQueue);
+    const song = DequeueSong();
     if (song === null) {
       return;
     }

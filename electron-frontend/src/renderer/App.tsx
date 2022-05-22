@@ -13,18 +13,24 @@ import Popup from '../components/Popup';
 
 const SongTest = () => {
   const [, setSongList] = useState<SongProps[]>([]);
+  const [, setQueue] = useState<QueueItemProps[]>([]);
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
   const [songPopupTriggered, setSongPopupTriggered] = useState<boolean>(false);
-  const [queue, setQueue] = useState<QueueItemProps[]>([]);
   const [leftSidebarTrigger, setLeftSidebarTrigger] = useState<boolean>(false);
   const [rightSidebarTrigger, setRightSidebarTrigger] =
     useState<boolean>(false);
 
   window.electron.store.songs.onChange((_, results) => setSongList(results));
+  window.electron.store.queueItems.onChange((_, results) => setQueue(results));
 
   useEffect(() => {
     setSongList(window.electron.store.songs.getAllSongs() ?? []);
   }, []);
+
+  useEffect(() => {
+    setQueue(window.electron.store.queueItems.getAllQueueItems() ?? []);
+  }, []);
+
   return (
     <>
       <LeftSidebar
@@ -35,8 +41,6 @@ const SongTest = () => {
         <SongLibrary
           setPopupTriggered={setSongPopupTriggered}
           setOpenSong={setOpenSong}
-          queue={queue}
-          setQueue={setQueue}
         />
         <Popup trigger={songPopupTriggered} setTrigger={setSongPopupTriggered}>
           <SongComponent song={openSong} />
@@ -46,7 +50,7 @@ const SongTest = () => {
         setTrigger={setRightSidebarTrigger}
         trigger={rightSidebarTrigger}
       >
-        <QueueList queue={queue} setQueue={setQueue} />
+        <QueueList />
       </RightSidebar>
     </>
   );

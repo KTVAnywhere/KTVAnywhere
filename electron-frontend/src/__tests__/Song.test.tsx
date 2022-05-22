@@ -48,7 +48,9 @@ describe('SongUpload', () => {
     const songPickerInput = screen.getByTestId('song-picker-input');
     fireEvent.click(songPickerButton);
 
-    await waitFor(() => expect(songPickerInput).toHaveValue('file.mp3'));
+    await waitFor(() =>
+      expect(songPickerInput).toHaveValue('bensound-energy.mp3')
+    );
   });
 
   test('song object should be returned on submit', async () => {
@@ -89,7 +91,7 @@ describe('SongUpload', () => {
     fireEvent.click(lyricsPickerButton);
     await waitFor(() =>
       expect(screen.getByTestId('lyrics-picker-input')).toHaveValue(
-        'lyrics.lrc'
+        'bensound-energy.lrc'
       )
     );
     fireEvent.click(submitButton);
@@ -120,13 +122,10 @@ describe('SongLibrary', () => {
   test('song library should display list of songs', async () => {
     const mockSetPopup = jest.fn();
     const mockSetOpenSong = jest.fn();
-    const mockFn = jest.fn();
     render(
       <SongLibrary
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
-        queue={[]}
-        setQueue={mockFn}
       />
     );
     const { getAllByRole } = within(
@@ -139,13 +138,10 @@ describe('SongLibrary', () => {
   test('click song name should open popup', async () => {
     const mockSetPopup = jest.fn();
     const mockSetOpenSong = jest.fn();
-    const mockFn = jest.fn();
     render(
       <SongLibrary
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
-        queue={[]}
-        setQueue={mockFn}
       />
     );
 

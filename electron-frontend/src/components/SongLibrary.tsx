@@ -1,17 +1,13 @@
 import { Dispatch, SetStateAction } from 'react';
 import { SongProps } from './SongItem';
-import { EnqueueSong, QueueItemProps } from './SongsQueue';
+import { EnqueueSong } from './SongsQueue';
 
 const SongLibrary = ({
   setPopupTriggered,
   setOpenSong,
-  queue,
-  setQueue,
 }: {
   setPopupTriggered: Dispatch<SetStateAction<boolean>>;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
-  queue: QueueItemProps[];
-  setQueue: Dispatch<SetStateAction<QueueItemProps[]>>;
 }) => {
   const handleDelete = (songId: string) => {
     window.electron.store.songs.deleteSong(songId);
@@ -56,10 +52,7 @@ const SongLibrary = ({
               <td>{song.songPath}</td>
               <td>{song.lyricsPath}</td>
               <td>
-                <button
-                  type="button"
-                  onClick={() => EnqueueSong(queue, setQueue, song)}
-                >
+                <button type="button" onClick={() => EnqueueSong(song)}>
                   Enqueue
                 </button>
                 <button type="button" onClick={() => handleDelete(song.songId)}>
