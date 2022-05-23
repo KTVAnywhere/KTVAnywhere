@@ -15,3 +15,7 @@ strong {
   text-align: justify;
   display: inline;
 }
+
+::-webkit-input-placeholder {
+  color: grey;
+}

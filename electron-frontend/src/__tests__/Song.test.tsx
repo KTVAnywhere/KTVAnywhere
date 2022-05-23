@@ -14,7 +14,6 @@ import mockedElectron from '../__testsData__/mocks';
 
 describe('SongUpload', () => {
   const mockAdd = jest.fn();
-  const mockGetAll = () => testLibrary;
   beforeEach(() => {
     global.window.electron = {
       ...mockedElectron,
@@ -31,7 +30,6 @@ describe('SongUpload', () => {
         songs: {
           ...mockedElectron.store.songs,
           addSong: mockAdd,
-          getAllSongs: mockGetAll,
         },
       },
     };
@@ -119,6 +117,26 @@ describe('SongUpload', () => {
 });
 
 describe('SongLibrary', () => {
+  const mockGetAll = () => testLibrary;
+  const mockDelete = jest.fn();
+  beforeEach(() => {
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        songs: {
+          ...mockedElectron.store.songs,
+          getAllSongs: mockGetAll,
+          deleteSong: mockDelete,
+        },
+      },
+    };
+  });
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
   test('song library should display list of songs', async () => {
     const mockSetPopup = jest.fn();
     const mockSetOpenSong = jest.fn();
@@ -133,6 +151,24 @@ describe('SongLibrary', () => {
     );
 
     expect(getAllByRole('row').length).toEqual(2);
+  });
+
+  test('delete button should delete song from library', async () => {
+    const mockSetPopup = jest.fn();
+    const mockSetOpenSong = jest.fn();
+    render(
+      <SongLibrary
+        setPopupTriggered={mockSetPopup}
+        setOpenSong={mockSetOpenSong}
+      />
+    );
+    const { getAllByRole } = within(
+      screen.getByRole('rowgroup', { name: /data/i })
+    );
+    const firstDeleteButton = getAllByRole('button', { name: /Delete/i })[0];
+    fireEvent.click(firstDeleteButton);
+
+    expect(mockDelete).toBeCalledWith(testLibrary[0].songId);
   });
 
   test('click song name should open popup', async () => {
@@ -159,6 +195,26 @@ describe('SongLibrary', () => {
 });
 
 describe('SongItem', () => {
+  const mockSet = jest.fn();
+  beforeEach(() => {
+    global.window.electron = {
+      ...mockedElectron,
+      dialog: {
+        openFile: jest
+          .fn()
+          .mockResolvedValueOnce(testSong2.songPath)
+          .mockResolvedValueOnce(testSong2.lyricsPath),
+      },
+      store: {
+        ...mockedElectron.store,
+        songs: {
+          ...mockedElectron.store.songs,
+          setSong: mockSet,
+        },
+      },
+    };
+  });
+
   test('song item should display song name, artist and paths', async () => {
     render(<SongComponent song={testSong} />);
 
@@ -166,5 +222,32 @@ describe('SongItem', () => {
     expect(screen.getByText(testSong.artist)).toBeInTheDocument();
     expect(screen.getByText(testSong.songPath)).toBeInTheDocument();
     expect(screen.getByText(testSong.lyricsPath)).toBeInTheDocument();
+  });
+
+  test('editing song details will update the database', async () => {
+    render(<SongComponent song={testSong} />);
+
+    const nameButton = screen.getByText(testSong.songName);
+    fireEvent.click(nameButton);
+    const nameInput = screen.getByRole('textbox');
+    fireEvent.change(nameInput, { target: { value: testSong2.songName } });
+    fireEvent.focusOut(nameInput);
+
+    const artistButton = screen.getByText(testSong.artist);
+    fireEvent.click(artistButton);
+    const artistInput = screen.getByRole('textbox');
+    fireEvent.change(artistInput, { target: { value: testSong2.artist } });
+    fireEvent.focusOut(artistInput);
+
+    const songPickerButton = screen.getByTestId('song-picker-button');
+    fireEvent.click(songPickerButton);
+
+    await waitFor(() =>
+      expect(screen.getByText(testSong2.songPath)).toBeInTheDocument()
+    );
+    const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
+    fireEvent.click(lyricsPickerButton);
+
+    await waitFor(() => expect(mockSet).toBeCalledWith(testSong2));
   });
 });

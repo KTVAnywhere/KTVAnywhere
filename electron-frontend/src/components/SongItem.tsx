@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { EditText } from 'react-edit-text';
 import './SongItem.css';
+import 'react-edit-text/dist/index.css';
 
 export interface SongProps {
   songId: string;
@@ -100,6 +101,7 @@ const SongComponent = ({ song }: { song: SongProps }) => {
         <p>{currSong.songPath}</p>
         <button
           type="button"
+          data-testid="song-picker-button"
           onClick={() =>
             handleChooseFile(songUploadOptions, (path) => ({
               ...currSong,
@@ -107,7 +109,7 @@ const SongComponent = ({ song }: { song: SongProps }) => {
             }))
           }
         >
-          edit
+          change file
         </button>
       </div>
       <div className="fields">
@@ -115,6 +117,7 @@ const SongComponent = ({ song }: { song: SongProps }) => {
         <p>{currSong.lyricsPath}</p>
         <button
           type="button"
+          data-testid="lyrics-picker-button"
           onClick={() =>
             handleChooseFile(lyricsUploadOptions, (path) => ({
               ...currSong,
@@ -122,7 +125,7 @@ const SongComponent = ({ song }: { song: SongProps }) => {
             }))
           }
         >
-          edit
+          change file
         </button>
       </div>
     </>
