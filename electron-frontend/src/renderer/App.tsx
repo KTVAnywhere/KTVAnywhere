@@ -20,6 +20,8 @@ const SongTest = () => {
   const [leftSidebarTrigger, setLeftSidebarTrigger] = useState<boolean>(false);
   const [rightSidebarTrigger, setRightSidebarTrigger] =
     useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
 
   window.electron.store.songs.onChange((_, results) => setSongList(results));
   window.electron.store.queueItems.onChange((_, results) => setQueue(results));
@@ -36,7 +38,12 @@ const SongTest = () => {
     <div className="outer">
       <div className="bottom-box">
         <div className="bottom-box-content">
-          <AudioPlayer />
+          <AudioPlayer
+            currentTime={currentTime}
+            setCurrentTime={setCurrentTime}
+            currentSong={currentSong}
+            setCurrentSong={setCurrentSong}
+          />
         </div>
       </div>
       <div className="top-box">

@@ -1,6 +1,7 @@
 import { Slider } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import './AudioPlayer.css';
+import { SongProps } from './SongItem';
 import { DequeueSong, GetQueueLength } from './SongsQueue';
 
 const ProgressBar = ({
@@ -72,34 +73,72 @@ const ProgressBar = ({
   );
 };
 
-export const AudioPlayer = () => {
+export const AudioPlayer = ({
+  currentTime,
+  setCurrentTime,
+  currentSong,
+  setCurrentSong,
+}: {
+  currentTime: number;
+  setCurrentTime: Dispatch<SetStateAction<number>>;
+  currentSong: SongProps | null;
+  setCurrentSong: Dispatch<SetStateAction<SongProps | null>>;
+}) => {
   const [duration, setDuration] = useState<number>();
-  const [currentTime, setCurrentTime] = useState<number>();
   const [isPlaying, setIsPlaying] = useState(true);
   const [skipToTime, setSkipToTime] = useState<number | null>();
-  const [currentSongPath, setCurrentSongPath] = useState<string | null>();
   const [songChange, setSongChange] = useState(false);
   const [volume, setVolume] = useState<number>(70);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const audio: HTMLAudioElement = document.getElementById(
       'audio'
     ) as HTMLAudioElement;
+    if (isPlaying) {
+      if (audio.readyState) {
+        audio.play();
+      } else if (!currentSong && GetQueueLength() > 0) {
+        const nextSong = DequeueSong();
+        setCurrentSong(nextSong);
+        audio.src = `atom:///${nextSong?.songPath}`;
+        audio.load();
+      }
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, setIsPlaying, currentSong, setCurrentSong]);
 
+  useEffect(() => {
+    const audio: HTMLAudioElement = document.getElementById(
+      'audio'
+    ) as HTMLAudioElement;
     if (songChange) {
       setSongChange(false);
       if (GetQueueLength() > 0) {
-        setCurrentSongPath(DequeueSong()?.songPath);
-        audio.src = `atom:///${currentSongPath}`;
+        setCurrentSong(DequeueSong());
+        audio.src = `atom:///${currentSong?.songPath}`;
         audio.load();
       } else {
         audio.src = '';
-        setCurrentSongPath(null);
         setDuration(0);
         setCurrentTime(0);
       }
     }
+  }, [songChange, setSongChange, currentSong, setCurrentTime, setCurrentSong]);
+
+  useEffect(() => {
+    const audio: HTMLAudioElement = document.getElementById(
+      'audio'
+    ) as HTMLAudioElement;
+    if (skipToTime) {
+      audio.currentTime = skipToTime;
+    }
+  }, [skipToTime]);
+
+  useEffect(() => {
+    const audio: HTMLAudioElement = document.getElementById(
+      'audio'
+    ) as HTMLAudioElement;
 
     const setAudioData = () => {
       audio.play();
@@ -112,29 +151,11 @@ export const AudioPlayer = () => {
     audio.addEventListener('loadeddata', setAudioData);
     audio.addEventListener('timeupdate', setAudioTime);
 
-    if (isPlaying) {
-      if (audio.readyState) {
-        audio.play();
-      } else if (!currentSongPath && GetQueueLength() > 0) {
-        const str = DequeueSong()?.songPath;
-        setCurrentSongPath(str);
-        audio.src = `atom:///${str}`;
-        audio.load();
-      }
-    } else {
-      audio.pause();
-    }
-
-    if (skipToTime && skipToTime !== currentTime) {
-      audio.currentTime = skipToTime;
-      setSkipToTime(null);
-    }
-
     return () => {
       audio.removeEventListener('loadeddata', setAudioData);
       audio.removeEventListener('timeupdate', setAudioTime);
     };
-  });
+  }, [setCurrentTime]);
 
   const handleEnded = () => {
     setSongChange(true);
