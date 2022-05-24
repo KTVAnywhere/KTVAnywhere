@@ -1,7 +1,32 @@
-.audio-controls {
-  background-color: greenyellow;
-}
-
 .audio-player {
   display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-button {
+  background-color: greenyellow;
+  height: 30px;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  user-select: none;
+  width: 50%;
+}
+
+.bar-progress {
+  flex: 1;
+  border: none;
+  border-radius: 5px;
+  margin: 0 20px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.volume-slider {
+  max-width: 8%;
 }

@@ -10,6 +10,7 @@ import SongComponent, {
 import SongLibrary from '../components/SongLibrary';
 import SongUpload from '../components/SongUpload';
 import Popup from '../components/Popup';
+import { AudioPlayer } from '../components/AudioPlayer';
 
 const SongTest = () => {
   const [, setSongList] = useState<SongProps[]>([]);
@@ -32,27 +33,37 @@ const SongTest = () => {
   }, []);
 
   return (
-    <>
-      <LeftSidebar
-        setTrigger={setLeftSidebarTrigger}
-        trigger={leftSidebarTrigger}
-      >
-        <SongUpload />
-        <SongLibrary
-          setPopupTriggered={setSongPopupTriggered}
-          setOpenSong={setOpenSong}
-        />
-        <Popup trigger={songPopupTriggered} setTrigger={setSongPopupTriggered}>
-          <SongComponent song={openSong} />
-        </Popup>
-      </LeftSidebar>
-      <RightSidebar
-        setTrigger={setRightSidebarTrigger}
-        trigger={rightSidebarTrigger}
-      >
-        <QueueList />
-      </RightSidebar>
-    </>
+    <div className="outer">
+      <div className="bottom-box">
+        <div className="bottom-box-content">
+          <AudioPlayer />
+        </div>
+      </div>
+      <div className="top-box">
+        <LeftSidebar
+          setTrigger={setLeftSidebarTrigger}
+          trigger={leftSidebarTrigger}
+        >
+          <SongUpload />
+          <SongLibrary
+            setPopupTriggered={setSongPopupTriggered}
+            setOpenSong={setOpenSong}
+          />
+          <Popup
+            trigger={songPopupTriggered}
+            setTrigger={setSongPopupTriggered}
+          >
+            <SongComponent song={openSong} />
+          </Popup>
+        </LeftSidebar>
+        <RightSidebar
+          setTrigger={setRightSidebarTrigger}
+          trigger={rightSidebarTrigger}
+        >
+          <QueueList />
+        </RightSidebar>
+      </div>
+    </div>
   );
 };
 

@@ -175,4 +175,9 @@ export function DequeueSong(): SongProps | null {
   return nextSong;
 }
 
+export function GetQueueLength(): number {
+  const queue = window.electron.store.queueItems.getAllQueueItems();
+  return queue ? queue.length : 0;
+}
+
 export default QueueList;

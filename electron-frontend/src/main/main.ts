@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath, handleFileOpen } from './util';
 import {
@@ -125,6 +125,15 @@ app
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
+    });
+    // custom protocol for reading local files
+    protocol.registerFileProtocol('atom', (request, callback) => {
+      const url = request.url.substring(7);
+      try {
+        callback(decodeURI(path.normalize(url)));
+      } catch (error) {
+        if (error) console.error('Failed to register protocol');
+      }
     });
   })
   .then(() => {
