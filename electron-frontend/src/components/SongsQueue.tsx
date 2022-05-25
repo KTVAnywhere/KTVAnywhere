@@ -1,4 +1,4 @@
-import React from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import {
   DragDropContext,
   Droppable,
@@ -21,7 +21,7 @@ const setQueue = (queueList: QueueItemProps[]) => {
 export const QueueList = ({
   setNextSong,
 }: {
-  setNextSong: React.Dispatch<React.SetStateAction<SongProps | null>>;
+  setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
   const queue = window.electron.store.queueItems.getAllQueueItems();
 

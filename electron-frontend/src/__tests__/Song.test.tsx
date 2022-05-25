@@ -140,10 +140,12 @@ describe('SongLibrary', () => {
   test('song library should display list of songs', async () => {
     const mockSetPopup = jest.fn();
     const mockSetOpenSong = jest.fn();
+    const mockSetNextSong = jest.fn();
     render(
       <SongLibrary
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
+        setNextSong={mockSetNextSong}
       />
     );
     const { getAllByRole } = within(
@@ -156,10 +158,12 @@ describe('SongLibrary', () => {
   test('delete button should delete song from library', async () => {
     const mockSetPopup = jest.fn();
     const mockSetOpenSong = jest.fn();
+    const mockSetNextSong = jest.fn();
     render(
       <SongLibrary
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
+        setNextSong={mockSetNextSong}
       />
     );
     const { getAllByRole } = within(
@@ -174,10 +178,12 @@ describe('SongLibrary', () => {
   test('click song name should open popup', async () => {
     const mockSetPopup = jest.fn();
     const mockSetOpenSong = jest.fn();
+    const mockSetNextSong = jest.fn();
     render(
       <SongLibrary
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
+        setNextSong={mockSetNextSong}
       />
     );
 

@@ -1,3 +1,5 @@
+import { queueWithFourSongs, testLibrary } from './testData';
+
 const mockedElectron = {
   ...window.electron,
   store: {
@@ -6,7 +8,7 @@ const mockedElectron = {
       setSong: jest.fn(),
       addSong: jest.fn(),
       deleteSong: jest.fn(),
-      getAllSongs: jest.fn(),
+      getAllSongs: () => testLibrary,
       setAllSongs: jest.fn(),
       onChange: jest.fn(),
     },
@@ -15,10 +17,14 @@ const mockedElectron = {
       setQueueItem: jest.fn(),
       addQueueItem: jest.fn(),
       deleteQueueItem: jest.fn(),
-      getAllQueueItems: jest.fn(),
+      getAllQueueItems: () => queueWithFourSongs,
       setAllQueueItems: jest.fn(),
       onChange: jest.fn(),
     },
+  },
+  file: {
+    readSend: jest.fn(),
+    readReceive: jest.fn(),
   },
 };
 export default mockedElectron;

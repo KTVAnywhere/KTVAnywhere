@@ -21,7 +21,7 @@ export const Lyrics = ({
   useEffect(() => {
     if (currentSong === null) {
       setLyrics('file not loaded');
-    } else if (!currentSong.songPath) {
+    } else if (!currentSong.lyricsPath) {
       setLyrics('no lyrics file for song');
     } else {
       window.electron.file.readReceive((err, data) => {

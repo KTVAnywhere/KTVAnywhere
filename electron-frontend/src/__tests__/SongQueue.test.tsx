@@ -23,6 +23,7 @@ import mockedElectron from '../__testsData__/mocks';
 describe('QueueList buttons', () => {
   const mockGetAllQueueItems = () => queueWithFourSongs;
   const mockSetAllQueueItems = jest.fn();
+  const mockSetNextSong = jest.fn();
 
   beforeEach(() => {
     global.window.electron = {
@@ -44,7 +45,7 @@ describe('QueueList buttons', () => {
   });
 
   test('clear queue button should empty the queue', () => {
-    render(<QueueList />);
+    render(<QueueList setNextSong={mockSetNextSong} />);
     const clearQueueButton = screen.getByTestId('clear-queue-button');
     fireEvent.click(clearQueueButton);
 
@@ -52,7 +53,7 @@ describe('QueueList buttons', () => {
   });
 
   test('delete button should delete song from queue', () => {
-    render(<QueueList />);
+    render(<QueueList setNextSong={mockSetNextSong} />);
     const deleteSongInQueueButton = screen.getAllByTestId(
       'delete-song-from-queue-button'
     )[1];
@@ -62,7 +63,7 @@ describe('QueueList buttons', () => {
   });
 
   test('up button should move song up in queue', () => {
-    render(<QueueList />);
+    render(<QueueList setNextSong={mockSetNextSong} />);
     const swapSongPositionInQueueButton = screen.getAllByTestId(
       'move-song-up-in-queue-button'
     )[1];
@@ -72,7 +73,7 @@ describe('QueueList buttons', () => {
   });
 
   test('send to front of queue button should move song to first item in queue', () => {
-    render(<QueueList />);
+    render(<QueueList setNextSong={mockSetNextSong} />);
     const sendToFrontInQueueButton = screen.getAllByTestId(
       'send-to-front-of-queue-button'
     )[3];
@@ -85,6 +86,7 @@ describe('QueueList buttons', () => {
 describe('Drag and Drop QueueList', () => {
   const mockGetAllQueueItems = () => queueWithFourSongs;
   const mockSetAllQueueItems = jest.fn();
+  const mockSetNextSong = jest.fn();
 
   beforeEach(() => {
     global.window.electron = {
@@ -107,7 +109,7 @@ describe('Drag and Drop QueueList', () => {
   });
 
   test('drag and drop second song in queue to first', async () => {
-    const { container } = render(<QueueList />);
+    const { container } = render(<QueueList setNextSong={mockSetNextSong} />);
     mockDndSpacing(container);
 
     await makeDnd({

@@ -5,9 +5,11 @@ import { EnqueueSong } from './SongsQueue';
 const SongLibrary = ({
   setPopupTriggered,
   setOpenSong,
+  setNextSong,
 }: {
   setPopupTriggered: Dispatch<SetStateAction<boolean>>;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
+  setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
   const handleDelete = (songId: string) => {
     window.electron.store.songs.deleteSong(songId);
@@ -21,8 +23,6 @@ const SongLibrary = ({
             <th>No.</th>
             <th>Song</th>
             <th>Artist</th>
-            <th>Song path</th>
-            <th>Lyrics path</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -49,9 +49,10 @@ const SongLibrary = ({
                 </div>
               </td>
               <td>{song.artist}</td>
-              <td>{song.songPath}</td>
-              <td>{song.lyricsPath}</td>
               <td>
+                <button type="button" onClick={() => setNextSong(song)}>
+                  Play
+                </button>
                 <button type="button" onClick={() => EnqueueSong(song)}>
                   Enqueue
                 </button>

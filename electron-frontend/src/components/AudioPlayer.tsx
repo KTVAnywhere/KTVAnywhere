@@ -73,25 +73,20 @@ const ProgressBar = ({
   );
 };
 
-export function PlaySongNow(
-  song: SongProps,
-  setNextSong: Dispatch<SetStateAction<SongProps | null>>
-) {
-  setNextSong(song);
-}
-
 export const AudioPlayer = ({
   currentTime,
   setCurrentTime,
   currentSong,
   setCurrentSong,
   nextSong,
+  setLyricsEnabled,
 }: {
   currentTime: number;
   setCurrentTime: Dispatch<SetStateAction<number>>;
   currentSong: SongProps | null;
   setCurrentSong: Dispatch<SetStateAction<SongProps | null>>;
   nextSong: SongProps | null;
+  setLyricsEnabled: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [duration, setDuration] = useState<number>();
   const [isPlaying, setIsPlaying] = useState(true);
@@ -99,6 +94,7 @@ export const AudioPlayer = ({
   const [volume, setVolume] = useState<number>(70);
 
   useEffect(() => {
+    if (nextSong === null) return;
     const audio: HTMLAudioElement = document.getElementById(
       'audio'
     ) as HTMLAudioElement;
@@ -168,7 +164,9 @@ export const AudioPlayer = ({
     setIsPlaying(!isPlaying);
   };
 
-  const handleLyricsToggle = () => {};
+  const handleLyricsToggle = () => {
+    setLyricsEnabled((state) => !state);
+  };
 
   const handleEndSong = () => {
     const audio: HTMLAudioElement = document.getElementById(

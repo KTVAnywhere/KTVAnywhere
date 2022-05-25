@@ -23,7 +23,7 @@ const SongTest = () => {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
   const [nextSong, setNextSong] = useState<SongProps | null>(null);
-  const [lyricsEnabled] = useState<boolean>(true);
+  const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(true);
 
   window.electron.store.songs.onChange((_, results) => setSongList(results));
   window.electron.store.queueItems.onChange((_, results) => setQueue(results));
@@ -45,6 +45,7 @@ const SongTest = () => {
           currentSong={currentSong}
           setCurrentSong={setCurrentSong}
           nextSong={nextSong}
+          setLyricsEnabled={setLyricsEnabled}
         />
       </div>
       <div className="top-box">
@@ -56,6 +57,7 @@ const SongTest = () => {
           <SongLibrary
             setPopupTriggered={setSongPopupTriggered}
             setOpenSong={setOpenSong}
+            setNextSong={setNextSong}
           />
           <Popup
             trigger={songPopupTriggered}
