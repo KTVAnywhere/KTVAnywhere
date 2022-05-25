@@ -70,3 +70,18 @@ export const queueAfterEnqueue = [
   { song: testSong, queueItemId: '1' },
   { song: testSong2, queueItemId: expect.any(String) },
 ];
+
+export const lineAt5s = 'Line 1';
+export const lineAt10s = 'Line 2';
+export const lineAt15s = 'Line 3';
+
+export const testLyrics = `
+[ar: Artist name]
+[al: Song name]
+[ti: Song Name]
+[by: Artist name]
+
+[00:00.00]
+[00:05.00]${lineAt5s}
+[00:10.00]${lineAt10s}
+[00:15.00]${lineAt15s}`;

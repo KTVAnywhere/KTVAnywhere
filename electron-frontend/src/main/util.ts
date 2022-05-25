@@ -1,6 +1,7 @@
 /* eslint import/prefer-default-export: off, import/no-mutable-exports: off */
 import { URL } from 'url';
 import path from 'path';
+import fs from 'fs-extra';
 import { dialog } from 'electron';
 
 export let resolveHtmlPath: (htmlFileName: string) => string;
@@ -24,4 +25,16 @@ export const handleFileOpen = async (config: Electron.OpenDialogOptions) => {
     return filePaths[0];
   }
   throw new Error('Cancelled file selection');
+};
+
+export const handleFileRead = (
+  filePath: string,
+  sendBack: (data: string) => void
+) => {
+  fs.readFile(filePath, 'utf-8', (err, data) => {
+    if (err) {
+      console.log(err.message);
+    }
+    sendBack(data);
+  });
 };

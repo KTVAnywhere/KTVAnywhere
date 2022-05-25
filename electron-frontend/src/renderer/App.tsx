@@ -11,6 +11,7 @@ import SongLibrary from '../components/SongLibrary';
 import SongUpload from '../components/SongUpload';
 import Popup from '../components/Popup';
 import { AudioPlayer } from '../components/AudioPlayer';
+import { Lyrics } from '../components/LyricsPlayer';
 
 const SongTest = () => {
   const [, setSongList] = useState<SongProps[]>([]);
@@ -22,6 +23,7 @@ const SongTest = () => {
     useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
+  const [lyricsEnabled] = useState<boolean>(true);
 
   window.electron.store.songs.onChange((_, results) => setSongList(results));
   window.electron.store.queueItems.onChange((_, results) => setQueue(results));
@@ -69,6 +71,11 @@ const SongTest = () => {
         >
           <QueueList />
         </RightSidebar>
+        <Lyrics
+          currentSong={currentSong}
+          currentTime={currentTime}
+          lyricsEnabled={lyricsEnabled}
+        />
       </div>
     </div>
   );

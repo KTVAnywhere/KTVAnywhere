@@ -7,15 +7,17 @@ declare global {
   interface Window {
     electron: {
       ipcRenderer: {
-        sendMessage(channel: Channels, args: unknown[]): void;
-        on(
-          channel: string,
-          func: (...args: unknown[]) => void
-        ): (() => void) | undefined;
-        once(channel: string, func: (...args: unknown[]) => void): void;
+        sendMessage(channel: Channels, data: string): void;
+        once(channel: string, func: (data: string) => void): void;
       };
       dialog: {
         openFile(config: Electron.OpenDialogOptions): Promise<string>;
+      };
+      file: {
+        readSend(filePath: string): void;
+        readReceive(
+          callback: (err: NodeJS.ErrnoException | null, results: string) => void
+        ): void;
       };
       store: {
         songs: {
