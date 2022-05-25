@@ -73,22 +73,39 @@ const ProgressBar = ({
   );
 };
 
+export function PlaySongNow(
+  song: SongProps,
+  setNextSong: Dispatch<SetStateAction<SongProps | null>>
+) {
+  setNextSong(song);
+}
+
 export const AudioPlayer = ({
   currentTime,
   setCurrentTime,
   currentSong,
   setCurrentSong,
+  nextSong,
 }: {
   currentTime: number;
   setCurrentTime: Dispatch<SetStateAction<number>>;
   currentSong: SongProps | null;
   setCurrentSong: Dispatch<SetStateAction<SongProps | null>>;
+  nextSong: SongProps | null;
 }) => {
   const [duration, setDuration] = useState<number>();
   const [isPlaying, setIsPlaying] = useState(true);
   const [skipToTime, setSkipToTime] = useState<number | null>();
-  const [songChange, setSongChange] = useState(false);
   const [volume, setVolume] = useState<number>(70);
+
+  useEffect(() => {
+    const audio: HTMLAudioElement = document.getElementById(
+      'audio'
+    ) as HTMLAudioElement;
+    setCurrentSong(nextSong);
+    audio.src = `atom:///${nextSong?.songPath}`;
+    audio.load();
+  }, [nextSong, setCurrentSong]);
 
   useEffect(() => {
     const audio: HTMLAudioElement = document.getElementById(
@@ -98,33 +115,15 @@ export const AudioPlayer = ({
       if (audio.readyState) {
         audio.play();
       } else if (!currentSong && GetQueueLength() > 0) {
-        const nextSong = DequeueSong();
-        setCurrentSong(nextSong);
-        audio.src = `atom:///${nextSong?.songPath}`;
+        const song = DequeueSong();
+        setCurrentSong(song);
+        audio.src = `atom:///${song?.songPath}`;
         audio.load();
       }
     } else {
       audio.pause();
     }
   }, [isPlaying, setIsPlaying, currentSong, setCurrentSong]);
-
-  useEffect(() => {
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
-    if (songChange) {
-      setSongChange(false);
-      if (GetQueueLength() > 0) {
-        setCurrentSong(DequeueSong());
-        audio.src = `atom:///${currentSong?.songPath}`;
-        audio.load();
-      } else {
-        audio.src = '';
-        setDuration(0);
-        setCurrentTime(0);
-      }
-    }
-  }, [songChange, setSongChange, currentSong, setCurrentTime, setCurrentSong]);
 
   useEffect(() => {
     const audio: HTMLAudioElement = document.getElementById(
@@ -157,10 +156,6 @@ export const AudioPlayer = ({
     };
   }, [setCurrentTime]);
 
-  const handleEnded = () => {
-    setSongChange(true);
-  };
-
   const handleVolumeChange = (_event: Event, newValue: number | number[]) => {
     setVolume(newValue as number);
     const audio: HTMLAudioElement = document.getElementById(
@@ -173,9 +168,23 @@ export const AudioPlayer = ({
     setIsPlaying(!isPlaying);
   };
 
+  const handleLyricsToggle = () => {};
+
   const handleEndSong = () => {
-    if (currentTime === undefined || duration === undefined) return;
-    setSkipToTime(duration);
+    const audio: HTMLAudioElement = document.getElementById(
+      'audio'
+    ) as HTMLAudioElement;
+    if (GetQueueLength() > 0) {
+      const song = DequeueSong();
+      setCurrentSong(song);
+      audio.src = `atom:///${song?.songPath}`;
+      audio.load();
+    } else {
+      setCurrentSong(null);
+      audio.src = '';
+      setDuration(0);
+      setCurrentTime(0);
+    }
   };
 
   const handleBackward = () => {
@@ -199,47 +208,78 @@ export const AudioPlayer = ({
   return (
     <div className="audio-player">
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio id="audio" onEnded={handleEnded} />
-      <button className="player-button" type="button" onClick={handleEndSong}>
-        end song
-      </button>
-      <button className="player-button" type="button" onClick={handleBackward}>
-        back 10
-      </button>
-      <button className="player-button" type="button" onClick={handleForward}>
-        forward 10
-      </button>
-      {isPlaying === true ? (
-        <button
-          className="player-button"
-          type="button"
-          onClick={handlePlayPause}
-        >
-          ||
-        </button>
-      ) : (
-        <button
-          className="player-button"
-          type="button"
-          onClick={handlePlayPause}
-        >
-          ▶
-        </button>
-      )}
-      <ProgressBar
-        duration={duration}
-        currentTime={currentTime}
-        setSkipToTime={setSkipToTime}
-      />
-      <Slider
-        className="volume-slider"
-        aria-label="Volume"
-        value={volume}
-        onChange={handleVolumeChange}
-        min={0}
-        max={100}
-        color="secondary"
-      />
+      <audio id="audio" onEnded={handleEndSong} />
+      <div className="right-controls">
+        <Slider
+          className="volume-slider"
+          aria-label="Volume"
+          value={volume}
+          onChange={handleVolumeChange}
+          min={0}
+          max={100}
+          color="secondary"
+        />
+        <span>Volume</span>
+      </div>
+      <div className="bottom-controls">
+        <ProgressBar
+          duration={duration}
+          currentTime={currentTime}
+          setSkipToTime={setSkipToTime}
+        />
+      </div>
+      <div className="top-controls">
+        <pre>
+          <button
+            className="player-button"
+            type="button"
+            onClick={handleBackward}
+          >
+            back 10
+          </button>
+          <button
+            className="player-button"
+            type="button"
+            onClick={handleForward}
+          >
+            forward 10
+          </button>
+          {'  '}
+          {isPlaying === true ? (
+            <button
+              className="player-button"
+              type="button"
+              onClick={handlePlayPause}
+            >
+              {'  '}II{'  '}
+            </button>
+          ) : (
+            <button
+              className="player-button"
+              type="button"
+              onClick={handlePlayPause}
+            >
+              {'  '}▶{'  '}
+            </button>
+          )}
+          {'  '}
+          <button
+            className="player-button"
+            type="button"
+            onClick={handleEndSong}
+          >
+            end song
+          </button>
+          {'  '}
+          <button
+            className="player-button"
+            type="button"
+            onClick={handleLyricsToggle}
+          >
+            toggle lyrics
+          </button>
+        </pre>
+      </div>
     </div>
   );
 };

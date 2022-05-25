@@ -17,11 +17,11 @@ const SongTest = () => {
   const [, setQueue] = useState<QueueItemProps[]>([]);
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
   const [songPopupTriggered, setSongPopupTriggered] = useState<boolean>(false);
-  const [leftSidebarTrigger, setLeftSidebarTrigger] = useState<boolean>(false);
-  const [rightSidebarTrigger, setRightSidebarTrigger] =
-    useState<boolean>(false);
+  const [leftSidebarTrigger, setLeftSidebarTrigger] = useState<boolean>(true);
+  const [rightSidebarTrigger, setRightSidebarTrigger] = useState<boolean>(true);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
+  const [nextSong, setNextSong] = useState<SongProps | null>(null);
 
   window.electron.store.songs.onChange((_, results) => setSongList(results));
   window.electron.store.queueItems.onChange((_, results) => setQueue(results));
@@ -37,14 +37,13 @@ const SongTest = () => {
   return (
     <div className="outer">
       <div className="bottom-box">
-        <div className="bottom-box-content">
-          <AudioPlayer
-            currentTime={currentTime}
-            setCurrentTime={setCurrentTime}
-            currentSong={currentSong}
-            setCurrentSong={setCurrentSong}
-          />
-        </div>
+        <AudioPlayer
+          currentTime={currentTime}
+          setCurrentTime={setCurrentTime}
+          currentSong={currentSong}
+          setCurrentSong={setCurrentSong}
+          nextSong={nextSong}
+        />
       </div>
       <div className="top-box">
         <LeftSidebar
@@ -67,7 +66,7 @@ const SongTest = () => {
           setTrigger={setRightSidebarTrigger}
           trigger={rightSidebarTrigger}
         >
-          <QueueList />
+          <QueueList setNextSong={setNextSong} />
         </RightSidebar>
       </div>
     </div>

@@ -1,11 +1,36 @@
 .audio-player {
+  position: relative;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.top-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+
   display: flex;
-  align-items: center;
+  justify-content: center;
+}
+
+.bottom-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+
+  display: flex;
   justify-content: center;
 }
 
 .player-button {
-  background-color: greenyellow;
+  background-color: rgb(171, 255, 149);
   height: 30px;
 }
 
@@ -27,6 +52,10 @@
   cursor: pointer;
 }
 
-.volume-slider {
-  max-width: 8%;
+.right-controls {
+  z-index: 1;
+  position: absolute;
+  right: 5%;
+  left: 85%;
+  top: 30%;
 }

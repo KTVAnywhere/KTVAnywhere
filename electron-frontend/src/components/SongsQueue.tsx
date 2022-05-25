@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   DragDropContext,
   Droppable,
@@ -17,7 +18,11 @@ const setQueue = (queueList: QueueItemProps[]) => {
   window.electron.store.queueItems.setAllQueueItems(queueList);
 };
 
-export const QueueList = () => {
+export const QueueList = ({
+  setNextSong,
+}: {
+  setNextSong: React.Dispatch<React.SetStateAction<SongProps | null>>;
+}) => {
   const queue = window.electron.store.queueItems.getAllQueueItems();
 
   const deleteSongFromQueue = (index: number): void => {
@@ -65,6 +70,11 @@ export const QueueList = () => {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     setQueue(items);
+  };
+
+  const handlePlaySong = (index: number): void => {
+    setNextSong(queue[index].song);
+    deleteSongFromQueue(index);
   };
 
   return (
@@ -117,7 +127,7 @@ export const QueueList = () => {
                             <button
                               type="button"
                               data-testid="play-now-button"
-                              onClick={() => null}
+                              onClick={() => handlePlaySong(index)}
                             >
                               play
                             </button>{' '}
