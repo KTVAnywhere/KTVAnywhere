@@ -1,6 +1,6 @@
 {
   "name": "ktvanywhere",
-  "version": "0.3.5",
+  "version": "0.4.2",
   "description": "A karaoke song software",
   "keywords": [
     "electron",
@@ -109,6 +109,7 @@
     "electron-store": "^8.0.1",
     "electron-updater": "^5.0.1",
     "lodash.uniq": "^4.5.0",
+    "lrc-kit": "^1.1.1",
     "react": "^18.1.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^18.1.0",

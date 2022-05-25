@@ -1,0 +1,47 @@
+.lyricsGroup {
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0px;
+  gap: 12px;
+
+  position: absolute;
+  left: 0%;
+  right: 0%;
+  top: 89.64%;
+  bottom: 6.65%;
+}
+
+.lyrics {
+  height: 39px;
+
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 39px;
+  /* identical to box height */
+
+  display: flex;
+  align-items: center;
+  text-align: center;
+
+  color: #ddead7;
+}
+
+.nextLyrics {
+  height: 29px;
+
+  font-style: normal;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 29px;
+  /* identical to box height */
+
+  display: flex;
+  align-items: center;
+  text-align: center;
+
+  color: #69798c;
+}

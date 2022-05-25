@@ -94,6 +94,16 @@ const SongComponent = ({ song }: { song: SongProps }) => {
           onChange={(value: string) =>
             handleChange({ ...currSong, artist: value })
           }
+          onSave={(event: {
+            name: string;
+            value: string;
+            previousValue: string;
+          }) => {
+            handleSave({
+              ...currSong,
+              artist: event.value || event.previousValue,
+            });
+          }}
         />
       </div>
       <div className="fields">

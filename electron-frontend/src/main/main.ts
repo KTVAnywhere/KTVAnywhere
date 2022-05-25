@@ -9,6 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
+import fs from 'fs';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath, handleFileOpen } from './util';
@@ -25,6 +26,15 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.on('file:readSend', async (event, filePath: string) => {
+  fs.readFile(filePath, 'utf-8', (err, data) => {
+    if (err) {
+      console.log(err.message);
+    }
+    event.reply('file:readReceive', err, data.toString());
+  });
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -120,6 +130,7 @@ app
   .whenReady()
   .then(() => {
     ipcMain.handle('dialog:openFile', (_, config) => handleFileOpen(config));
+
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
