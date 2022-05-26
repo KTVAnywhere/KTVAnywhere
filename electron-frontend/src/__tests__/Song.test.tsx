@@ -149,10 +149,10 @@ describe('SongLibrary', () => {
       />
     );
     const { getAllByRole } = within(
-      screen.getByRole('rowgroup', { name: /data/i })
+      screen.getByRole('list', { name: /data/i })
     );
 
-    expect(getAllByRole('row').length).toEqual(2);
+    expect(getAllByRole('listitem').length).toEqual(2);
   });
 
   test('delete button should delete song from library', async () => {
@@ -167,7 +167,7 @@ describe('SongLibrary', () => {
       />
     );
     const { getAllByRole } = within(
-      screen.getByRole('rowgroup', { name: /data/i })
+      screen.getByRole('list', { name: /data/i })
     );
     const firstDeleteButton = getAllByRole('button', { name: /Delete/i })[0];
     fireEvent.click(firstDeleteButton);
@@ -188,7 +188,7 @@ describe('SongLibrary', () => {
     );
 
     const song1button = screen.getByRole('button', {
-      name: testLibrary[0].songName,
+      name: (content) => content.startsWith(testLibrary[0].songName),
     });
     fireEvent.click(song1button);
 

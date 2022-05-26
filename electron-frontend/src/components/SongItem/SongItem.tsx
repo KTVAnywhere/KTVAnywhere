@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { EditText } from 'react-edit-text';
-import './SongItem.css';
+import './SongItem.module.css';
 import 'react-edit-text/dist/index.css';
 
 export interface SongProps {

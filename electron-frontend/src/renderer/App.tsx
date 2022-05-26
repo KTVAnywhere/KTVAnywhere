@@ -1,4 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import './App.css';
@@ -12,6 +13,17 @@ import SongUpload from '../components/SongUpload';
 import Popup from '../components/Popup';
 import { AudioPlayer } from '../components/AudioPlayer';
 import { Lyrics } from '../components/LyricsPlayer';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+  typography: {
+    button: {
+      textTransform: 'none',
+    },
+  },
+});
 
 const SongTest = () => {
   const [, setSongList] = useState<SongProps[]>([]);
@@ -89,9 +101,9 @@ export default function App() {
         <Route
           path="/"
           element={
-            <>
+            <ThemeProvider theme={darkTheme}>
               <SongTest />
-            </>
+            </ThemeProvider>
           }
         />
       </Routes>

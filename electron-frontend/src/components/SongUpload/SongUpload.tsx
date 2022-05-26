@@ -6,8 +6,8 @@ import {
   lyricsUploadOptions,
   SongProps,
   songUploadOptions,
-} from './SongItem';
-import './Form.css';
+} from '../SongItem';
+import './SongUpload.module.css';
 
 interface FormErrorProps {
   songName: string;
