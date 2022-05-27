@@ -6,7 +6,7 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
-import { SongProps } from './SongItem';
+import { SongProps } from '../SongItem';
 import './SongsQueue.css';
 
 export interface QueueItemProps {
@@ -64,7 +64,7 @@ export const QueueList = ({
     setQueue(newQueue);
   };
 
-  const handleOnDragEnd = (result: DropResult): void => {
+  const onDragEnd = (result: DropResult): void => {
     if (!result.destination) return;
     const items = Array.from(queue);
     const [reorderedItem] = items.splice(result.source.index, 1);
@@ -72,7 +72,7 @@ export const QueueList = ({
     setQueue(items);
   };
 
-  const handlePlaySong = (index: number): void => {
+  const playSong = (index: number): void => {
     setNextSong(queue[index].song);
     deleteSongFromQueue(index);
   };
@@ -89,7 +89,7 @@ export const QueueList = ({
         Clear queue
       </button>
       {queue.length > 0 ? (
-        <DragDropContext onDragEnd={handleOnDragEnd}>
+        <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="songsQueue">
             {(provided) => (
               <ul
@@ -108,6 +108,7 @@ export const QueueList = ({
                       {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
                       {(provided) => (
                         <li
+                          className="queue-card"
                           ref={provided.innerRef}
                           // eslint-disable-next-line react/jsx-props-no-spreading
                           {...provided.dragHandleProps}
@@ -127,7 +128,7 @@ export const QueueList = ({
                             <button
                               type="button"
                               data-testid="play-now-button"
-                              onClick={() => handlePlaySong(index)}
+                              onClick={() => playSong(index)}
                             >
                               play
                             </button>{' '}

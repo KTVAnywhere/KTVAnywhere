@@ -3,7 +3,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import './App.css';
-import { QueueList, QueueItemProps } from '../components/SongsQueue';
+import QueueList, { QueueItemProps } from '../components/SongsQueue';
 import SongComponent, {
   emptySongProps,
   SongProps,

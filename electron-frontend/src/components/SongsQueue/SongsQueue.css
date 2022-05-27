@@ -1,4 +1,4 @@
-li {
+.queue-card {
   display: flex;
   justify-content: left;
   align-items: center;
@@ -12,7 +12,7 @@ li {
   width: 90%;
 }
 
-li:nth-child(4n + 1) {
+.queue-card:nth-child(4n + 1) {
   background: linear-gradient(
     90deg,
     rgba(37, 3, 105, 0.938) 0%,
@@ -20,11 +20,11 @@ li:nth-child(4n + 1) {
   );
 }
 
-li:nth-of-type(4n + 2) {
+.queue-card:nth-of-type(4n + 2) {
   background: linear-gradient(90deg, rgb(110, 6, 105) 0%, rgb(158, 7, 88) 100%);
 }
 
-li:nth-of-type(4n + 3) {
+.queue-card:nth-of-type(4n + 3) {
   background: linear-gradient(90deg, rgb(3, 29, 48) 0%, rgb(12, 65, 136) 100%);
 }
 

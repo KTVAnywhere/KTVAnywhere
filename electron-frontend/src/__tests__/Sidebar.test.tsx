@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 
-describe('Sidebar', () => {
+describe('Sidebar component tests', () => {
   test('open Sidebar with toggle button', async () => {
     const mockLeftSetTrigger = jest.fn();
     const mockRightSetTrigger = jest.fn();

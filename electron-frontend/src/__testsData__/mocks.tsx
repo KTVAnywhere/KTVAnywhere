@@ -1,4 +1,4 @@
-import { queueWithFourSongs, testLibrary } from './testData';
+import { queueTestDataWithSongs012, songListTestData } from './testData';
 
 const mockedElectron = {
   ...window.electron,
@@ -8,7 +8,7 @@ const mockedElectron = {
       setSong: jest.fn(),
       addSong: jest.fn(),
       deleteSong: jest.fn(),
-      getAllSongs: () => testLibrary,
+      getAllSongs: () => songListTestData,
       setAllSongs: jest.fn(),
       onChange: jest.fn(),
     },
@@ -17,7 +17,7 @@ const mockedElectron = {
       setQueueItem: jest.fn(),
       addQueueItem: jest.fn(),
       deleteQueueItem: jest.fn(),
-      getAllQueueItems: () => queueWithFourSongs,
+      getAllQueueItems: () => queueTestDataWithSongs012,
       setAllQueueItems: jest.fn(),
       onChange: jest.fn(),
     },
