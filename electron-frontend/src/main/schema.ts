@@ -1,4 +1,4 @@
-import { SongProps } from 'components/SongItem';
+import { SongProps } from 'components/Song';
 import { QueueItemProps } from 'components/SongsQueue';
 import { Schema } from 'electron-store';
 

@@ -1,9 +1,9 @@
-import SongItem, {
+import Song, {
   SongProps,
   emptySongProps,
   songUploadOptions,
   lyricsUploadOptions,
-} from './SongItem';
+} from './Song';
 
-export default SongItem;
+export default Song;
 export { SongProps, emptySongProps, songUploadOptions, lyricsUploadOptions };

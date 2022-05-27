@@ -1,34 +1,17 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { SongProps } from '../components/SongItem';
+import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
-export type Channels = 'ipc-example';
-export type FileChannels = 'readSend' | 'readReceive';
-
 contextBridge.exposeInMainWorld('electron', {
-  ipcRenderer: {
-    sendMessage(channel: Channels, data: string) {
-      ipcRenderer.send(channel, data);
-    },
-    once(channel: Channels, func: (data: string) => void) {
-      ipcRenderer.once(channel, (_event, data) => func(data));
-    },
-  },
   dialog: {
     openFile(config: Electron.OpenDialogOptions) {
       return ipcRenderer.invoke('dialog:openFile', config);
     },
   },
   file: {
-    readSend(filePath: string) {
-      ipcRenderer.send('file:readSend', filePath);
+    read(filePath: string) {
+      return ipcRenderer.invoke('file:read', filePath);
     },
-    readReceive: (
-      callback: (err: NodeJS.ErrnoException | null, results: string) => void
-    ) =>
-      ipcRenderer.once('file:readReceive', (_event, err, data) =>
-        callback(err, data)
-      ),
   },
   store: {
     songs: {

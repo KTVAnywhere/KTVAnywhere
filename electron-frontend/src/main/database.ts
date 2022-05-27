@@ -1,6 +1,6 @@
 import Store from 'electron-store';
 import schemas, { SongsType, QueueItemsType } from './schema';
-import { SongProps } from '../components/SongItem';
+import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
 export const createSongsStore = () =>

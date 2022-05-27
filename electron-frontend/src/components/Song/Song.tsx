@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { EditText } from 'react-edit-text';
-import './SongItem.module.css';
+import './Song.module.css';
 import 'react-edit-text/dist/index.css';
 
 export interface SongProps {
@@ -39,14 +39,14 @@ export const lyricsUploadOptions: Electron.OpenDialogOptions = {
   properties: ['openFile'],
 };
 
-const SongComponent = ({ song }: { song: SongProps }) => {
+const Song = ({ song }: { song: SongProps }) => {
   const [currSong, setCurrSong] = useState(song);
 
-  const handleChange = (changedSong: SongProps) => {
+  const changeSong = (changedSong: SongProps) => {
     setCurrSong(changedSong);
   };
 
-  const handleChooseFile = async (
+  const chooseFile = async (
     config: Electron.OpenDialogOptions,
     setPathFn: (arg0: string) => SongProps
   ) => {
@@ -60,7 +60,7 @@ const SongComponent = ({ song }: { song: SongProps }) => {
       .catch((err) => console.log(err));
   };
 
-  const handleSave = (changedSong: SongProps) => {
+  const saveSong = (changedSong: SongProps) => {
     window.electron.store.songs.setSong(changedSong);
     setCurrSong(changedSong);
   };
@@ -72,14 +72,14 @@ const SongComponent = ({ song }: { song: SongProps }) => {
           placeholder="song name"
           value={currSong.songName}
           onChange={(value: string) =>
-            handleChange({ ...currSong, songName: value })
+            changeSong({ ...currSong, songName: value })
           }
           onSave={(event: {
             name: string;
             value: string;
             previousValue: string;
           }) => {
-            handleSave({
+            saveSong({
               ...currSong,
               songName: event.value || event.previousValue,
             });
@@ -92,14 +92,14 @@ const SongComponent = ({ song }: { song: SongProps }) => {
           placeholder="song artist"
           value={currSong.artist}
           onChange={(value: string) =>
-            handleChange({ ...currSong, artist: value })
+            changeSong({ ...currSong, artist: value })
           }
           onSave={(event: {
             name: string;
             value: string;
             previousValue: string;
           }) => {
-            handleSave({
+            saveSong({
               ...currSong,
               artist: event.value || event.previousValue,
             });
@@ -113,7 +113,7 @@ const SongComponent = ({ song }: { song: SongProps }) => {
           type="button"
           data-testid="song-picker-button"
           onClick={() =>
-            handleChooseFile(songUploadOptions, (path) => ({
+            chooseFile(songUploadOptions, (path) => ({
               ...currSong,
               songPath: path,
             }))
@@ -129,7 +129,7 @@ const SongComponent = ({ song }: { song: SongProps }) => {
           type="button"
           data-testid="lyrics-picker-button"
           onClick={() =>
-            handleChooseFile(lyricsUploadOptions, (path) => ({
+            chooseFile(lyricsUploadOptions, (path) => ({
               ...currSong,
               lyricsPath: path,
             }))
@@ -142,4 +142,4 @@ const SongComponent = ({ song }: { song: SongProps }) => {
   );
 };
 
-export default SongComponent;
+export default Song;

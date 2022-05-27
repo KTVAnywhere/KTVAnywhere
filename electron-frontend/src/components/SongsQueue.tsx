@@ -6,7 +6,7 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
-import { SongProps } from './SongItem';
+import { SongProps } from './Song';
 import './SongsQueue.css';
 
 export interface QueueItemProps {

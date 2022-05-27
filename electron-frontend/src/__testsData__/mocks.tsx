@@ -23,8 +23,7 @@ const mockedElectron = {
     },
   },
   file: {
-    readSend: jest.fn(),
-    readReceive: jest.fn(),
+    read: jest.fn().mockResolvedValue('lyrics'),
   },
 };
 export default mockedElectron;

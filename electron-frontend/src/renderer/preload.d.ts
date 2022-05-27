@@ -1,23 +1,15 @@
-import { SongProps } from 'components/SongItem';
+import { SongProps } from 'components/Song';
 import { QueueItemProps } from 'components/SongsQueue';
-import { Channels } from 'main/preload';
 import { IpcRenderer } from 'electron';
 
 declare global {
   interface Window {
     electron: {
-      ipcRenderer: {
-        sendMessage(channel: Channels, data: string): void;
-        once(channel: string, func: (data: string) => void): void;
-      };
       dialog: {
         openFile(config: Electron.OpenDialogOptions): Promise<string>;
       };
       file: {
-        readSend(filePath: string): void;
-        readReceive(
-          callback: (err: NodeJS.ErrnoException | null, results: string) => void
-        ): void;
+        read(filePath: string): Promise<string>;
       };
       store: {
         songs: {

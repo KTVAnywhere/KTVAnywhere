@@ -7,32 +7,29 @@ import {
   lineAt5s,
   lineAt10s,
 } from '../__testsData__/testData';
-import { Lyrics } from '../components/LyricsPlayer';
+import LyricsPlayer from '../components/LyricsPlayer';
 
 describe('Lyrics player', () => {
-  const mockSend = jest.fn();
+  const mockRead = jest.fn().mockResolvedValue(testLyrics);
   beforeEach(() => {
     global.window.electron = {
       ...mockedElectron,
       file: {
-        readSend: mockSend,
-        readReceive: jest.fn(
-          (
-            callback: (err: NodeJS.ErrnoException | null, data: string) => void
-          ) => {
-            callback(null, testLyrics);
-          }
-        ),
+        read: mockRead,
       },
     };
   });
-  test('should load the lyrics of song currently playing', () => {
-    render(<Lyrics currentSong={testSong} currentTime={0} lyricsEnabled />);
-    expect(mockSend).toBeCalledWith(testSong.lyricsPath);
+  test('should load the lyrics of song currently playing', async () => {
+    render(
+      <LyricsPlayer currentSong={testSong} currentTime={0} lyricsEnabled />
+    );
+    await waitFor(() => expect(mockRead).toBeCalledWith(testSong.lyricsPath));
   });
 
   test('should display lyric line based on time', async () => {
-    render(<Lyrics currentSong={testSong} currentTime={6} lyricsEnabled />);
+    render(
+      <LyricsPlayer currentSong={testSong} currentTime={6} lyricsEnabled />
+    );
     const line = screen.getByTestId('lyrics');
     const nextLine = screen.getByTestId('next-lyrics');
     await waitFor(() => expect(line).toHaveTextContent(lineAt5s));
@@ -41,7 +38,11 @@ describe('Lyrics player', () => {
 
   test('lyrics should not be displayed if disabled', async () => {
     render(
-      <Lyrics currentSong={testSong} currentTime={6} lyricsEnabled={false} />
+      <LyricsPlayer
+        currentSong={testSong}
+        currentTime={6}
+        lyricsEnabled={false}
+      />
     );
     const line = screen.getByTestId('lyrics');
     const nextLine = screen.getByTestId('next-lyrics');

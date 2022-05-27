@@ -6,9 +6,10 @@ import {
   within,
   waitFor,
 } from '@testing-library/react';
-import SongComponent from '../components/SongItem';
+import * as Queue from '../components/SongsQueue';
+import SongComponent from '../components/Song';
 import SongUpload from '../components/SongUpload';
-import SongLibrary from '../components/SongLibrary';
+import SongLibrary from '../components/SongList';
 import { testSong, testSong2, testLibrary } from '../__testsData__/testData';
 import mockedElectron from '../__testsData__/mocks';
 
@@ -116,9 +117,14 @@ describe('SongUpload', () => {
   });
 });
 
-describe('SongLibrary', () => {
+describe('SongList', () => {
   const mockGetAll = () => testLibrary;
   const mockDelete = jest.fn();
+
+  const mockSetPopup = jest.fn();
+  const mockSetOpenSong = jest.fn();
+  const mockSetNextSong = jest.fn();
+
   beforeEach(() => {
     global.window.electron = {
       ...mockedElectron,
@@ -138,9 +144,6 @@ describe('SongLibrary', () => {
     jest.clearAllMocks();
   });
   test('song library should display list of songs', async () => {
-    const mockSetPopup = jest.fn();
-    const mockSetOpenSong = jest.fn();
-    const mockSetNextSong = jest.fn();
     render(
       <SongLibrary
         setPopupTriggered={mockSetPopup}
@@ -155,10 +158,46 @@ describe('SongLibrary', () => {
     expect(getAllByRole('listitem').length).toEqual(2);
   });
 
+  test('click play button should call setNextSong with the song clicked', async () => {
+    render(
+      <SongLibrary
+        setPopupTriggered={mockSetPopup}
+        setOpenSong={mockSetOpenSong}
+        setNextSong={mockSetNextSong}
+      />
+    );
+    const { getAllByRole } = within(
+      screen.getByRole('list', { name: /data/i })
+    );
+    const firstPlayButton = getAllByRole('button', {
+      name: /Play/i,
+    })[0];
+    fireEvent.click(firstPlayButton);
+
+    expect(mockSetNextSong).toBeCalledWith(testLibrary[0]);
+  });
+
+  test('click enqueue button should add song to queue', async () => {
+    const enqueueSpy = jest.spyOn(Queue, 'EnqueueSong');
+    render(
+      <SongLibrary
+        setPopupTriggered={mockSetPopup}
+        setOpenSong={mockSetOpenSong}
+        setNextSong={mockSetNextSong}
+      />
+    );
+    const { getAllByRole } = within(
+      screen.getByRole('list', { name: /data/i })
+    );
+    const firstEnqueueButton = getAllByRole('button', {
+      name: /Enqueue/i,
+    })[0];
+    fireEvent.click(firstEnqueueButton);
+
+    expect(enqueueSpy).toBeCalledWith(testLibrary[0]);
+  });
+
   test('delete button should delete song from library', async () => {
-    const mockSetPopup = jest.fn();
-    const mockSetOpenSong = jest.fn();
-    const mockSetNextSong = jest.fn();
     render(
       <SongLibrary
         setPopupTriggered={mockSetPopup}
@@ -176,9 +215,6 @@ describe('SongLibrary', () => {
   });
 
   test('click song name should open popup', async () => {
-    const mockSetPopup = jest.fn();
-    const mockSetOpenSong = jest.fn();
-    const mockSetNextSong = jest.fn();
     render(
       <SongLibrary
         setPopupTriggered={mockSetPopup}
@@ -200,7 +236,7 @@ describe('SongLibrary', () => {
   });
 });
 
-describe('SongItem', () => {
+describe('Song', () => {
   const mockSet = jest.fn();
   beforeEach(() => {
     global.window.electron = {

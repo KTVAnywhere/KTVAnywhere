@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Lrc, Runner } from 'lrc-kit';
-import { SongProps } from './SongItem';
-import './LyricsPlayer.css';
+import { SongProps } from '../Song';
+import styles from './LyricsPlayer.module.css';
 
 interface LyricsProps {
   currentSong: SongProps | null;
@@ -9,7 +9,7 @@ interface LyricsProps {
   lyricsEnabled: boolean;
 }
 
-export const Lyrics = ({
+const LyricsPlayer = ({
   currentSong,
   currentTime,
   lyricsEnabled,
@@ -24,14 +24,10 @@ export const Lyrics = ({
     } else if (!currentSong.lyricsPath) {
       setLyrics('no lyrics file for song');
     } else {
-      window.electron.file.readReceive((err, data) => {
-        if (err) {
-          console.log(err);
-        } else {
-          setRunner(new Runner(Lrc.parse(data)));
-        }
-      });
-      window.electron.file.readSend(currentSong.lyricsPath);
+      window.electron.file
+        .read(currentSong.lyricsPath)
+        .then((lyricsData) => setRunner(new Runner(Lrc.parse(lyricsData))))
+        .catch((err) => console.log(err));
     }
   }, [currentSong]);
 
@@ -60,15 +56,15 @@ export const Lyrics = ({
   }, [lyricsEnabled]);
 
   return (
-    <div className="lyricsGroup">
-      <div className="lyrics" data-testid="lyrics">
+    <div className={styles.lyricsGroup}>
+      <div className={styles.lyrics} data-testid="lyrics">
         {lyrics}
       </div>
-      <div className="nextLyrics" data-testid="next-lyrics">
+      <div className={styles.nextLyrics} data-testid="next-lyrics">
         {nextLyrics}
       </div>
     </div>
   );
 };
 
-export const test = 'hello';
+export default LyricsPlayer;

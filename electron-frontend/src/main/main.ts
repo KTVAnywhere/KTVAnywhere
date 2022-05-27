@@ -9,32 +9,22 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs-extra';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import MenuBuilder from './menu';
-import { resolveHtmlPath, handleFileOpen } from './util';
+import { resolveHtmlPath, openFile } from './util';
 import {
   createSongsStore,
   createQueueItemsStore,
   songFunctions,
   queueItemFunctions,
-} from './db';
+} from './database';
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
-ipcMain.on('file:readSend', async (event, filePath: string) => {
-  fs.readFile(filePath, 'utf-8', (err, data) => {
-    if (err) {
-      console.log(err.message);
-    }
-    event.reply('file:readReceive', err, data.toString());
-  });
+ipcMain.handle('file:read', async (_, filePath: string) => {
+  const data = await fs.promises.readFile(filePath, 'utf-8');
+  return data;
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -129,7 +119,7 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    ipcMain.handle('dialog:openFile', (_, config) => handleFileOpen(config));
+    ipcMain.handle('dialog:openFile', (_, config) => openFile(config));
 
     createWindow();
     app.on('activate', () => {

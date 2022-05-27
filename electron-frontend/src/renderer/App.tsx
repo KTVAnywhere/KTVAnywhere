@@ -4,15 +4,12 @@ import { useEffect, useState } from 'react';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import './App.css';
 import { QueueList, QueueItemProps } from '../components/SongsQueue';
-import SongComponent, {
-  emptySongProps,
-  SongProps,
-} from '../components/SongItem';
-import SongLibrary from '../components/SongLibrary';
+import Song, { emptySongProps, SongProps } from '../components/Song';
+import SongLibrary from '../components/SongList';
 import SongUpload from '../components/SongUpload';
 import Popup from '../components/Popup';
 import { AudioPlayer } from '../components/AudioPlayer';
-import { Lyrics } from '../components/LyricsPlayer';
+import LyricsPlayer from '../components/LyricsPlayer';
 
 const darkTheme = createTheme({
   palette: {
@@ -75,7 +72,7 @@ const SongTest = () => {
             trigger={songPopupTriggered}
             setTrigger={setSongPopupTriggered}
           >
-            <SongComponent song={openSong} />
+            <Song song={openSong} />
           </Popup>
         </LeftSidebar>
         <RightSidebar
@@ -84,7 +81,7 @@ const SongTest = () => {
         >
           <QueueList setNextSong={setNextSong} />
         </RightSidebar>
-        <Lyrics
+        <LyricsPlayer
           currentSong={currentSong}
           currentTime={currentTime}
           lyricsEnabled={lyricsEnabled}

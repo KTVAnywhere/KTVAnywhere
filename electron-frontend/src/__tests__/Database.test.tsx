@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import { queueItemFunctions, songFunctions } from '../main/db';
-import { SongProps } from '../components/SongItem';
+import { queueItemFunctions, songFunctions } from '../main/database';
+import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 import {
   testLibrary,

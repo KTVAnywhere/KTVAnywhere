@@ -1,4 +1,4 @@
-import { SongProps } from '../components/SongItem';
+import { SongProps } from '../components/Song';
 
 export const testSong: SongProps = {
   songId: expect.any(String),

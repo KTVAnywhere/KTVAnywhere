@@ -1,7 +1,7 @@
 import { Slider } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import './AudioPlayer.css';
-import { SongProps } from './SongItem';
+import { SongProps } from './Song';
 import { DequeueSong, GetQueueLength } from './SongsQueue';
 
 const ProgressBar = ({

@@ -9,11 +9,11 @@ import {
 } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Dispatch, SetStateAction } from 'react';
-import { SongProps } from '../SongItem';
+import { SongProps } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
-import './SongLibrary.module.css';
+import './SongList.module.css';
 
-const handleDelete = (songId: string) => {
+const deleteSong = (songId: string) => {
   window.electron.store.songs.deleteSong(songId);
 };
 
@@ -59,7 +59,7 @@ const SongCard = ({
         <Button
           variant="contained"
           size="small"
-          onClick={() => handleDelete(song.songId)}
+          onClick={() => deleteSong(song.songId)}
         >
           Delete
         </Button>
@@ -68,7 +68,7 @@ const SongCard = ({
   );
 };
 
-const SongLibrary = ({
+const SongList = ({
   setPopupTriggered,
   setOpenSong,
   setNextSong,
@@ -96,4 +96,4 @@ const SongLibrary = ({
   );
 };
 
-export default SongLibrary;
+export default SongList;
