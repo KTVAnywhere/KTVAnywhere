@@ -7,21 +7,20 @@ import {
   mockGetComputedStyle,
   DND_DRAGGABLE_DATA_ATTR,
 } from 'react-beautiful-dnd-test-utils';
-import { DequeueSong, EnqueueSong, QueueList } from '../components/SongsQueue';
+import QueueList, { DequeueSong, EnqueueSong } from '../components/SongsQueue';
 import {
-  queueAfterDel,
-  queueAfterEnqueue,
-  queueAfterPositionSwap,
-  sendItemToFrontQueue,
-  testSong2,
-  testSong,
-  queueWithFourSongs,
-  queueWithOneSong,
+  queueTestDataWithSongs012,
+  queueTestDataWithSongs102,
+  queueTestDataWithSongs201,
+  queueTestDataWithSongs01,
+  queueTestDataWithSongs02,
+  queueTestDataWithSong0,
+  songTestData,
 } from '../__testsData__/testData';
 import mockedElectron from '../__testsData__/mocks';
 
-describe('QueueList buttons', () => {
-  const mockGetAllQueueItems = () => queueWithFourSongs;
+describe('QueueList component buttons tests', () => {
+  const mockGetAllQueueItems = () => queueTestDataWithSongs012;
   const mockSetAllQueueItems = jest.fn();
   const mockSetNextSong = jest.fn();
 
@@ -59,7 +58,7 @@ describe('QueueList buttons', () => {
     )[1];
     fireEvent.click(deleteSongInQueueButton);
 
-    expect(mockSetAllQueueItems).toBeCalledWith(queueAfterDel);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueTestDataWithSongs02);
   });
 
   test('up button should move song up in queue', () => {
@@ -69,22 +68,22 @@ describe('QueueList buttons', () => {
     )[1];
     fireEvent.click(swapSongPositionInQueueButton);
 
-    expect(mockSetAllQueueItems).toBeCalledWith(queueAfterPositionSwap);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueTestDataWithSongs102);
   });
 
   test('send to front of queue button should move song to first item in queue', () => {
     render(<QueueList setNextSong={mockSetNextSong} />);
     const sendToFrontInQueueButton = screen.getAllByTestId(
       'send-to-front-of-queue-button'
-    )[3];
+    )[2];
     fireEvent.click(sendToFrontInQueueButton);
 
-    expect(mockSetAllQueueItems).toBeCalledWith(sendItemToFrontQueue);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueTestDataWithSongs201);
   });
 });
 
-describe('Drag and Drop QueueList', () => {
-  const mockGetAllQueueItems = () => queueWithFourSongs;
+describe('Drag and Drop tests on QueueList component', () => {
+  const mockGetAllQueueItems = () => queueTestDataWithSongs012;
   const mockSetAllQueueItems = jest.fn();
   const mockSetNextSong = jest.fn();
 
@@ -121,12 +120,12 @@ describe('Drag and Drop QueueList', () => {
       positions: 1,
     });
 
-    expect(mockSetAllQueueItems).toBeCalledWith(queueAfterPositionSwap);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueTestDataWithSongs102);
   });
 });
 
-describe('Enqueue and Dequeue', () => {
-  const mockGetAllQueueItems = () => queueWithOneSong;
+describe('Enqueue and Dequeue tests', () => {
+  const mockGetAllQueueItems = () => queueTestDataWithSong0;
   const mockSetAllQueueItems = jest.fn();
 
   beforeEach(() => {
@@ -149,16 +148,16 @@ describe('Enqueue and Dequeue', () => {
   });
 
   test('enqueue song', () => {
-    EnqueueSong(testSong2);
+    EnqueueSong(songTestData[1]);
 
-    expect(mockSetAllQueueItems).toBeCalledWith(queueAfterEnqueue);
+    expect(mockSetAllQueueItems).toBeCalledWith(queueTestDataWithSongs01);
   });
 
   test('dequeue song', () => {
     const dequeuedItem = DequeueSong();
 
     expect(mockSetAllQueueItems).toBeCalledWith([]);
-    expect(dequeuedItem).toEqual(testSong);
+    expect(dequeuedItem).toEqual(songTestData[0]);
   });
 
   test('dequeue empty queue', () => {

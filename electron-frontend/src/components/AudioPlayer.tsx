@@ -9,11 +9,11 @@ const ProgressBar = ({
   currentTime,
   setSkipToTime,
 }: {
-  duration: number | undefined;
-  currentTime: number | undefined;
+  duration: number;
+  currentTime: number;
   setSkipToTime: Dispatch<SetStateAction<number | null | undefined>>;
 }) => {
-  function formatTime(seconds: number) {
+  function formatSecondsToMinutesAndSeconds(seconds: number) {
     return `${Math.floor(seconds / 60)}:${`0${Math.floor(seconds % 60)}`.slice(
       -2
     )}`;
@@ -22,7 +22,6 @@ const ProgressBar = ({
   function getSkippedTime(
     e: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent
   ) {
-    if (duration === undefined) return 0;
     const mousePositionWhenClicked = e.pageX;
     const bar = document.querySelector('.bar-progress') as HTMLSpanElement;
     const leftSideOfBar = bar.getBoundingClientRect().left + window.scrollX;
@@ -32,7 +31,9 @@ const ProgressBar = ({
     return unitTime * relativePositionInBar;
   }
 
-  function handleTimeChange(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  function songPlayBackTimeChange(
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) {
     setSkipToTime(getSkippedTime(e));
 
     function updateTimeOnMove(event: MouseEvent) {
@@ -46,28 +47,26 @@ const ProgressBar = ({
     });
   }
 
-  const currentPercentage =
-    currentTime === undefined || duration === undefined
-      ? 0
-      : (currentTime / duration) * 100;
+  const currentPercentage = duration === 0 ? 0 : (currentTime / duration) * 100;
 
   return (
     <div className="progress-bar">
       <span className="progress-bar-time">
-        {currentTime === undefined ? 0 : formatTime(currentTime)}
+        {formatSecondsToMinutesAndSeconds(currentTime)}
       </span>
       <div
         className="bar-progress"
         role="progressbar"
         tabIndex={0}
         aria-label="Progress bar of song"
+        data-testid="progress-bar"
         style={{
           background: `linear-gradient(to right, #7FB069 ${currentPercentage}%, white 0)`,
         }}
-        onMouseDown={(e) => handleTimeChange(e)}
+        onMouseDown={(e) => songPlayBackTimeChange(e)}
       />
       <span className="progress-bar-time">
-        {duration === undefined ? 0 : formatTime(duration)}
+        {formatSecondsToMinutesAndSeconds(duration)}
       </span>
     </div>
   );
@@ -88,8 +87,8 @@ export const AudioPlayer = ({
   nextSong: SongProps | null;
   setLyricsEnabled: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const [duration, setDuration] = useState<number>();
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [duration, setDuration] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [skipToTime, setSkipToTime] = useState<number | null>();
   const [volume, setVolume] = useState<number>(70);
 
@@ -101,6 +100,7 @@ export const AudioPlayer = ({
     setCurrentSong(nextSong);
     audio.src = `atom:///${nextSong?.songPath}`;
     audio.load();
+    setIsPlaying(true);
   }, [nextSong, setCurrentSong]);
 
   useEffect(() => {
@@ -115,6 +115,7 @@ export const AudioPlayer = ({
         setCurrentSong(song);
         audio.src = `atom:///${song?.songPath}`;
         audio.load();
+        audio.play();
       }
     } else {
       audio.pause();
@@ -152,23 +153,27 @@ export const AudioPlayer = ({
     };
   }, [setCurrentTime]);
 
-  const handleVolumeChange = (_event: Event, newValue: number | number[]) => {
+  const volumeChange = (_event: Event, newValue: number | number[]) => {
     setVolume(newValue as number);
     const audio: HTMLAudioElement = document.getElementById(
       'audio'
     ) as HTMLAudioElement;
-    audio.volume = volume / 100;
+    audio.volume = (newValue as number) / 100;
   };
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+  const playSong = () => {
+    setIsPlaying(true);
   };
 
-  const handleLyricsToggle = () => {
+  const pauseSong = () => {
+    setIsPlaying(false);
+  };
+
+  const toggleLyrics = () => {
     setLyricsEnabled((state) => !state);
   };
 
-  const handleEndSong = () => {
+  const endSong = () => {
     const audio: HTMLAudioElement = document.getElementById(
       'audio'
     ) as HTMLAudioElement;
@@ -179,43 +184,37 @@ export const AudioPlayer = ({
       audio.load();
     } else {
       setCurrentSong(null);
+      setIsPlaying(false);
       audio.src = '';
       setDuration(0);
       setCurrentTime(0);
     }
   };
 
-  const handleBackward = () => {
-    if (currentTime === undefined || duration === undefined) return;
-    if (currentTime - 10 <= 0) {
-      setSkipToTime(0.01);
-    } else {
-      setSkipToTime(currentTime - 10);
-    }
+  const backwardTenSeconds = () => {
+    setSkipToTime(() => (currentTime <= 10 ? 0.01 : currentTime - 10));
   };
 
-  const handleForward = () => {
-    if (currentTime === undefined || duration === undefined) return;
-    if (currentTime + 10 >= duration) {
-      setSkipToTime(duration);
-    } else {
-      setSkipToTime(currentTime + 10);
-    }
+  const forwardTenSeconds = () => {
+    setSkipToTime(() =>
+      currentTime + 10 >= duration ? duration : currentTime + 10
+    );
   };
 
   return (
     <div className="audio-player">
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio id="audio" onEnded={handleEndSong} />
+      <audio id="audio" data-testid="audio-element" onEnded={endSong} />
       <div className="right-controls">
         <Slider
           className="volume-slider"
           aria-label="Volume"
           value={volume}
-          onChange={handleVolumeChange}
+          onChange={volumeChange}
           min={0}
           max={100}
           color="secondary"
+          data-testid="volume-slider"
         />
         <span>Volume</span>
       </div>
@@ -231,23 +230,26 @@ export const AudioPlayer = ({
           <button
             className="player-button"
             type="button"
-            onClick={handleBackward}
+            data-testid="backward-10-button"
+            onClick={backwardTenSeconds}
           >
             back 10
           </button>
           <button
             className="player-button"
             type="button"
-            onClick={handleForward}
+            data-testid="forward-10-button"
+            onClick={forwardTenSeconds}
           >
             forward 10
           </button>
           {'  '}
-          {isPlaying === true ? (
+          {isPlaying ? (
             <button
               className="player-button"
               type="button"
-              onClick={handlePlayPause}
+              data-testid="pause-button"
+              onClick={pauseSong}
             >
               {'  '}II{'  '}
             </button>
@@ -255,7 +257,8 @@ export const AudioPlayer = ({
             <button
               className="player-button"
               type="button"
-              onClick={handlePlayPause}
+              data-testid="play-button"
+              onClick={playSong}
             >
               {'  '}▶{'  '}
             </button>
@@ -264,7 +267,8 @@ export const AudioPlayer = ({
           <button
             className="player-button"
             type="button"
-            onClick={handleEndSong}
+            data-testid="end-song-button"
+            onClick={endSong}
           >
             end song
           </button>
@@ -272,7 +276,8 @@ export const AudioPlayer = ({
           <button
             className="player-button"
             type="button"
-            onClick={handleLyricsToggle}
+            data-testid="toggle-lyrics-button"
+            onClick={toggleLyrics}
           >
             toggle lyrics
           </button>

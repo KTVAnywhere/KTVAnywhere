@@ -9,8 +9,8 @@ import {
 import * as Queue from '../components/SongsQueue';
 import SongComponent from '../components/Song';
 import SongUpload from '../components/SongUpload';
-import SongLibrary from '../components/SongList';
-import { testSong, testSong2, testLibrary } from '../__testsData__/testData';
+import SongList from '../components/SongList';
+import { songTestData, songListTestData } from '../__testsData__/testData';
 import mockedElectron from '../__testsData__/mocks';
 
 describe('SongUpload', () => {
@@ -21,10 +21,10 @@ describe('SongUpload', () => {
       dialog: {
         openFile: jest
           .fn()
-          .mockResolvedValueOnce(testSong.songPath)
-          .mockResolvedValueOnce(testSong.lyricsPath)
-          .mockResolvedValueOnce(testSong2.songPath)
-          .mockResolvedValueOnce(testSong2.lyricsPath),
+          .mockResolvedValueOnce(songTestData[0].songPath)
+          .mockResolvedValueOnce(songTestData[0].lyricsPath)
+          .mockResolvedValueOnce(songTestData[1].songPath)
+          .mockResolvedValueOnce(songTestData[1].lyricsPath),
       },
       store: {
         ...mockedElectron.store,
@@ -60,8 +60,12 @@ describe('SongUpload', () => {
     const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
     const submitButton = screen.getByRole('button', { name: /Upload/i });
 
-    fireEvent.change(songNameInput, { target: { value: testSong.songName } });
-    fireEvent.change(artistInput, { target: { value: testSong.artist } });
+    fireEvent.change(songNameInput, {
+      target: { value: songTestData[0].songName },
+    });
+    fireEvent.change(artistInput, {
+      target: { value: songTestData[0].artist },
+    });
     fireEvent.click(songPickerButton);
     await waitFor(() =>
       expect(screen.getByTestId('song-picker-input')).toHaveValue()
@@ -72,7 +76,7 @@ describe('SongUpload', () => {
     );
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(mockAdd).toBeCalledWith(testSong));
+    await waitFor(() => expect(mockAdd).toBeCalledWith(songTestData[0]));
   });
 
   test('form should not submit if song name is not filled in', async () => {
@@ -82,7 +86,9 @@ describe('SongUpload', () => {
     const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
     const submitButton = screen.getByRole('button', { name: /Upload/i });
 
-    fireEvent.change(artistInput, { target: { value: testSong.artist } });
+    fireEvent.change(artistInput, {
+      target: { value: songTestData[0].artist },
+    });
     fireEvent.click(songPickerButton);
     await waitFor(() =>
       expect(screen.getByTestId('song-picker-input')).toHaveValue()
@@ -105,8 +111,12 @@ describe('SongUpload', () => {
     const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
     const submitButton = screen.getByRole('button', { name: /Upload/i });
 
-    fireEvent.change(songNameInput, { target: { value: testSong.songName } });
-    fireEvent.change(artistInput, { target: { value: testSong.artist } });
+    fireEvent.change(songNameInput, {
+      target: { value: songTestData[0].songName },
+    });
+    fireEvent.change(artistInput, {
+      target: { value: songTestData[0].artist },
+    });
     fireEvent.click(lyricsPickerButton);
     await waitFor(() =>
       expect(screen.getByTestId('lyrics-picker-input')).toHaveValue()
@@ -118,7 +128,7 @@ describe('SongUpload', () => {
 });
 
 describe('SongList', () => {
-  const mockGetAll = () => testLibrary;
+  const mockGetAll = () => songListTestData;
   const mockDelete = jest.fn();
 
   const mockSetPopup = jest.fn();
@@ -145,7 +155,7 @@ describe('SongList', () => {
   });
   test('song library should display list of songs', async () => {
     render(
-      <SongLibrary
+      <SongList
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
         setNextSong={mockSetNextSong}
@@ -160,7 +170,7 @@ describe('SongList', () => {
 
   test('click play button should call setNextSong with the song clicked', async () => {
     render(
-      <SongLibrary
+      <SongList
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
         setNextSong={mockSetNextSong}
@@ -174,13 +184,13 @@ describe('SongList', () => {
     })[0];
     fireEvent.click(firstPlayButton);
 
-    expect(mockSetNextSong).toBeCalledWith(testLibrary[0]);
+    expect(mockSetNextSong).toBeCalledWith(songTestData[0]);
   });
 
   test('click enqueue button should add song to queue', async () => {
     const enqueueSpy = jest.spyOn(Queue, 'EnqueueSong');
     render(
-      <SongLibrary
+      <SongList
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
         setNextSong={mockSetNextSong}
@@ -194,12 +204,12 @@ describe('SongList', () => {
     })[0];
     fireEvent.click(firstEnqueueButton);
 
-    expect(enqueueSpy).toBeCalledWith(testLibrary[0]);
+    expect(enqueueSpy).toBeCalledWith(songTestData[0]);
   });
 
   test('delete button should delete song from library', async () => {
     render(
-      <SongLibrary
+      <SongList
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
         setNextSong={mockSetNextSong}
@@ -211,12 +221,12 @@ describe('SongList', () => {
     const firstDeleteButton = getAllByRole('button', { name: /Delete/i })[0];
     fireEvent.click(firstDeleteButton);
 
-    expect(mockDelete).toBeCalledWith(testLibrary[0].songId);
+    expect(mockDelete).toBeCalledWith(songListTestData[0].songId);
   });
 
   test('click song name should open popup', async () => {
     render(
-      <SongLibrary
+      <SongList
         setPopupTriggered={mockSetPopup}
         setOpenSong={mockSetOpenSong}
         setNextSong={mockSetNextSong}
@@ -224,13 +234,13 @@ describe('SongList', () => {
     );
 
     const song1button = screen.getByRole('button', {
-      name: (content) => content.startsWith(testLibrary[0].songName),
+      name: (content) => content.startsWith(songListTestData[0].songName),
     });
     fireEvent.click(song1button);
 
     expect(mockSetPopup).toBeCalledWith(true);
     expect(mockSetOpenSong).toBeCalledWith({
-      ...testLibrary[0],
+      ...songListTestData[0],
       songId: expect.any(String),
     });
   });
@@ -244,8 +254,8 @@ describe('Song', () => {
       dialog: {
         openFile: jest
           .fn()
-          .mockResolvedValueOnce(testSong2.songPath)
-          .mockResolvedValueOnce(testSong2.lyricsPath),
+          .mockResolvedValueOnce(songTestData[1].songPath)
+          .mockResolvedValueOnce(songTestData[1].lyricsPath),
       },
       store: {
         ...mockedElectron.store,
@@ -258,38 +268,42 @@ describe('Song', () => {
   });
 
   test('song item should display song name, artist and paths', async () => {
-    render(<SongComponent song={testSong} />);
+    render(<SongComponent song={songTestData[0]} />);
 
-    expect(screen.getByText(testSong.songName)).toBeInTheDocument();
-    expect(screen.getByText(testSong.artist)).toBeInTheDocument();
-    expect(screen.getByText(testSong.songPath)).toBeInTheDocument();
-    expect(screen.getByText(testSong.lyricsPath)).toBeInTheDocument();
+    expect(screen.getByText(songTestData[0].songName)).toBeInTheDocument();
+    expect(screen.getByText(songTestData[0].artist)).toBeInTheDocument();
+    expect(screen.getByText(songTestData[0].songPath)).toBeInTheDocument();
+    expect(screen.getByText(songTestData[0].lyricsPath)).toBeInTheDocument();
   });
 
   test('editing song details will update the database', async () => {
-    render(<SongComponent song={testSong} />);
+    render(<SongComponent song={songTestData[0]} />);
 
-    const nameButton = screen.getByText(testSong.songName);
+    const nameButton = screen.getByText(songTestData[0].songName);
     fireEvent.click(nameButton);
     const nameInput = screen.getByRole('textbox');
-    fireEvent.change(nameInput, { target: { value: testSong2.songName } });
+    fireEvent.change(nameInput, {
+      target: { value: songTestData[1].songName },
+    });
     fireEvent.focusOut(nameInput);
 
-    const artistButton = screen.getByText(testSong.artist);
+    const artistButton = screen.getByText(songTestData[0].artist);
     fireEvent.click(artistButton);
     const artistInput = screen.getByRole('textbox');
-    fireEvent.change(artistInput, { target: { value: testSong2.artist } });
+    fireEvent.change(artistInput, {
+      target: { value: songTestData[1].artist },
+    });
     fireEvent.focusOut(artistInput);
 
     const songPickerButton = screen.getByTestId('song-picker-button');
     fireEvent.click(songPickerButton);
 
     await waitFor(() =>
-      expect(screen.getByText(testSong2.songPath)).toBeInTheDocument()
+      expect(screen.getByText(songTestData[1].songPath)).toBeInTheDocument()
     );
     const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
     fireEvent.click(lyricsPickerButton);
 
-    await waitFor(() => expect(mockSet).toBeCalledWith(testSong2));
+    await waitFor(() => expect(mockSet).toBeCalledWith(songTestData[1]));
   });
 });

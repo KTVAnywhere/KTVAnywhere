@@ -3,9 +3,9 @@ import { queueItemFunctions, songFunctions } from '../main/database';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 import {
-  testLibrary,
-  queueWithFourSongs,
-  queueAfterPositionSwap,
+  songListTestData,
+  queueTestDataWithSongs012,
+  queueTestDataWithSongs102,
 } from '../__testsData__/testData';
 
 const ActualStore = jest.requireActual('electron-store');
@@ -23,7 +23,7 @@ describe('songs store', () => {
   };
 
   beforeEach(() => {
-    data = testLibrary;
+    data = songListTestData;
   });
   afterEach(() => {
     mockGet.mockClear();
@@ -31,43 +31,50 @@ describe('songs store', () => {
   });
   test('get song based on songId', () => {
     const { getSong } = songFunctions;
-    expect(getSong(songsStore, '1')).toEqual(testLibrary[0]);
+    expect(getSong(songsStore, '0')).toEqual(songListTestData[0]);
   });
   test('add song to end of songs store', () => {
     const toAdd: SongProps = {
-      songId: '3',
-      songName: 'Test song 3',
-      artist: 'Test artist 3',
-      songPath: 'C:\\dir\\file3.mp3',
-      lyricsPath: 'C:\\dir\\lyrics3.lrc',
+      songId: '2',
+      songName: 'Test song 2',
+      artist: 'Test artist 2',
+      songPath: 'C:\\dir\\file2.mp3',
+      lyricsPath: 'C:\\dir\\lyrics2.lrc',
     };
     const { addSong } = songFunctions;
     addSong(songsStore, toAdd);
-    expect(mockSet).toBeCalledWith('songs', [...testLibrary, toAdd]);
+    expect(mockSet).toBeCalledWith('songs', [...songListTestData, toAdd]);
   });
   test('change song in list', () => {
     const newTestSong: SongProps = {
-      ...testLibrary[1],
+      ...songListTestData[1],
       songName: 'new test song',
     };
     const { setSong } = songFunctions;
     setSong(songsStore, newTestSong);
     expect(mockSet).toBeCalledWith('songs', [
-      ...testLibrary.slice(0, 1),
+      ...songListTestData.slice(0, 1),
       newTestSong,
     ]);
   });
   test('delete song', () => {
     const { deleteSong } = songFunctions;
-    deleteSong(songsStore, '1');
-    expect(mockSet).toBeCalledWith('songs', [...testLibrary.slice(1)]);
+    deleteSong(songsStore, '0');
+    expect(mockSet).toBeCalledWith('songs', [...songListTestData.slice(1)]);
   });
   test('get all songs', () => {
     const { getAllSongs } = songFunctions;
-    expect(getAllSongs(songsStore)).toEqual(testLibrary);
+    expect(getAllSongs(songsStore)).toEqual(songListTestData);
   });
   test('set all songs', () => {
-    const newTestLibrary: SongProps[] = [
+    const newsongListTestData: SongProps[] = [
+      {
+        songId: '2',
+        songName: 'Test song 2',
+        artist: 'Test artist 2',
+        songPath: 'C:\\dir\\file2.mp3',
+        lyricsPath: 'C:\\dir\\lyrics2.lrc',
+      },
       {
         songId: '3',
         songName: 'Test song 3',
@@ -75,17 +82,10 @@ describe('songs store', () => {
         songPath: 'C:\\dir\\file3.mp3',
         lyricsPath: 'C:\\dir\\lyrics3.lrc',
       },
-      {
-        songId: '4',
-        songName: 'Test song 4',
-        artist: 'Test artist 4',
-        songPath: 'C:\\dir\\file4.mp3',
-        lyricsPath: 'C:\\dir\\lyrics4.lrc',
-      },
     ];
     const { setAllSongs } = songFunctions;
-    setAllSongs(songsStore, newTestLibrary);
-    expect(mockSet).toBeCalledWith('songs', newTestLibrary);
+    setAllSongs(songsStore, newsongListTestData);
+    expect(mockSet).toBeCalledWith('songs', newsongListTestData);
   });
 });
 
@@ -102,7 +102,7 @@ describe('queueItems store', () => {
   };
 
   beforeEach(() => {
-    data = queueWithFourSongs;
+    data = queueTestDataWithSongs012;
   });
   afterEach(() => {
     mockGet.mockClear();
@@ -111,31 +111,33 @@ describe('queueItems store', () => {
 
   test('get queueItem based on queueItemId', () => {
     const { getQueueItem } = queueItemFunctions;
-    expect(getQueueItem(queueItemsStore, '1')).toEqual(queueWithFourSongs[0]);
+    expect(getQueueItem(queueItemsStore, '0')).toEqual(
+      queueTestDataWithSongs012[0]
+    );
   });
   test('add queueItem to end of queueItems store', () => {
     const toAdd: QueueItemProps = {
       song: {
-        songId: '5',
-        songName: 'Test song 5',
-        artist: 'Test artist 5',
-        songPath: 'C:\\dir\\file5.mp3',
-        lyricsPath: 'C:\\dir\\lyrics5.lrc',
+        songId: '3',
+        songName: 'Test song 3',
+        artist: 'Test artist 3',
+        songPath: 'C:\\dir\\file3.mp3',
+        lyricsPath: 'C:\\dir\\lyrics3.lrc',
       },
-      queueItemId: '5',
+      queueItemId: '3',
     };
     const { addQueueItem } = queueItemFunctions;
     addQueueItem(queueItemsStore, toAdd);
     expect(mockSet).toBeCalledWith('queueItems', [
-      ...queueWithFourSongs,
+      ...queueTestDataWithSongs012,
       toAdd,
     ]);
   });
   test('change queueItem in queueItems store', () => {
     const newTestQueueItem: QueueItemProps = {
-      ...queueWithFourSongs[0],
+      ...queueTestDataWithSongs012[0],
       song: {
-        ...queueWithFourSongs[0].song,
+        ...queueTestDataWithSongs012[0].song,
         songName: 'new test song',
       },
     };
@@ -143,24 +145,26 @@ describe('queueItems store', () => {
     setQueueItem(queueItemsStore, newTestQueueItem);
     expect(mockSet).toBeCalledWith('queueItems', [
       newTestQueueItem,
-      ...queueWithFourSongs.slice(1),
+      ...queueTestDataWithSongs012.slice(1),
     ]);
   });
   test('delete queueItem', () => {
     const { deleteQueueItem } = queueItemFunctions;
-    deleteQueueItem(queueItemsStore, '2');
+    deleteQueueItem(queueItemsStore, '1');
     expect(mockSet).toBeCalledWith('queueItems', [
-      ...queueWithFourSongs.slice(0, 1),
-      ...queueWithFourSongs.slice(2),
+      ...queueTestDataWithSongs012.slice(0, 1),
+      ...queueTestDataWithSongs012.slice(2),
     ]);
   });
   test('get all queueItems', () => {
     const { getAllQueueItems } = queueItemFunctions;
-    expect(getAllQueueItems(queueItemsStore)).toEqual(queueWithFourSongs);
+    expect(getAllQueueItems(queueItemsStore)).toEqual(
+      queueTestDataWithSongs012
+    );
   });
   test('set all queueItems', () => {
     const { setAllQueueItems } = queueItemFunctions;
-    setAllQueueItems(queueItemsStore, queueAfterPositionSwap);
-    expect(mockSet).toBeCalledWith('queueItems', queueAfterPositionSwap);
+    setAllQueueItems(queueItemsStore, queueTestDataWithSongs102);
+    expect(mockSet).toBeCalledWith('queueItems', queueTestDataWithSongs102);
   });
 });

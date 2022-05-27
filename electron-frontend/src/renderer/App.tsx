@@ -2,14 +2,14 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
-import './App.css';
-import { QueueList, QueueItemProps } from '../components/SongsQueue';
+import QueueList, { QueueItemProps } from '../components/SongsQueue';
 import Song, { emptySongProps, SongProps } from '../components/Song';
-import SongLibrary from '../components/SongList';
+import SongList from '../components/SongList';
 import SongUpload from '../components/SongUpload';
 import Popup from '../components/Popup';
 import { AudioPlayer } from '../components/AudioPlayer';
 import LyricsPlayer from '../components/LyricsPlayer';
+import './App.css';
 
 const darkTheme = createTheme({
   palette: {
@@ -22,7 +22,7 @@ const darkTheme = createTheme({
   },
 });
 
-const SongTest = () => {
+const MainPage = () => {
   const [, setSongList] = useState<SongProps[]>([]);
   const [, setQueue] = useState<QueueItemProps[]>([]);
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
@@ -63,7 +63,7 @@ const SongTest = () => {
           trigger={leftSidebarTrigger}
         >
           <SongUpload />
-          <SongLibrary
+          <SongList
             setPopupTriggered={setSongPopupTriggered}
             setOpenSong={setOpenSong}
             setNextSong={setNextSong}
@@ -99,7 +99,7 @@ export default function App() {
           path="/"
           element={
             <ThemeProvider theme={darkTheme}>
-              <SongTest />
+              <MainPage />
             </ThemeProvider>
           }
         />
