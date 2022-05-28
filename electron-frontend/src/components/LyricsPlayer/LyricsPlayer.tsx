@@ -21,8 +21,10 @@ const LyricsPlayer = ({
   useEffect(() => {
     if (currentSong === null) {
       setLyrics('file not loaded');
+      setRunner(new Runner(Lrc.parse('')));
     } else if (!currentSong.lyricsPath) {
       setLyrics('no lyrics file for song');
+      setRunner(new Runner(Lrc.parse('')));
     } else {
       window.electron.file
         .read(currentSong.lyricsPath)
