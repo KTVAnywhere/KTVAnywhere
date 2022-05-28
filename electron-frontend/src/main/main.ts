@@ -9,16 +9,22 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import fs from 'fs-extra';
+import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import MenuBuilder from './menu';
-import { resolveHtmlPath, handleFileOpen } from './util';
+import { resolveHtmlPath, openFile } from './util';
+import {
+  createSongsStore,
+  createQueueItemsStore,
+  songFunctions,
+  queueItemFunctions,
+} from './database';
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.handle('file:read', async (_, filePath: string) => {
+  const data = await fs.promises.readFile(filePath, 'utf-8');
+  return data;
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -113,12 +119,85 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
-    ipcMain.handle('dialog:openFile', (_, config) => handleFileOpen(config));
+    ipcMain.handle('dialog:openFile', (_, config) => openFile(config));
+
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
     });
+    // custom protocol for reading local files
+    protocol.registerFileProtocol('atom', (request, callback) => {
+      const url = request.url.substring(7);
+      try {
+        callback(decodeURI(path.normalize(url)));
+      } catch (error) {
+        if (error) console.error('Failed to register protocol');
+      }
+    });
+  })
+  .then(() => {
+    // Database
+    const songsStore = createSongsStore();
+    const queueItemsStore = createQueueItemsStore();
+    const { getSong, setSong, addSong, deleteSong, getAllSongs, setAllSongs } =
+      songFunctions;
+    const {
+      getQueueItem,
+      setQueueItem,
+      addQueueItem,
+      deleteQueueItem,
+      getAllQueueItems,
+      setAllQueueItems,
+    } = queueItemFunctions;
+
+    ipcMain.on('store:getSong', async (event, songId) => {
+      event.returnValue = getSong(songsStore, songId);
+    });
+    ipcMain.on('store:addSong', async (_, song) => {
+      addSong(songsStore, song);
+    });
+    ipcMain.on('store:setSong', async (_, song) => {
+      setSong(songsStore, song);
+    });
+    ipcMain.on('store:deleteSong', async (_, songId) => {
+      deleteSong(songsStore, songId);
+    });
+    ipcMain.on('store:getAllSongs', async (event) => {
+      event.returnValue = getAllSongs(songsStore);
+    });
+    ipcMain.on('store:setAllSongs', async (_, songs) => {
+      setAllSongs(songsStore, songs);
+    });
+
+    songsStore.onDidChange('songs', (results) =>
+      mainWindow?.webContents.send('store:onSongsChange', results)
+    );
+
+    ipcMain.on('store:getQueueItem', async (event, queueItemId) => {
+      event.returnValue = getQueueItem(queueItemsStore, queueItemId);
+    });
+    ipcMain.on('store:setQueueItem', async (_, queueItem) => {
+      setQueueItem(queueItemsStore, queueItem);
+    });
+    ipcMain.on('store:addQueueItem', async (_, queueItem) => {
+      addQueueItem(queueItemsStore, queueItem);
+    });
+    ipcMain.on('store:deleteQueueItem', async (_, queueItemId) => {
+      deleteQueueItem(queueItemsStore, queueItemId);
+    });
+
+    ipcMain.on('store:getAllQueueItems', async (event) => {
+      event.returnValue = getAllQueueItems(queueItemsStore);
+    });
+
+    ipcMain.on('store:setAllQueueItems', async (_, queueItems) => {
+      setAllQueueItems(queueItemsStore, queueItems);
+    });
+
+    queueItemsStore.onDidChange('queueItems', (results) =>
+      mainWindow?.webContents.send('store:onQueueItemsChange', results)
+    );
   })
   .catch(console.log);

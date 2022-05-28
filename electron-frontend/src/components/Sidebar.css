@@ -1,0 +1,91 @@
+.toggle-btn {
+  background-color: rgb(92, 88, 88);
+  color: white;
+  transition: all ease-in 0.1s;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+/* Left */
+.leftsidebar-opened {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: fit-content;
+
+  display: flex;
+  justify-content: left;
+  align-items: top;
+}
+
+.leftsidebar-inner {
+  position: relative;
+  padding: 20px;
+  width: 100%;
+  background-color: rgb(50, 50, 50);
+  color: white;
+  overflow-y: scroll;
+}
+
+.leftsidebar-collasped {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 25px;
+  background-color: rgb(58, 52, 52);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.leftsidebar-collasped .toggle-btn {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+}
+
+/* Right*/
+.rightsidebar-opened {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: fit-content;
+
+  display: flex;
+  justify-content: left;
+  align-items: top;
+}
+
+.rightsidebar-inner {
+  position: relative;
+  padding: 20px;
+  width: 100%;
+  background-color: rgb(50, 50, 50);
+  color: white;
+  overflow-y: scroll;
+}
+
+.rightsidebar-collasped {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 25px;
+  background-color: rgb(58, 52, 52);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rightsidebar-collasped .toggle-btn {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+}

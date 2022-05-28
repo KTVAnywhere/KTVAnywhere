@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'development') {
   };
 }
 
-export const handleFileOpen = async (config: Electron.OpenDialogOptions) => {
+export const openFile = async (config: Electron.OpenDialogOptions) => {
   const { canceled, filePaths } = await dialog.showOpenDialog(config);
   if (!canceled) {
     return filePaths[0];

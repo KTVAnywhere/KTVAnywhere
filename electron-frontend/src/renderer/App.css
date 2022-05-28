@@ -67,9 +67,31 @@ a:hover {
   text-decoration: none;
 }
 
-.Hello {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
+h2 {
+  text-align: center;
+}
+
+.outer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.top-box {
+  position: absolute;
+  height: 88%;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.bottom-box {
+  position: absolute;
+  background-color: #1f2232;
+  height: 12%;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }

@@ -1,190 +1,77 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { SongProps } from '../components/Song';
 
-import { QueueItemProps } from '../components/SongsQueue';
-
-export const queueWithFourSongs = [
+export const songTestData = [
   {
-    song: {
-      songId: '1',
-      songName: 'bensound-energy',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-energy.mp3',
-      lyricsPath: 'C:\\dir\\bensound-energy.lrc',
-    },
-    queueItemId: '1',
+    songId: expect.any(String),
+    songName: 'bensound-energy',
+    artist: 'bensound',
+    songPath: 'C:\\dir\\bensound-energy.mp3',
+    lyricsPath: 'C:\\dir\\bensound-energy.lrc',
   },
   {
-    song: {
-      songId: '2',
-      songName: 'bensound-sunny',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-sunny.mp3',
-      lyricsPath: 'C:\\dir\\bensound-sunny.lrc',
-    },
-    queueItemId: '2',
+    songId: expect.any(String),
+    songName: 'bensound-sunny',
+    artist: 'bensound',
+    songPath: 'C:\\dir\\bensound-sunny.mp3',
+    lyricsPath: 'C:\\dir\\bensound-sunny.lrc',
   },
   {
-    song: {
-      songId: '3',
-      songName: 'bensound-betterdays',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-betterdays.mp3',
-      lyricsPath: 'C:\\dir\\bensound-betterdays.lrc',
-    },
-    queueItemId: '3',
-  },
-  {
-    song: {
-      songId: '4',
-      songName: 'bensound-dubstep',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-dubstep.mp3',
-      lyricsPath: 'C:\\dir\\bensound-dubstep.lrc',
-    },
-    queueItemId: '4',
+    songId: expect.any(String),
+    songName: 'bensound-betterdays',
+    artist: 'bensound',
+    songPath: 'C:\\dir\\bensound-betterdays.mp3',
+    lyricsPath: 'C:\\dir\\bensound-betterdays.lrc',
   },
 ];
 
-export const queueAfterDel = [
-  {
-    song: {
-      songId: '1',
-      songName: 'bensound-energy',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-energy.mp3',
-      lyricsPath: 'C:\\dir\\bensound-energy.lrc',
-    },
-    queueItemId: '1',
-  },
-  {
-    song: {
-      songId: '3',
-      songName: 'bensound-betterdays',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-betterdays.mp3',
-      lyricsPath: 'C:\\dir\\bensound-betterdays.lrc',
-    },
-    queueItemId: '3',
-  },
-  {
-    song: {
-      songId: '4',
-      songName: 'bensound-dubstep',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-dubstep.mp3',
-      lyricsPath: 'C:\\dir\\bensound-dubstep.lrc',
-    },
-    queueItemId: '4',
-  },
+export const songListTestData: SongProps[] = [
+  { ...songTestData[0], songId: '0' },
+  { ...songTestData[1], songId: '1' },
 ];
 
-export const queueAfterPositionSwap = [
-  {
-    song: {
-      songId: '2',
-      songName: 'bensound-sunny',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-sunny.mp3',
-      lyricsPath: 'C:\\dir\\bensound-sunny.lrc',
-    },
-    queueItemId: '2',
-  },
-  {
-    song: {
-      songId: '1',
-      songName: 'bensound-energy',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-energy.mp3',
-      lyricsPath: 'C:\\dir\\bensound-energy.lrc',
-    },
-    queueItemId: '1',
-  },
-  {
-    song: {
-      songId: '3',
-      songName: 'bensound-betterdays',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-betterdays.mp3',
-      lyricsPath: 'C:\\dir\\bensound-betterdays.lrc',
-    },
-    queueItemId: '3',
-  },
-  {
-    song: {
-      songId: '4',
-      songName: 'bensound-dubstep',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-dubstep.mp3',
-      lyricsPath: 'C:\\dir\\bensound-dubstep.lrc',
-    },
-    queueItemId: '4',
-  },
+export const queueTestDataWithSong0 = [
+  { song: songTestData[0], queueItemId: '0' },
 ];
 
-export const originalQueue = [
-  {
-    song: {
-      songId: '1',
-      songName: 'bensound-energy',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-energy.mp3',
-      lyricsPath: 'C:\\dir\\bensound-energy.lrc',
-    },
-    queueItemId: '1',
-  },
+export const queueTestDataWithSongs012 = [
+  { song: songTestData[0], queueItemId: '0' },
+  { song: songTestData[1], queueItemId: '1' },
+  { song: songTestData[2], queueItemId: '2' },
 ];
 
-export const songItemToEnqueue = {
-  songId: '2',
-  songName: 'bensound-sunny',
-  artist: 'bensound',
-  songPath: 'C:\\dir\\bensound-sunny.mp3',
-  lyricsPath: 'C:\\dir\\bensound-sunny.lrc',
-};
-
-export const queueAfterEnqueue = [
-  {
-    song: {
-      songId: '1',
-      songName: 'bensound-energy',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-energy.mp3',
-      lyricsPath: 'C:\\dir\\bensound-energy.lrc',
-    },
-    queueItemId: '1',
-  },
-  {
-    song: {
-      songId: '2',
-      songName: 'bensound-sunny',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-sunny.mp3',
-      lyricsPath: 'C:\\dir\\bensound-sunny.lrc',
-    },
-    queueItemId: expect.any(String),
-  },
+export const queueTestDataWithSongs201 = [
+  { song: songTestData[2], queueItemId: '2' },
+  { song: songTestData[0], queueItemId: '0' },
+  { song: songTestData[1], queueItemId: '1' },
 ];
 
-export const queueAfterDequeue = [
-  {
-    song: {
-      songId: '2',
-      songName: 'bensound-sunny',
-      artist: 'bensound',
-      songPath: 'C:\\dir\\bensound-sunny.mp3',
-      lyricsPath: 'C:\\dir\\bensound-sunny.lrc',
-    },
-    queueItemId: '2',
-  },
+export const queueTestDataWithSongs02 = [
+  { song: songTestData[0], queueItemId: '0' },
+  { song: songTestData[2], queueItemId: '2' },
 ];
 
-export const songItemDequeued = {
-  songId: '1',
-  songName: 'bensound-energy',
-  artist: 'bensound',
-  songPath: 'C:\\dir\\bensound-energy.mp3',
-  lyricsPath: 'C:\\dir\\bensound-energy.lrc',
-};
+export const queueTestDataWithSongs102 = [
+  { song: songTestData[1], queueItemId: '1' },
+  { song: songTestData[0], queueItemId: '0' },
+  { song: songTestData[2], queueItemId: '2' },
+];
 
-export const emptyQueue: QueueItemProps[] = [];
+export const queueTestDataWithSongs01 = [
+  { song: songTestData[0], queueItemId: '0' },
+  { song: songTestData[1], queueItemId: expect.any(String) },
+];
+
+export const lineAt5s = 'Line 1';
+export const lineAt10s = 'Line 2';
+export const lineAt15s = 'Line 3';
+
+export const testLyrics = `
+[ar: Artist name]
+[al: Song name]
+[ti: Song Name]
+[by: Artist name]
+
+[00:00.00]
+[00:05.00]${lineAt5s}
+[00:10.00]${lineAt10s}
+[00:15.00]${lineAt15s}`;

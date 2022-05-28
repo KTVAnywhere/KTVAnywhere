@@ -3,4 +3,3 @@
 
 cd ./electron-frontend
 npx lint-staged
-npm test
