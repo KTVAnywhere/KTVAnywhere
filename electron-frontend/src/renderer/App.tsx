@@ -14,6 +14,9 @@ import './App.css';
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: '#ABFF95',
+    },
   },
   typography: {
     button: {
