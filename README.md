@@ -1,7 +1,7 @@
 
-# KTV anywhere
+# KTV Anywhere
 #### A karaoke song system for everyone
-[![Electron](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml/badge.svg?branch=v0.5.1)](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml)
+[![Electron](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml/badge.svg)](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml)
 ## Aim
 While karaoke has been around for many years, casual singers usually go to karaoke joints instead of having a home karaoke system due to the high set-up cost and subscription service. Therefore, we hope to make a self-hosted karaoke song system that is easy to deploy for personal use. It would only require a working computer and songs the users already have. We hope to make it seamless and provide a fun and interactive karaoke experience for all ages.
 ### Implemented Features
@@ -17,7 +17,7 @@ While karaoke has been around for many years, casual singers usually go to karao
 
 ## Technologies
 
-KTV anywhere uses the following technlogies:
+KTV Anywhere uses the following technlogies:
 
 - [Electron] - Cross-platform desktop deployment
 - [ReactJS] - For the application's frontend
@@ -31,7 +31,7 @@ Download and install the latest release from the [releases page].
 Setup
 ```sh
 git clone https://github.com/weiquany/KTVAnywhere.git
-cd electron-frontend
+cd ./KTVAnywhere/electron-frontend
 npm install
 ```
 Starting the application

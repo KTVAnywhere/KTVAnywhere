@@ -29,19 +29,21 @@ const SongCard = ({
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ width: 1 }}>
       <CardActionArea
         onClick={() => {
           setPopupTriggered(true);
           setOpenSong(song);
         }}
       >
-        <CardContent>
-          <Typography variant="h5">{song.songName}</Typography>
-          <Typography>{song.artist}</Typography>
+        <CardContent sx={{ height: '40px' }}>
+          <Typography noWrap variant="h5">
+            {song.songName}
+          </Typography>
+          <Typography noWrap>{song.artist}</Typography>
         </CardContent>
       </CardActionArea>
-      <CardActions>
+      <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           size="small"
           variant="contained"
@@ -80,9 +82,17 @@ const SongList = ({
   return (
     <div>
       <h2>Song library</h2>
-      <List aria-label="data">
+      <List
+        aria-label="data"
+        sx={{
+          width: '280px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+        }}
+      >
         {window.electron.store.songs.getAllSongs().map((song) => (
-          <ListItem disablePadding key={song.songId}>
+          <ListItem key={song.songId} sx={{ px: 0 }}>
             <SongCard
               song={song}
               setPopupTriggered={setPopupTriggered}
