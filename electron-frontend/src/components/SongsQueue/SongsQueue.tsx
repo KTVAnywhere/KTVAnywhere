@@ -1,5 +1,14 @@
 import { Dispatch, SetStateAction } from 'react';
 import {
+  Button,
+  CardActions,
+  CardContent,
+  List,
+  ListItem,
+  Typography,
+} from '@mui/material';
+import Card from '@mui/material/Card';
+import {
   DragDropContext,
   Droppable,
   Draggable,
@@ -7,7 +16,7 @@ import {
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
 import { SongProps } from '../Song';
-import './SongsQueue.css';
+import './SongsQueue.module.css';
 
 export interface QueueItemProps {
   song: SongProps;
@@ -80,20 +89,27 @@ export const QueueList = ({
   return (
     <div className="QueueList">
       <h2>Songs Queue</h2>
-      <button
-        className="delete-song-from-queue-button"
-        type="button"
+      <Button
+        size="small"
+        variant="contained"
         data-testid="clear-queue-button"
         onClick={() => clearQueue()}
+        color="error"
       >
         Clear queue
-      </button>
+      </Button>
       {queue.length > 0 ? (
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="songsQueue">
             {(provided) => (
-              <ul
-                className="songsQueue"
+              <List
+                aria-label="data"
+                sx={{
+                  width: '280px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                }}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...provided.droppableProps}
                 ref={provided.innerRef}
@@ -107,61 +123,76 @@ export const QueueList = ({
                     >
                       {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
                       {(provided) => (
-                        <li
-                          className="queue-card"
+                        <ListItem
                           ref={provided.innerRef}
                           // eslint-disable-next-line react/jsx-props-no-spreading
                           {...provided.dragHandleProps}
                           // eslint-disable-next-line react/jsx-props-no-spreading
                           {...provided.draggableProps}
                           data-testid="draggable-queue-item"
+                          sx={{ px: 0 }}
                         >
-                          <div>
-                            <pre>
-                              <strong>{index + 1}</strong>
-                              {'   '}
-                              {queueItem.song.songName}
-                              {'  by  '}
-                              {queueItem.song.artist}
-                              {'   '}
-                            </pre>
-                            <button
-                              type="button"
-                              data-testid="play-now-button"
-                              onClick={() => playSong(index)}
+                          <Card sx={{ width: 1 }}>
+                            <CardContent sx={{ height: '40px' }}>
+                              <Typography noWrap variant="h5">
+                                {queueItem.song.songName}
+                              </Typography>
+                              <Typography noWrap>
+                                {queueItem.song.artist}
+                              </Typography>
+                            </CardContent>
+                            <CardActions
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                              }}
                             >
-                              play
-                            </button>{' '}
-                            <button
-                              type="button"
-                              data-testid="move-song-up-in-queue-button"
-                              onClick={() => shiftSongUp(index)}
-                            >
-                              up
-                            </button>{' '}
-                            <button
-                              className="delete-song-from-queue-button"
-                              type="button"
-                              data-testid="delete-song-from-queue-button"
-                              onClick={() => deleteSongFromQueue(index)}
-                            >
-                              remove
-                            </button>{' '}
-                            <button
-                              type="button"
-                              data-testid="send-to-front-of-queue-button"
-                              onClick={() => sendSongToFrontOfQueue(index)}
-                            >
-                              first
-                            </button>
-                          </div>
-                        </li>
+                              <Button
+                                sx={{ minWidth: '2px' }}
+                                size="small"
+                                variant="contained"
+                                data-testid="play-now-button"
+                                onClick={() => playSong(index)}
+                              >
+                                Play
+                              </Button>
+                              <Button
+                                sx={{ minWidth: '2px' }}
+                                size="small"
+                                variant="contained"
+                                data-testid="move-song-up-in-queue-button"
+                                onClick={() => shiftSongUp(index)}
+                              >
+                                Up
+                              </Button>
+                              <Button
+                                sx={{ minWidth: '2px' }}
+                                variant="contained"
+                                size="small"
+                                data-testid="delete-song-from-queue-button"
+                                onClick={() => deleteSongFromQueue(index)}
+                                color="error"
+                              >
+                                Delete
+                              </Button>
+                              <Button
+                                sx={{ minWidth: '2px' }}
+                                variant="contained"
+                                size="small"
+                                data-testid="send-to-front-of-queue-button"
+                                onClick={() => sendSongToFrontOfQueue(index)}
+                              >
+                                First
+                              </Button>
+                            </CardActions>
+                          </Card>
+                        </ListItem>
                       )}
                     </Draggable>
                   );
                 })}
                 {provided.placeholder}
-              </ul>
+              </List>
             )}
           </Droppable>
         </DragDropContext>

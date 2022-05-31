@@ -37,15 +37,20 @@ const MainPage = () => {
   const [nextSong, setNextSong] = useState<SongProps | null>(null);
   const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(true);
 
-  window.electron.store.songs.onChange((_, results) => setSongList(results));
-  window.electron.store.queueItems.onChange((_, results) => setQueue(results));
-
   useEffect(() => {
+    const songsUnsubsribe = window.electron.store.songs.onChange((_, results) =>
+      setSongList(results)
+    );
+    const queueItemsUnsubscribe = window.electron.store.queueItems.onChange(
+      (_, results) => setQueue(results)
+    );
     setSongList(window.electron.store.songs.getAllSongs() ?? []);
-  }, []);
-
-  useEffect(() => {
     setQueue(window.electron.store.queueItems.getAllQueueItems() ?? []);
+
+    return () => {
+      songsUnsubsribe();
+      queueItemsUnsubscribe();
+    };
   }, []);
 
   return (

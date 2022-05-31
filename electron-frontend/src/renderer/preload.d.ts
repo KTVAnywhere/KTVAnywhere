@@ -21,7 +21,7 @@ declare global {
           setAllSongs(songs: SongProps[]): void;
           onChange(
             callback: (_event: IpcRenderer, results: SongProps[]) => void
-          ): IpcRenderer;
+          ): () => void;
         };
         queueItems: {
           getQueueItem(queueItemId: string): QueueItemProps;
@@ -32,7 +32,7 @@ declare global {
           setAllQueueItems(queueItems: QueueItemProps[]): void;
           onChange(
             callback: (_event: IpcRenderer, results: QueueItemProps[]) => void
-          ): IpcRenderer;
+          ): () => void;
         };
       };
     };

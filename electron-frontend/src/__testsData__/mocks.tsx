@@ -10,7 +10,7 @@ const mockedElectron = {
       deleteSong: jest.fn(),
       getAllSongs: () => songListTestData,
       setAllSongs: jest.fn(),
-      onChange: jest.fn(),
+      onChange: jest.fn().mockReturnValue(jest.fn()),
     },
     queueItems: {
       getQueueItem: jest.fn(),
@@ -19,7 +19,7 @@ const mockedElectron = {
       deleteQueueItem: jest.fn(),
       getAllQueueItems: () => queueTestDataWithSongs012,
       setAllQueueItems: jest.fn(),
-      onChange: jest.fn(),
+      onChange: jest.fn().mockReturnValue(jest.fn()),
     },
   },
   file: {
