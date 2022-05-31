@@ -200,4 +200,4 @@ app
       mainWindow?.webContents.send('store:onQueueItemsChange', results)
     );
   })
-  .catch(console.log);
+  .catch(console.error);

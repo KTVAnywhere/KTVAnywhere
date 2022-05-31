@@ -101,7 +101,7 @@ describe('Audio player component tests', () => {
     expect(HTMLMediaElement.prototype.load).toHaveBeenCalledTimes(1);
   });
 
-  test('should play current song when play song button is clicked', async () => {
+  test('should play currently paused song when play song button is clicked', async () => {
     render(
       <AudioPlayer
         currentTime={0}
@@ -114,10 +114,8 @@ describe('Audio player component tests', () => {
     );
 
     expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(0);
-    // by default play button is displayed, to show the pause button, play button has to be clicked first
     const playButton = screen.getByTestId('play-button');
     fireEvent.click(playButton);
-    // implementation already called pause once when component is rendered
     expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
   });
 
@@ -187,13 +185,13 @@ describe('Audio player component tests', () => {
   });
 
   test('volume slider should change volume', async () => {
-    let val: number;
+    let audioVolume: number;
     Object.defineProperty(HTMLMediaElement.prototype, 'volume', {
       get() {
-        return val;
+        return audioVolume;
       },
       set(V) {
-        val = V;
+        audioVolume = V;
       },
     });
     render(
@@ -207,6 +205,8 @@ describe('Audio player component tests', () => {
       />
     );
     const sliderInput = screen.getByTestId('volume-slider');
+    const originalGetBoundingClientRect = sliderInput.getBoundingClientRect;
+
     sliderInput.getBoundingClientRect = jest.fn(() => ({
       width: 100,
       height: 10,
@@ -230,5 +230,7 @@ describe('Audio player component tests', () => {
       clientX: 100,
     });
     expect(HTMLMediaElement.prototype.volume).toEqual(1);
+
+    sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
   });
 });
