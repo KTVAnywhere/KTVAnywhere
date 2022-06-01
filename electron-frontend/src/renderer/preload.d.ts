@@ -7,6 +7,7 @@ declare global {
     electron: {
       dialog: {
         openFile(config: Electron.OpenDialogOptions): Promise<string>;
+        openFiles(config: Electron.OpenDialogOptions): Promise<string[]>;
       };
       file: {
         read(filePath: string): Promise<string>;
@@ -16,6 +17,7 @@ declare global {
           getSong(songId: string): SongProps;
           setSong(song: SongProps): void;
           addSong(song: SongProps): void;
+          addSongs(songs: SongProps[], prepend: boolean): void;
           deleteSong(songId: string): void;
           getAllSongs(): SongProps[];
           setAllSongs(songs: SongProps[]): void;
@@ -34,6 +36,11 @@ declare global {
             callback: (_event: IpcRenderer, results: QueueItemProps[]) => void
           ): () => void;
         };
+      };
+      preprocess: {
+        getSongDetails(
+          songPaths: string[]
+        ): Promise<{ songName: string; artist: string; songPath: string }[]>;
       };
     };
   }

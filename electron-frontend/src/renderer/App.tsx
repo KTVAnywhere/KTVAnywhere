@@ -1,18 +1,12 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import {
-  Box,
-  Container,
-  CssBaseline,
-  Drawer,
-  ScopedCssBaseline,
-} from '@mui/material';
+import { Container, CssBaseline } from '@mui/material';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList, { QueueItemProps } from '../components/SongsQueue';
 import Song, { emptySongProps, SongProps } from '../components/Song';
 import SongList from '../components/SongList';
-import SongUpload from '../components/SongUpload';
+import { SongUploadButton } from '../components/SongUpload';
 import Popup from '../components/Popup';
 import { AudioPlayer } from '../components/AudioPlayer';
 import LyricsPlayer from '../components/LyricsPlayer';
@@ -73,7 +67,7 @@ const MainPage = () => {
           lyricsEnabled={lyricsEnabled}
         />
         <LeftSidebar>
-          <SongUpload />
+          <SongUploadButton />
           <SongList
             setPopupTriggered={setSongPopupTriggered}
             setOpenSong={setOpenSong}

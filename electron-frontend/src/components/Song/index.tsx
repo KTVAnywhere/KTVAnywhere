@@ -1,9 +1,9 @@
 import Song, {
   SongProps,
   emptySongProps,
-  songUploadOptions,
-  lyricsUploadOptions,
+  songPickerOptions,
+  lyricsPickerOptions,
 } from './Song';
 
 export default Song;
-export { SongProps, emptySongProps, songUploadOptions, lyricsUploadOptions };
+export { SongProps, emptySongProps, songPickerOptions, lyricsPickerOptions };

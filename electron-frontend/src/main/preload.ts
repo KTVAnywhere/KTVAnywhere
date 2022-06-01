@@ -7,6 +7,9 @@ contextBridge.exposeInMainWorld('electron', {
     openFile(config: Electron.OpenDialogOptions) {
       return ipcRenderer.invoke('dialog:openFile', config);
     },
+    openFiles(config: Electron.OpenDialogOptions) {
+      return ipcRenderer.invoke('dialog:openFiles', config);
+    },
   },
   file: {
     read(filePath: string) {
@@ -23,6 +26,9 @@ contextBridge.exposeInMainWorld('electron', {
       },
       addSong(song: SongProps) {
         ipcRenderer.send('store:addSong', song);
+      },
+      addSongs(songs: SongProps[], prepend = false) {
+        ipcRenderer.send('store:addSongs', songs, prepend);
       },
       deleteSong(songId: string) {
         ipcRenderer.send('store:deleteSong', songId);
@@ -67,6 +73,11 @@ contextBridge.exposeInMainWorld('electron', {
         return () =>
           ipcRenderer.removeListener('store:onQueueItemsChange', callback);
       },
+    },
+  },
+  preprocess: {
+    getSongDetails(songPaths: string[]) {
+      return ipcRenderer.invoke('preprocess:getSongDetails', songPaths);
     },
   },
 });
