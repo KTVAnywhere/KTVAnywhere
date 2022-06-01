@@ -1,5 +1,5 @@
+import { Button, Dialog, DialogContent } from '@mui/material';
 import { Dispatch, ReactNode, SetStateAction } from 'react';
-import './Popup.css';
 
 interface PopupProps {
   children: ReactNode;
@@ -9,18 +9,20 @@ interface PopupProps {
 
 const Popup = ({ children, trigger, setTrigger }: PopupProps) =>
   trigger ? (
-    <div className="popup">
-      <div className="popup-inner">
-        <button
-          type="button"
-          className="close-btn"
-          onClick={() => setTrigger(false)}
-        >
-          X
-        </button>
-        {children}
-      </div>
-    </div>
+    <Dialog open onClose={() => setTrigger(false)}>
+      <Button
+        variant="outlined"
+        onClick={() => setTrigger(false)}
+        sx={{
+          position: 'absolute',
+          right: 10,
+          top: 10,
+        }}
+      >
+        X
+      </Button>
+      <DialogContent>{children}</DialogContent>
+    </Dialog>
   ) : (
     <></>
   );

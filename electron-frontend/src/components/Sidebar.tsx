@@ -1,24 +1,22 @@
 import { ReactNode } from 'react';
 import { Drawer } from '@mui/material';
-import './Sidebar.css';
 
 interface SidebarProps {
   children: ReactNode;
 }
 
-const drawerWidth = '16%';
 const drawerHeight = '88%';
+const backgroundColor = '#2C2F33';
 
 export const LeftSidebar = ({ children }: SidebarProps) => {
   return (
     <Drawer
       sx={{
-        width: drawerWidth,
+        position: 'fixed',
         '& .MuiDrawer-paper': {
-          width: drawerWidth,
           height: drawerHeight,
           boxSizing: 'border-box',
-          alignItems: 'center',
+          background: backgroundColor,
         },
         padding: 2,
       }}
@@ -34,12 +32,12 @@ export const RightSidebar = ({ children }: SidebarProps) => {
   return (
     <Drawer
       sx={{
-        maxWidth: drawerWidth,
         '& .MuiDrawer-paper': {
-          width: drawerWidth,
+          minWidth: '330px',
           height: drawerHeight,
           boxSizing: 'border-box',
           alignItems: 'center',
+          background: backgroundColor,
         },
       }}
       variant="permanent"

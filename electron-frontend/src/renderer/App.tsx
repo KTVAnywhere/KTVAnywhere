@@ -53,12 +53,16 @@ const MainPage = () => {
   }, []);
 
   return (
-    <div className="outer">
+    <Container sx={{ position: 'fixed', top: 0, bottom: 0, left: 0, right: 0 }}>
       <CssBaseline enableColorScheme />
       <Container
         maxWidth={false}
         sx={{
           height: '88%',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
         }}
       >
         <LyricsPlayer
@@ -89,6 +93,10 @@ const MainPage = () => {
         sx={{
           bgcolor: '#1f2232',
           height: '12%',
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
         }}
       >
         <AudioPlayer
@@ -100,7 +108,7 @@ const MainPage = () => {
           setLyricsEnabled={setLyricsEnabled}
         />
       </Container>
-    </div>
+    </Container>
   );
 };
 

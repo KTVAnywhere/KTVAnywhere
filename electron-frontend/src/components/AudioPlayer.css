@@ -59,3 +59,10 @@
   left: 85%;
   top: 30%;
 }
+
+.left-controls {
+  position: absolute;
+  right: 85%;
+  left: 2%;
+  top: 10%;
+}

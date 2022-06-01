@@ -3,6 +3,7 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
+  Container,
   List,
   ListItem,
   Typography,
@@ -11,7 +12,6 @@ import Card from '@mui/material/Card';
 import { Dispatch, SetStateAction } from 'react';
 import { SongProps } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
-import './SongList.module.css';
 
 const deleteSong = (songId: string) => {
   window.electron.store.songs.deleteSong(songId);
@@ -80,8 +80,10 @@ const SongList = ({
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
   return (
-    <div>
-      <h2>Song library</h2>
+    <Container>
+      <Typography variant="h5" align="center" gutterBottom>
+        Songs Library
+      </Typography>
       <List
         aria-label="data"
         sx={{
@@ -102,7 +104,7 @@ const SongList = ({
           </ListItem>
         ))}
       </List>
-    </div>
+    </Container>
   );
 };
 

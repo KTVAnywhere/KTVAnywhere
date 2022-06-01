@@ -3,6 +3,7 @@ import {
   Button,
   CardActions,
   CardContent,
+  Container,
   List,
   ListItem,
   Typography,
@@ -16,7 +17,6 @@ import {
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
 import { SongProps } from '../Song';
-import './SongsQueue.module.css';
 
 export interface QueueItemProps {
   song: SongProps;
@@ -87,8 +87,17 @@ export const QueueList = ({
   };
 
   return (
-    <div className="QueueList">
-      <h2>Songs Queue</h2>
+    <Container>
+      <Typography
+        variant="h5"
+        align="center"
+        gutterBottom
+        sx={{
+          paddingTop: '5%',
+        }}
+      >
+        Songs Queue
+      </Typography>
       <Button
         size="small"
         variant="contained"
@@ -132,7 +141,7 @@ export const QueueList = ({
                           data-testid="draggable-queue-item"
                           sx={{ px: 0 }}
                         >
-                          <Card sx={{ width: 1 }}>
+                          <Card sx={{ width: 1, bgcolor: '#000000' }}>
                             <CardContent sx={{ height: '70px' }}>
                               <Typography noWrap variant="h5">
                                 {queueItem.song.songName}
@@ -197,9 +206,15 @@ export const QueueList = ({
           </Droppable>
         </DragDropContext>
       ) : (
-        <p>No songs in queue</p>
+        <Typography
+          sx={{
+            paddingTop: '5%',
+          }}
+        >
+          No songs in queue
+        </Typography>
       )}
-    </div>
+    </Container>
   );
 };
 

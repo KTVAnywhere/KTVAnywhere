@@ -1,4 +1,4 @@
-import { Button, Slider } from '@mui/material';
+import { Button, Grid, Slider, Typography } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import './AudioPlayer.css';
 import { SongProps } from './Song';
@@ -50,10 +50,10 @@ const ProgressBar = ({
   const currentPercentage = duration === 0 ? 0 : (currentTime / duration) * 100;
 
   return (
-    <div className="progress-bar">
-      <span className="progress-bar-time">
-        {formatSecondsToMinutesAndSeconds(currentTime)}
-      </span>
+    <Grid container direction="row" alignItems="center" maxWidth="60%">
+      <Grid item>
+        <Typography>{formatSecondsToMinutesAndSeconds(currentTime)}</Typography>
+      </Grid>
       <div
         className="bar-progress"
         role="progressbar"
@@ -65,10 +65,10 @@ const ProgressBar = ({
         }}
         onMouseDown={(e) => songPlayBackTimeChange(e)}
       />
-      <span className="progress-bar-time">
-        {formatSecondsToMinutesAndSeconds(duration)}
-      </span>
-    </div>
+      <Grid item>
+        <Typography>{formatSecondsToMinutesAndSeconds(duration)}</Typography>
+      </Grid>
+    </Grid>
   );
 };
 
@@ -205,6 +205,14 @@ export const AudioPlayer = ({
     <div className="audio-player">
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio id="audio" data-testid="audio-element" onEnded={endSong} />
+      <div className="left-controls">
+        <Typography noWrap sx={{ fontSize: '32px' }}>
+          {currentSong?.songName}
+        </Typography>
+        <Typography noWrap sx={{ fontSize: '24px', opacity: '80%' }}>
+          {currentSong?.artist}
+        </Typography>
+      </div>
       <div className="right-controls">
         <Slider
           className="volume-slider"
@@ -216,7 +224,7 @@ export const AudioPlayer = ({
           color="secondary"
           data-testid="volume-slider"
         />
-        <span>Volume</span>
+        <Typography>Volume</Typography>
       </div>
       <div className="bottom-controls">
         <ProgressBar

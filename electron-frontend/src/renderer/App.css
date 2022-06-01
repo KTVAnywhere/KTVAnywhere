@@ -20,78 +20,11 @@ body {
 }
 
 button {
-  background-color: white;
   padding: 4px 8px;
-  border-radius: 5px;
-  border: none;
-  appearance: none;
-  font-size: 0.8rem;
-  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
-    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
-  transition: all ease-in 0.1s;
   cursor: pointer;
-  opacity: 0.9;
 }
 
 button:hover {
   transform: scale(1.05);
   opacity: 1;
-}
-
-li {
-  list-style: none;
-}
-
-table {
-  table-layout: fixed;
-  border-collapse: collapse;
-  width: 800px;
-  align-items: center;
-}
-td {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  text-align: center;
-}
-
-a {
-  text-decoration: none;
-  height: fit-content;
-  width: fit-content;
-  margin: 10px;
-}
-
-a:hover {
-  opacity: 1;
-  text-decoration: none;
-}
-
-h2 {
-  text-align: center;
-}
-
-.outer {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-.top-box {
-  position: absolute;
-  height: 88%;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
-.bottom-box {
-  position: absolute;
-  background-color: #1f2232;
-  height: 12%;
-  bottom: 0;
-  left: 0;
-  right: 0;
 }
