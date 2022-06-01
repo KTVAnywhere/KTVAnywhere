@@ -133,7 +133,7 @@ export const QueueList = ({
                           sx={{ px: 0 }}
                         >
                           <Card sx={{ width: 1 }}>
-                            <CardContent sx={{ height: '40px' }}>
+                            <CardContent sx={{ height: '70px' }}>
                               <Typography noWrap variant="h5">
                                 {queueItem.song.songName}
                               </Typography>

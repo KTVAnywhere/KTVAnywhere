@@ -36,7 +36,7 @@ const SongCard = ({
           setOpenSong(song);
         }}
       >
-        <CardContent sx={{ height: '40px' }}>
+        <CardContent sx={{ height: '70px' }}>
           <Typography noWrap variant="h5">
             {song.songName}
           </Typography>

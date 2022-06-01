@@ -1,4 +1,4 @@
-import { Slider } from '@mui/material';
+import { Button, Slider } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import './AudioPlayer.css';
 import { SongProps } from './Song';
@@ -227,60 +227,62 @@ export const AudioPlayer = ({
       </div>
       <div className="top-controls">
         <pre>
-          <button
-            className="player-button"
-            type="button"
+          <Button
+            variant="contained"
+            size="small"
             data-testid="backward-10-button"
             onClick={backwardTenSeconds}
           >
             back 10
-          </button>
-          <button
-            className="player-button"
-            type="button"
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
             data-testid="forward-10-button"
             onClick={forwardTenSeconds}
           >
             forward 10
-          </button>
+          </Button>
           {'  '}
           {isPlaying ? (
-            <button
-              className="player-button"
-              type="button"
+            <Button
+              variant="contained"
+              size="small"
               data-testid="pause-button"
               onClick={pauseSong}
             >
-              {'  '}II{'  '}
-            </button>
+              II
+            </Button>
           ) : (
-            <button
-              className="player-button"
-              type="button"
+            <Button
+              variant="contained"
+              size="small"
               data-testid="play-button"
               onClick={playSong}
             >
-              {'  '}▶{'  '}
-            </button>
+              ▶
+            </Button>
           )}
           {'  '}
-          <button
-            className="player-button"
-            type="button"
+          <Button
+            sx={{ minWidth: '2px' }}
+            variant="contained"
+            size="small"
             data-testid="end-song-button"
             onClick={endSong}
           >
             end song
-          </button>
+          </Button>
           {'  '}
-          <button
-            className="player-button"
-            type="button"
+          <Button
+            sx={{ minWidth: '2px' }}
+            variant="contained"
+            size="small"
             data-testid="toggle-lyrics-button"
             onClick={toggleLyrics}
           >
             toggle lyrics
-          </button>
+          </Button>
         </pre>
       </div>
     </div>

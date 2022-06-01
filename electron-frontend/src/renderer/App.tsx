@@ -1,6 +1,13 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
+import {
+  Box,
+  Container,
+  CssBaseline,
+  Drawer,
+  ScopedCssBaseline,
+} from '@mui/material';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList, { QueueItemProps } from '../components/SongsQueue';
 import Song, { emptySongProps, SongProps } from '../components/Song';
@@ -30,8 +37,6 @@ const MainPage = () => {
   const [, setQueue] = useState<QueueItemProps[]>([]);
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
   const [songPopupTriggered, setSongPopupTriggered] = useState<boolean>(false);
-  const [leftSidebarTrigger, setLeftSidebarTrigger] = useState<boolean>(true);
-  const [rightSidebarTrigger, setRightSidebarTrigger] = useState<boolean>(true);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
   const [nextSong, setNextSong] = useState<SongProps | null>(null);
@@ -55,21 +60,19 @@ const MainPage = () => {
 
   return (
     <div className="outer">
-      <div className="bottom-box">
-        <AudioPlayer
-          currentTime={currentTime}
-          setCurrentTime={setCurrentTime}
+      <CssBaseline enableColorScheme />
+      <Container
+        maxWidth={false}
+        sx={{
+          height: '88%',
+        }}
+      >
+        <LyricsPlayer
           currentSong={currentSong}
-          setCurrentSong={setCurrentSong}
-          nextSong={nextSong}
-          setLyricsEnabled={setLyricsEnabled}
+          currentTime={currentTime}
+          lyricsEnabled={lyricsEnabled}
         />
-      </div>
-      <div className="top-box">
-        <LeftSidebar
-          setTrigger={setLeftSidebarTrigger}
-          trigger={leftSidebarTrigger}
-        >
+        <LeftSidebar>
           <SongUpload />
           <SongList
             setPopupTriggered={setSongPopupTriggered}
@@ -83,18 +86,26 @@ const MainPage = () => {
             <Song song={openSong} />
           </Popup>
         </LeftSidebar>
-        <RightSidebar
-          setTrigger={setRightSidebarTrigger}
-          trigger={rightSidebarTrigger}
-        >
+        <RightSidebar>
           <QueueList setNextSong={setNextSong} />
         </RightSidebar>
-        <LyricsPlayer
-          currentSong={currentSong}
+      </Container>
+      <Container
+        maxWidth={false}
+        sx={{
+          bgcolor: '#1f2232',
+          height: '12%',
+        }}
+      >
+        <AudioPlayer
           currentTime={currentTime}
-          lyricsEnabled={lyricsEnabled}
+          setCurrentTime={setCurrentTime}
+          currentSong={currentSong}
+          setCurrentSong={setCurrentSong}
+          nextSong={nextSong}
+          setLyricsEnabled={setLyricsEnabled}
         />
-      </div>
+      </Container>
     </div>
   );
 };
