@@ -1,3 +1,4 @@
-import SongUpload from './SongUpload';
+import SongUploadForm, { SongUploadButton } from './SongUpload';
 
-export default SongUpload;
+export default SongUploadForm;
+export { SongUploadButton };

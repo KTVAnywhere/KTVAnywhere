@@ -2,6 +2,7 @@
 import { URL } from 'url';
 import path from 'path';
 import { dialog } from 'electron';
+import { parseFile } from 'music-metadata';
 
 export let resolveHtmlPath: (htmlFileName: string) => string;
 
@@ -18,10 +19,38 @@ if (process.env.NODE_ENV === 'development') {
   };
 }
 
-export const openFile = async (config: Electron.OpenDialogOptions) => {
+export const openFiles = async (config: Electron.OpenDialogOptions) => {
   const { canceled, filePaths } = await dialog.showOpenDialog(config);
   if (!canceled) {
-    return filePaths[0];
+    return filePaths;
   }
   throw new Error('Cancelled file selection');
+};
+
+export const openFile = async (config: Electron.OpenDialogOptions) => {
+  const filePaths = await openFiles(config);
+  return filePaths[0];
+};
+
+export const processSongDetails = async (songPaths: string[]) => {
+  const items = await Promise.all(
+    songPaths.map(async (songPath) => {
+      try {
+        const { common } = await parseFile(songPath);
+        return {
+          songName: common.title,
+          artist: common.artist,
+          songPath,
+        };
+      } catch (error) {
+        console.log(`${songPath} is not an audio file`);
+        return null;
+      }
+    })
+  );
+  return items.filter((x) => x) as {
+    songName: string;
+    artist: string;
+    songPath: string;
+  }[];
 };

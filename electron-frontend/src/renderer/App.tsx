@@ -5,7 +5,7 @@ import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList, { QueueItemProps } from '../components/SongsQueue';
 import Song, { emptySongProps, SongProps } from '../components/Song';
 import SongList from '../components/SongList';
-import SongUpload from '../components/SongUpload';
+import { SongUploadButton } from '../components/SongUpload';
 import Popup from '../components/Popup';
 import { AudioPlayer } from '../components/AudioPlayer';
 import LyricsPlayer from '../components/LyricsPlayer';
@@ -70,7 +70,7 @@ const MainPage = () => {
           setTrigger={setLeftSidebarTrigger}
           trigger={leftSidebarTrigger}
         >
-          <SongUpload />
+          <SongUploadButton />
           <SongList
             setPopupTriggered={setSongPopupTriggered}
             setOpenSong={setOpenSong}

@@ -12,7 +12,12 @@ import path from 'path';
 import fs from 'fs-extra';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import MenuBuilder from './menu';
-import { resolveHtmlPath, openFile } from './util';
+import {
+  resolveHtmlPath,
+  openFiles,
+  openFile,
+  processSongDetails,
+} from './util';
 import {
   createSongsStore,
   createQueueItemsStore,
@@ -120,6 +125,10 @@ app
   .whenReady()
   .then(() => {
     ipcMain.handle('dialog:openFile', (_, config) => openFile(config));
+    ipcMain.handle('dialog:openFiles', (_, config) => openFiles(config));
+    ipcMain.handle('preprocess:getSongDetails', async (_, songPaths) =>
+      processSongDetails(songPaths)
+    );
 
     createWindow();
     app.on('activate', () => {
@@ -141,8 +150,15 @@ app
     // Database
     const songsStore = createSongsStore();
     const queueItemsStore = createQueueItemsStore();
-    const { getSong, setSong, addSong, deleteSong, getAllSongs, setAllSongs } =
-      songFunctions;
+    const {
+      getSong,
+      setSong,
+      addSong,
+      addSongs,
+      deleteSong,
+      getAllSongs,
+      setAllSongs,
+    } = songFunctions;
     const {
       getQueueItem,
       setQueueItem,
@@ -157,6 +173,9 @@ app
     });
     ipcMain.on('store:addSong', async (_, song) => {
       addSong(songsStore, song);
+    });
+    ipcMain.on('store:addSongs', async (_, songs, prepend) => {
+      addSongs(songsStore, songs, prepend);
     });
     ipcMain.on('store:setSong', async (_, song) => {
       setSong(songsStore, song);

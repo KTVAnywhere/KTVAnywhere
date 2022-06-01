@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { Button } from '@mui/material';
 import React, { Component } from 'react';
 import uniqid from 'uniqid';
 import {
   emptySongProps,
-  lyricsUploadOptions,
+  lyricsPickerOptions,
   SongProps,
-  songUploadOptions,
+  songPickerOptions,
 } from '../Song';
 import './SongUpload.module.css';
 
@@ -15,7 +16,41 @@ interface FormErrorProps {
   cancelled: string;
 }
 
-class SongUpload extends Component<
+const songUploadOptions: Electron.OpenDialogOptions = {
+  title: 'Select songs',
+  buttonLabel: 'Add',
+  filters: [
+    {
+      name: 'Audio',
+      extensions: ['mp3', 'wav', 'm4a', 'wma'],
+    },
+  ],
+  properties: ['openFile', 'createDirectory', 'multiSelections'],
+};
+
+export const SongUploadButton = () => {
+  const getFileName = (str: string) =>
+    str.replace(/^.*(\\|\/|:)/, '').replace(/\.[^/.]+$/, '');
+  const chooseSongs = (options: Electron.OpenDialogOptions) => {
+    window.electron.dialog
+      .openFiles(options)
+      .then((songPaths) => window.electron.preprocess.getSongDetails(songPaths))
+      .then((songDetails) =>
+        songDetails.map((songDetail) => ({
+          ...emptySongProps,
+          songId: uniqid(),
+          songName: songDetail.songName ?? getFileName(songDetail.songPath),
+          artist: songDetail.artist ?? '',
+          songPath: songDetail.songPath,
+        }))
+      )
+      .then((results) => window.electron.store.songs.addSongs(results, true))
+      .catch((error) => console.log(error));
+  };
+  return <Button onClick={() => chooseSongs(songUploadOptions)}>Upload</Button>;
+};
+
+class SongUploadForm extends Component<
   {},
   { song: SongProps; error: FormErrorProps }
 > {
@@ -143,7 +178,7 @@ class SongUpload extends Component<
                   type="button"
                   data-testid="song-picker-button"
                   onClick={() =>
-                    this.chooseFile(songUploadOptions, (path: string) =>
+                    this.chooseFile(songPickerOptions, (path: string) =>
                       this.changeSong({ ...song, songPath: path })
                     )
                   }
@@ -164,7 +199,7 @@ class SongUpload extends Component<
                   type="button"
                   data-testid="lyrics-picker-button"
                   onClick={() =>
-                    this.chooseFile(lyricsUploadOptions, (path: string) =>
+                    this.chooseFile(lyricsPickerOptions, (path: string) =>
                       this.changeSong({ ...song, lyricsPath: path })
                     )
                   }
@@ -181,4 +216,4 @@ class SongUpload extends Component<
   }
 }
 
-export default SongUpload;
+export default SongUploadForm;

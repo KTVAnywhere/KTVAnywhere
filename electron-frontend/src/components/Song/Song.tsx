@@ -19,7 +19,7 @@ export const emptySongProps = {
   lyricsPath: '',
 };
 
-export const songUploadOptions: Electron.OpenDialogOptions = {
+export const songPickerOptions: Electron.OpenDialogOptions = {
   filters: [
     {
       name: 'Audio',
@@ -29,7 +29,7 @@ export const songUploadOptions: Electron.OpenDialogOptions = {
   properties: ['openFile'],
 };
 
-export const lyricsUploadOptions: Electron.OpenDialogOptions = {
+export const lyricsPickerOptions: Electron.OpenDialogOptions = {
   filters: [
     {
       name: 'Lyrics',
@@ -113,7 +113,7 @@ const Song = ({ song }: { song: SongProps }) => {
           type="button"
           data-testid="song-picker-button"
           onClick={() =>
-            chooseFile(songUploadOptions, (path) => ({
+            chooseFile(songPickerOptions, (path) => ({
               ...currSong,
               songPath: path,
             }))
@@ -129,7 +129,7 @@ const Song = ({ song }: { song: SongProps }) => {
           type="button"
           data-testid="lyrics-picker-button"
           onClick={() =>
-            chooseFile(lyricsUploadOptions, (path) => ({
+            chooseFile(lyricsPickerOptions, (path) => ({
               ...currSong,
               lyricsPath: path,
             }))

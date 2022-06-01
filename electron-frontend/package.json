@@ -109,6 +109,7 @@
     "electron-updater": "^5.0.1",
     "lodash.uniq": "^4.5.0",
     "lrc-kit": "^1.1.1",
+    "music-metadata": "^7.12.3",
     "react": "^18.1.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^18.1.0",
