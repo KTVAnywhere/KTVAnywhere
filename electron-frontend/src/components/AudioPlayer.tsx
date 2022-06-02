@@ -1,4 +1,13 @@
-import { Button, Grid, Slider, Typography } from '@mui/material';
+import { Grid, IconButton, Slider, Typography } from '@mui/material';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import FastForwardIcon from '@mui/icons-material/FastForward';
+import FastRewindIcon from '@mui/icons-material/FastRewind';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
+import LyricsIcon from '@mui/icons-material/Lyrics';
+import VolumeMuteIcon from '@mui/icons-material/VolumeMute';
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import './AudioPlayer.css';
 import { SongProps } from './Song';
@@ -161,6 +170,14 @@ export const AudioPlayer = ({
     audio.volume = (newValue as number) / 100;
   };
 
+  const volumeZero = () => {
+    setVolume(0);
+    const audio: HTMLAudioElement = document.getElementById(
+      'audio'
+    ) as HTMLAudioElement;
+    audio.volume = 0;
+  };
+
   const playSong = () => {
     setIsPlaying(true);
   };
@@ -202,98 +219,121 @@ export const AudioPlayer = ({
   };
 
   return (
-    <div className="audio-player">
+    <Grid container direction="column">
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio id="audio" data-testid="audio-element" onEnded={endSong} />
-      <div className="left-controls">
-        <Typography noWrap sx={{ fontSize: '32px' }}>
-          {currentSong?.songName}
-        </Typography>
-        <Typography noWrap sx={{ fontSize: '24px', opacity: '80%' }}>
-          {currentSong?.artist}
-        </Typography>
-      </div>
-      <div className="right-controls">
-        <Slider
-          className="volume-slider"
-          aria-label="Volume"
-          value={volume}
-          onChange={volumeChange}
-          min={0}
-          max={100}
-          color="secondary"
-          data-testid="volume-slider"
-        />
-        <Typography>Volume: {volume}%</Typography>
-      </div>
-      <div className="bottom-controls">
+      <Grid item container sx={{ justifyContent: 'center' }}>
         <ProgressBar
           duration={duration}
           currentTime={currentTime}
           setSkipToTime={setSkipToTime}
         />
-      </div>
-      <div className="top-controls">
-        <pre>
-          <Button
-            variant="contained"
-            size="small"
+        <IconButton
+          sx={{ padding: 0 }}
+          data-testid="end-song-button"
+          onClick={endSong}
+        >
+          <SkipNextIcon sx={{ fontSize: '35px' }} />
+        </IconButton>
+      </Grid>
+      <Grid item container direction="row" sx={{ justifyContent: 'center' }}>
+        <Grid
+          item
+          sx={{ position: 'absolute', left: '2%', right: '85%', top: 0 }}
+        >
+          <Typography noWrap sx={{ fontSize: '32px' }}>
+            {currentSong?.songName}
+          </Typography>
+          <Typography noWrap sx={{ fontSize: '24px', opacity: '80%' }}>
+            {currentSong?.artist}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <IconButton sx={{ padding: 0 }}>
+            <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
+          </IconButton>
+          <Typography>vocals</Typography>
+        </Grid>
+        <Grid item sx={{ marginLeft: '2%' }}>
+          <IconButton sx={{ padding: 0 }}>
+            <GraphicEqIcon sx={{ fontSize: '35px' }} />
+          </IconButton>
+        </Grid>
+        <Grid item sx={{ marginLeft: '1%', width: '8%' }}>
+          <Slider
+            className="volume-slider"
+            aria-label="Volume"
+            value={volume}
+            onChange={volumeChange}
+            min={0}
+            max={100}
+            color="secondary"
+          />
+          <Typography>Pitch: {volume}%</Typography>
+        </Grid>
+        <Grid item sx={{ marginLeft: '3%', marginRight: '3%' }}>
+          <IconButton
+            sx={{ padding: 0 }}
             data-testid="backward-10-button"
             onClick={backwardTenSeconds}
           >
-            back 10
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            data-testid="forward-10-button"
-            onClick={forwardTenSeconds}
-          >
-            forward 10
-          </Button>
-          {'  '}
+            <FastRewindIcon sx={{ fontSize: '35px' }} />
+          </IconButton>
           {isPlaying ? (
-            <Button
-              variant="contained"
-              size="small"
+            <IconButton
+              sx={{ padding: 0 }}
               data-testid="pause-button"
               onClick={pauseSong}
             >
-              II
-            </Button>
+              <PauseCircleIcon sx={{ fontSize: '64px' }} />
+            </IconButton>
           ) : (
-            <Button
-              variant="contained"
-              size="small"
+            <IconButton
+              sx={{ padding: 0 }}
               data-testid="play-button"
               onClick={playSong}
             >
-              ▶
-            </Button>
-          )}
-          {'  '}
-          <Button
-            sx={{ minWidth: '2px' }}
-            variant="contained"
-            size="small"
-            data-testid="end-song-button"
-            onClick={endSong}
+              <PlayCircleIcon sx={{ fontSize: '64px' }} />
+            </IconButton>
+          )}{' '}
+          <IconButton
+            sx={{ padding: 0 }}
+            data-testid="forward-10-button"
+            onClick={forwardTenSeconds}
           >
-            end song
-          </Button>
-          {'  '}
-          <Button
-            sx={{ minWidth: '2px' }}
-            variant="contained"
-            size="small"
+            <FastForwardIcon sx={{ fontSize: '35px' }} />
+          </IconButton>
+        </Grid>
+        <Grid item sx={{ marginRight: '1%' }}>
+          <IconButton sx={{ padding: 0 }} onClick={() => volumeZero()}>
+            <VolumeMuteIcon sx={{ fontSize: '35px' }} />
+          </IconButton>
+        </Grid>
+        <Grid item sx={{ marginRight: '2%', width: '8%' }}>
+          <Slider
+            className="volume-slider"
+            aria-label="Volume"
+            value={volume}
+            onChange={volumeChange}
+            min={0}
+            max={100}
+            color="secondary"
+            data-testid="volume-slider"
+          />
+          <Typography>Volume: {volume}%</Typography>
+        </Grid>
+        <Grid item>
+          <IconButton
+            sx={{ padding: 0 }}
             data-testid="toggle-lyrics-button"
             onClick={toggleLyrics}
           >
-            toggle lyrics
-          </Button>
-        </pre>
-      </div>
-    </div>
+            <LyricsIcon sx={{ fontSize: '30px' }} />
+          </IconButton>
+          <Typography>lyrics</Typography>
+        </Grid>
+      </Grid>
+    </Grid>
   );
 };
 

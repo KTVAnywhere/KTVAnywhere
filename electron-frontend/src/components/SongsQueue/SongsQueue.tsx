@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import Card from '@mui/material/Card';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   DragDropContext,
   Droppable,
@@ -144,9 +145,15 @@ export const QueueList = ({
                           <Card
                             sx={{
                               width: 1,
-                              bgcolor: '#000000',
                             }}
                           >
+                            <DragIndicatorIcon
+                              sx={{
+                                position: 'absolute',
+                                top: '40%',
+                                right: 0,
+                              }}
+                            />
                             <CardContent sx={{ height: '70px' }}>
                               <Typography noWrap variant="h5">
                                 {queueItem.song.songName}

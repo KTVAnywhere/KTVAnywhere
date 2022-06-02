@@ -69,7 +69,7 @@ const Song = ({ song }: { song: SongProps }) => {
       <Container disableGutters>
         <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText
-          placeholder="song name"
+          placeholder="Enter song name"
           value={currSong.songName}
           onChange={(value: string) =>
             changeSong({ ...currSong, songName: value })
