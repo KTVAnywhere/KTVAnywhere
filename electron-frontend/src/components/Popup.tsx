@@ -21,7 +21,7 @@ const Popup = ({ children, trigger, setTrigger }: PopupProps) =>
       >
         X
       </Button>
-      <DialogContent>{children}</DialogContent>
+      <DialogContent sx={{ paddingLeft: 0 }}>{children}</DialogContent>
     </Dialog>
   ) : (
     <></>

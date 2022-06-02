@@ -6,12 +6,9 @@ body {
   position: relative;
   color: white;
   height: 100vh;
-  background: linear-gradient(
-    200.96deg,
-    #fedc2a -29.09%,
-    #dd5789 51.77%,
-    #7a2c9e 129.35%
-  );
+  background-color: #1b2845;
+  background-image: linear-gradient(315deg, #1b2845 0%, #274060 74%);
+
   font-family: sans-serif;
   overflow-y: hidden;
   display: flex;

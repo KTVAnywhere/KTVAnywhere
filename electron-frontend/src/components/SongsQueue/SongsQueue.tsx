@@ -141,7 +141,12 @@ export const QueueList = ({
                           data-testid="draggable-queue-item"
                           sx={{ px: 0 }}
                         >
-                          <Card sx={{ width: 1, bgcolor: '#000000' }}>
+                          <Card
+                            sx={{
+                              width: 1,
+                              bgcolor: '#000000',
+                            }}
+                          >
                             <CardContent sx={{ height: '70px' }}>
                               <Typography noWrap variant="h5">
                                 {queueItem.song.songName}
@@ -178,20 +183,20 @@ export const QueueList = ({
                                 sx={{ minWidth: '2px' }}
                                 variant="contained"
                                 size="small"
-                                data-testid="delete-song-from-queue-button"
-                                onClick={() => deleteSongFromQueue(index)}
-                                color="error"
+                                data-testid="send-to-front-of-queue-button"
+                                onClick={() => sendSongToFrontOfQueue(index)}
                               >
-                                Delete
+                                First
                               </Button>
                               <Button
                                 sx={{ minWidth: '2px' }}
                                 variant="contained"
                                 size="small"
-                                data-testid="send-to-front-of-queue-button"
-                                onClick={() => sendSongToFrontOfQueue(index)}
+                                data-testid="delete-song-from-queue-button"
+                                onClick={() => deleteSongFromQueue(index)}
+                                color="error"
                               >
-                                First
+                                Delete
                               </Button>
                             </CardActions>
                           </Card>

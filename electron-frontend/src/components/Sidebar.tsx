@@ -18,7 +18,6 @@ export const LeftSidebar = ({ children }: SidebarProps) => {
           boxSizing: 'border-box',
           background: backgroundColor,
         },
-        padding: 2,
       }}
       variant="permanent"
       anchor="left"

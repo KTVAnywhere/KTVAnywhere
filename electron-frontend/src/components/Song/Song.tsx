@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { EditText } from 'react-edit-text';
-import './Song.module.css';
 import 'react-edit-text/dist/index.css';
+import { Button, Container, Typography } from '@mui/material';
 
 export interface SongProps {
   songId: string;
@@ -65,15 +65,16 @@ const Song = ({ song }: { song: SongProps }) => {
     setCurrSong(changedSong);
   };
   return (
-    <>
-      <div className="fields">
-        <strong>Name: </strong>
+    <Container sx={{ paddingTop: '5%' }}>
+      <Container disableGutters>
+        <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText
           placeholder="song name"
           value={currSong.songName}
           onChange={(value: string) =>
             changeSong({ ...currSong, songName: value })
           }
+          style={{ border: 'groove', marginBottom: '2%' }}
           onSave={(event: {
             name: string;
             value: string;
@@ -85,15 +86,16 @@ const Song = ({ song }: { song: SongProps }) => {
             });
           }}
         />
-      </div>
-      <div className="fields">
-        <strong>Artist: </strong>
+      </Container>
+      <Container disableGutters>
+        <Typography sx={{ fontWeight: 600 }}>Artist: </Typography>
         <EditText
-          placeholder="song artist"
+          placeholder="Enter song artist"
           value={currSong.artist}
           onChange={(value: string) =>
             changeSong({ ...currSong, artist: value })
           }
+          style={{ border: 'groove', marginBottom: '2%' }}
           onSave={(event: {
             name: string;
             value: string;
@@ -105,13 +107,14 @@ const Song = ({ song }: { song: SongProps }) => {
             });
           }}
         />
-      </div>
-      <div className="fields">
-        <strong>Path: </strong>
-        <p>{currSong.songPath}</p>
-        <button
-          type="button"
+      </Container>
+      <Container disableGutters>
+        <Typography sx={{ fontWeight: 600 }}>Path: </Typography>
+        <Typography sx={{ mt: '1%' }}>{currSong.songPath}</Typography>
+        <Button
+          variant="outlined"
           data-testid="song-picker-button"
+          sx={{ mt: '1%', mb: '2%' }}
           onClick={() =>
             chooseFile(songPickerOptions, (path) => ({
               ...currSong,
@@ -120,14 +123,15 @@ const Song = ({ song }: { song: SongProps }) => {
           }
         >
           change file
-        </button>
-      </div>
-      <div className="fields">
-        <strong>Lyrics: </strong>
-        <p>{currSong.lyricsPath}</p>
-        <button
-          type="button"
+        </Button>
+      </Container>
+      <Container disableGutters>
+        <Typography sx={{ fontWeight: 600 }}>Lyrics: </Typography>
+        <Typography sx={{ mt: '1%' }}>{currSong.lyricsPath}</Typography>
+        <Button
+          variant="outlined"
           data-testid="lyrics-picker-button"
+          sx={{ mt: '1%' }}
           onClick={() =>
             chooseFile(lyricsPickerOptions, (path) => ({
               ...currSong,
@@ -135,10 +139,10 @@ const Song = ({ song }: { song: SongProps }) => {
             }))
           }
         >
-          change file
-        </button>
-      </div>
-    </>
+          {currSong.lyricsPath ? 'change file' : 'upload file'}
+        </Button>
+      </Container>
+    </Container>
   );
 };
 

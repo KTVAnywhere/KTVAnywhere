@@ -224,7 +224,7 @@ export const AudioPlayer = ({
           color="secondary"
           data-testid="volume-slider"
         />
-        <Typography>Volume</Typography>
+        <Typography>Volume: {volume}%</Typography>
       </div>
       <div className="bottom-controls">
         <ProgressBar

@@ -45,6 +45,14 @@ const SongCard = ({
       </CardActionArea>
       <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
+          variant="contained"
+          size="small"
+          onClick={() => deleteSong(song.songId)}
+          color="error"
+        >
+          Delete
+        </Button>
+        <Button
           size="small"
           variant="contained"
           onClick={() => setNextSong(song)}
@@ -57,13 +65,6 @@ const SongCard = ({
           onClick={() => EnqueueSong(song)}
         >
           Enqueue
-        </Button>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => deleteSong(song.songId)}
-        >
-          Delete
         </Button>
       </CardActions>
     </Card>
