@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { EditText } from 'react-edit-text';
+import EditIcon from '@mui/icons-material/Edit';
 import 'react-edit-text/dist/index.css';
 import { Button, Container, Typography } from '@mui/material';
 
@@ -39,11 +40,20 @@ export const lyricsPickerOptions: Electron.OpenDialogOptions = {
   properties: ['openFile'],
 };
 
-const Song = ({ song }: { song: SongProps }) => {
+interface SongComponentProps {
+  song: SongProps;
+  setSong: Dispatch<SetStateAction<SongProps>>;
+}
+
+const Song = ({ song, setSong }: SongComponentProps) => {
   const [currSong, setCurrSong] = useState(song);
 
   const changeSong = (changedSong: SongProps) => {
     setCurrSong(changedSong);
+  };
+
+  const saveSong = (changedSong: SongProps) => {
+    setSong(changedSong);
   };
 
   const chooseFile = async (
@@ -55,26 +65,30 @@ const Song = ({ song }: { song: SongProps }) => {
       .then((result) => setPathFn(result))
       .then((result) => {
         setCurrSong(result);
-        return window.electron.store.songs.setSong(result);
+        return setSong(result);
       })
       .catch((err) => console.log(err));
   };
 
-  const saveSong = (changedSong: SongProps) => {
-    window.electron.store.songs.setSong(changedSong);
-    setCurrSong(changedSong);
-  };
   return (
     <Container sx={{ paddingTop: '5%' }}>
       <Container disableGutters>
         <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText
           placeholder="Enter song name"
+          showEditButton
+          editButtonContent={
+            <EditIcon data-testid="edit-name" color="action" />
+          }
+          editButtonProps={{ style: { backgroundColor: 'transparent' } }}
           value={currSong.songName}
           onChange={(value: string) =>
             changeSong({ ...currSong, songName: value })
           }
-          style={{ border: 'groove', marginBottom: '2%' }}
+          style={{
+            marginBottom: '2%',
+            font: 'inherit',
+          }}
           onSave={(event: {
             name: string;
             value: string;
@@ -91,11 +105,14 @@ const Song = ({ song }: { song: SongProps }) => {
         <Typography sx={{ fontWeight: 600 }}>Artist: </Typography>
         <EditText
           placeholder="Enter song artist"
-          value={currSong.artist}
-          onChange={(value: string) =>
-            changeSong({ ...currSong, artist: value })
+          showEditButton
+          editButtonContent={
+            <EditIcon data-testid="edit-artist" color="action" />
           }
-          style={{ border: 'groove', marginBottom: '2%' }}
+          editButtonProps={{ style: { backgroundColor: 'transparent' } }}
+          value={currSong.artist}
+          onChange={(value: string) => saveSong({ ...currSong, artist: value })}
+          style={{ marginBottom: '2%', font: 'inherit' }}
           onSave={(event: {
             name: string;
             value: string;

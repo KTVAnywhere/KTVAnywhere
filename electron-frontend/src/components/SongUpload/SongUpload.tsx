@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Button } from '@mui/material';
-import React, { Component } from 'react';
+import { Component, Dispatch, SetStateAction, FormEvent } from 'react';
 import uniqid from 'uniqid';
 import {
   emptySongProps,
@@ -8,7 +8,12 @@ import {
   SongProps,
   songPickerOptions,
 } from '../Song';
+import { useSongStagingDialog } from './SongStagingDialog.context';
 import './SongUpload.module.css';
+
+interface SongUploadProps {
+  setUploadedSongs: Dispatch<SetStateAction<SongProps[]>>;
+}
 
 interface FormErrorProps {
   songName: string;
@@ -28,7 +33,8 @@ const songUploadOptions: Electron.OpenDialogOptions = {
   properties: ['openFile', 'createDirectory', 'multiSelections'],
 };
 
-export const SongUploadButton = () => {
+export const SongUploadButton = ({ setUploadedSongs }: SongUploadProps) => {
+  const { setOpen: setOpenUploadDialog } = useSongStagingDialog();
   const getFileName = (str: string) =>
     str.replace(/^.*(\\|\/|:)/, '').replace(/\.[^/.]+$/, '');
   const chooseSongs = (options: Electron.OpenDialogOptions) => {
@@ -44,12 +50,21 @@ export const SongUploadButton = () => {
           songPath: songDetail.songPath,
         }))
       )
-      .then((results) => window.electron.store.songs.addSongs(results, true))
+      .then((results) => {
+        setUploadedSongs(results);
+        return setOpenUploadDialog(true);
+      })
       .catch((error) => console.log(error));
   };
-  return <Button onClick={() => chooseSongs(songUploadOptions)}>Upload</Button>;
+  return (
+    <Button
+      sx={{ alignSelf: 'flex-end', margin: '3%' }}
+      onClick={() => chooseSongs(songUploadOptions)}
+    >
+      Upload
+    </Button>
+  );
 };
-
 class SongUploadForm extends Component<
   {},
   { song: SongProps; error: FormErrorProps }
@@ -91,7 +106,7 @@ class SongUploadForm extends Component<
     this.setState((state) => ({ ...state, song: newSong }));
   }
 
-  submitForm(event: React.FormEvent<HTMLFormElement>) {
+  submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const { song } = this.state;
 

@@ -4,10 +4,18 @@ import { useEffect, useState } from 'react';
 import { Container, CssBaseline } from '@mui/material';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList, { QueueItemProps } from '../components/SongsQueue';
-import Song, { emptySongProps, SongProps } from '../components/Song';
+import {
+  emptySongProps,
+  SongProps,
+  SongDialogProvider,
+  SongDialog,
+} from '../components/Song';
 import SongList from '../components/SongList';
-import { SongUploadButton } from '../components/SongUpload';
-import Popup from '../components/Popup';
+import {
+  SongUploadButton,
+  SongStagingDialog,
+  SongStagingDialogProvider,
+} from '../components/SongUpload';
 import { AudioPlayer } from '../components/AudioPlayer';
 import LyricsPlayer from '../components/LyricsPlayer';
 import './App.css';
@@ -30,11 +38,11 @@ const MainPage = () => {
   const [, setSongList] = useState<SongProps[]>([]);
   const [, setQueue] = useState<QueueItemProps[]>([]);
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
-  const [songPopupTriggered, setSongPopupTriggered] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
   const [nextSong, setNextSong] = useState<SongProps | null>(null);
   const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(true);
+  const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
 
   useEffect(() => {
     const songsUnsubsribe = window.electron.store.songs.onChange((_, results) =>
@@ -70,20 +78,19 @@ const MainPage = () => {
           currentTime={currentTime}
           lyricsEnabled={lyricsEnabled}
         />
-        <LeftSidebar>
-          <SongUploadButton />
-          <SongList
-            setPopupTriggered={setSongPopupTriggered}
-            setOpenSong={setOpenSong}
-            setNextSong={setNextSong}
-          />
-          <Popup
-            trigger={songPopupTriggered}
-            setTrigger={setSongPopupTriggered}
-          >
-            <Song song={openSong} />
-          </Popup>
-        </LeftSidebar>
+        <SongStagingDialogProvider>
+          <SongDialogProvider>
+            <LeftSidebar>
+              <SongUploadButton setUploadedSongs={setUploadedSongs} />
+              <SongList setOpenSong={setOpenSong} setNextSong={setNextSong} />
+              <SongDialog song={openSong} setSong={setOpenSong} />
+              <SongStagingDialog
+                uploadedSongs={uploadedSongs}
+                setUploadedSongs={setUploadedSongs}
+              />
+            </LeftSidebar>
+          </SongDialogProvider>
+        </SongStagingDialogProvider>
         <RightSidebar>
           <QueueList setNextSong={setNextSong} />
         </RightSidebar>

@@ -10,29 +10,24 @@ import {
 } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Dispatch, SetStateAction } from 'react';
-import { SongProps } from '../Song';
+import { SongProps, useSongDialog } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
-
-const deleteSong = (songId: string) => {
-  window.electron.store.songs.deleteSong(songId);
-};
 
 const SongCard = ({
   song,
-  setPopupTriggered,
   setOpenSong,
   setNextSong,
 }: {
   song: SongProps;
-  setPopupTriggered: Dispatch<SetStateAction<boolean>>;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
+  const { setOpen: setOpenSongDialog } = useSongDialog();
   return (
     <Card sx={{ width: 1 }}>
       <CardActionArea
         onClick={() => {
-          setPopupTriggered(true);
+          setOpenSongDialog(true);
           setOpenSong(song);
         }}
       >
@@ -44,14 +39,6 @@ const SongCard = ({
         </CardContent>
       </CardActionArea>
       <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => deleteSong(song.songId)}
-          color="error"
-        >
-          Delete
-        </Button>
         <Button
           size="small"
           variant="contained"
@@ -72,11 +59,9 @@ const SongCard = ({
 };
 
 const SongList = ({
-  setPopupTriggered,
   setOpenSong,
   setNextSong,
 }: {
-  setPopupTriggered: Dispatch<SetStateAction<boolean>>;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
@@ -98,7 +83,6 @@ const SongList = ({
           <ListItem key={song.songId} sx={{ px: 0 }}>
             <SongCard
               song={song}
-              setPopupTriggered={setPopupTriggered}
               setOpenSong={setOpenSong}
               setNextSong={setNextSong}
             />

@@ -1,7 +1,18 @@
 import '@testing-library/jest-dom';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import SongUploadForm, { SongUploadButton } from '../components/SongUpload';
-import { songTestData } from '../__testsData__/testData';
+import {
+  render,
+  fireEvent,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
+import SongUploadForm, {
+  SongStagingDialog,
+  SongStagingDialogProvider,
+  SongUploadButton,
+} from '../components/SongUpload';
+import * as SongStagingDialogContext from '../components/SongUpload/SongStagingDialog.context';
+import { songListTestData, songTestData } from '../__testsData__/testData';
 import mockedElectron from '../__testsData__/mocks';
 
 describe('SongUploadButton', () => {
@@ -36,7 +47,11 @@ describe('SongUploadButton', () => {
   });
 
   test('getSongDetails should be called with array of song paths', async () => {
-    render(<SongUploadButton />);
+    render(
+      <SongStagingDialogProvider>
+        <SongUploadButton setUploadedSongs={jest.fn()} />
+      </SongStagingDialogProvider>
+    );
     const songUploadButton = screen.getByRole('button');
     fireEvent.click(songUploadButton);
 
@@ -48,8 +63,17 @@ describe('SongUploadButton', () => {
     );
   });
 
-  test('databse addSongs function should be called with song details returned from getSongDetails', async () => {
-    render(<SongUploadButton />);
+  test('should return the list of chosen songs', async () => {
+    const mockSetSong = jest.fn();
+    const mockSetOpen = jest.fn();
+    jest
+      .spyOn(SongStagingDialogContext, 'useSongStagingDialog')
+      .mockReturnValue({ open: false, setOpen: mockSetOpen });
+    render(
+      <SongStagingDialogProvider>
+        <SongUploadButton setUploadedSongs={mockSetSong} />
+      </SongStagingDialogProvider>
+    );
     const songUploadButton = screen.getByRole('button');
     fireEvent.click(songUploadButton);
     const expectedResult = songTestData.map((song) => ({
@@ -58,7 +82,101 @@ describe('SongUploadButton', () => {
     }));
 
     await waitFor(() => expect(mockGetSongDetails).toBeCalled());
-    await waitFor(() => expect(mockAdd).toBeCalledWith(expectedResult, true));
+    await waitFor(() => expect(mockSetSong).toBeCalledWith(expectedResult));
+    expect(mockSetOpen).toBeCalledWith(true);
+  });
+});
+
+describe('SongStagingDialog', () => {
+  const mockAdd = jest.fn();
+  const mockSetOpen = jest.fn();
+  beforeEach(() => {
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        songs: {
+          ...mockedElectron.store.songs,
+          addSongs: mockAdd,
+        },
+      },
+    };
+
+    jest
+      .spyOn(SongStagingDialogContext, 'useSongStagingDialog')
+      .mockReturnValue({ open: true, setOpen: mockSetOpen });
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+  test('should display the list of chosen songs', () => {
+    render(
+      <SongStagingDialogProvider>
+        <SongStagingDialog
+          uploadedSongs={songListTestData}
+          setUploadedSongs={jest.fn()}
+        />
+      </SongStagingDialogProvider>
+    );
+    const { getAllByRole } = within(screen.getByRole('list'));
+
+    expect(getAllByRole('listitem').length).toEqual(songListTestData.length);
+  });
+
+  test('click upload songs button should add songs to database', async () => {
+    render(
+      <SongStagingDialogProvider>
+        <SongStagingDialog
+          uploadedSongs={songListTestData}
+          setUploadedSongs={jest.fn()}
+        />
+      </SongStagingDialogProvider>
+    );
+    const uploadButton = screen.getByRole('button', { name: /upload/i });
+    fireEvent.click(uploadButton);
+    await waitFor(() =>
+      expect(mockAdd).toBeCalledWith(songListTestData, expect.any(Boolean))
+    );
+  });
+
+  test('click delete button should remove the song from the list', () => {
+    const mockSet = jest.fn();
+    render(
+      <SongStagingDialogProvider>
+        <SongStagingDialog
+          uploadedSongs={songListTestData}
+          setUploadedSongs={mockSet}
+        />
+      </SongStagingDialogProvider>
+    );
+    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
+    fireEvent.click(deleteButtons[0]);
+    expect(mockSet.mock.calls[0][0](songListTestData)).toEqual(
+      songListTestData.slice(1)
+    );
+  });
+
+  test('edit song should edit song in the list', () => {
+    const mockSet = jest.fn();
+    render(
+      <SongStagingDialogProvider>
+        <SongStagingDialog
+          uploadedSongs={songListTestData}
+          setUploadedSongs={mockSet}
+        />
+      </SongStagingDialogProvider>
+    );
+    const editNameButtons = screen.getAllByTestId('edit-name');
+    fireEvent.click(editNameButtons[0]);
+    const nameInput = screen.getByRole('textbox');
+    fireEvent.change(nameInput, {
+      target: { value: songTestData[2].songName },
+    });
+    fireEvent.focusOut(nameInput);
+    expect(
+      screen.queryByText(songListTestData[0].songName)
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(songTestData[2].songName)).toBeInTheDocument();
   });
 });
 
