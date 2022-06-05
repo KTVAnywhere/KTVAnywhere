@@ -12,6 +12,9 @@ declare global {
       file: {
         read(filePath: string): Promise<string>;
       };
+      music: {
+        getLrc(song: SongProps): Promise<{ lyricsPath: string; error?: Error }>;
+      };
       store: {
         songs: {
           getSong(songId: string): SongProps;

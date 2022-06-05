@@ -11,12 +11,14 @@
 import path from 'path';
 import fs from 'fs-extra';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
+import { spawn } from 'child_process';
 import MenuBuilder from './menu';
 import {
   resolveHtmlPath,
   openFiles,
   openFile,
   processSongDetails,
+  getLrcFile,
 } from './util';
 import {
   createSongsStore,
@@ -109,6 +111,8 @@ const createWindow = async () => {
   });
 };
 
+spawn('python', ['/spleeter.py', 'test', 'test']);
+
 /**
  * Add event listeners...
  */
@@ -145,6 +149,9 @@ app
         if (error) console.error('Failed to register protocol');
       }
     });
+  })
+  .then(() => {
+    ipcMain.handle('music:getLrc', (_, song) => getLrcFile(song));
   })
   .then(() => {
     // Database

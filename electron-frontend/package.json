@@ -102,6 +102,7 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.2",
+    "@mui/lab": "^5.0.0-alpha.84",
     "@mui/material": "^5.8.2",
     "ajv": "^8.11.0",
     "electron-debug": "^3.2.0",
@@ -116,6 +117,7 @@
     "react-dom": "^18.1.0",
     "react-edit-text": "^4.4.0",
     "react-router-dom": "^6.3.0",
+    "simple-netease-cloud-music": "^0.5.2",
     "uniqid": "^5.4.0"
   },
   "devDependencies": {
