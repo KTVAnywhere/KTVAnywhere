@@ -26,7 +26,6 @@ const SongStagingDialog = ({
   const { open, setOpen } = useSongStagingDialog();
 
   const uploadSongs = () => {
-    window.document.body.focus();
     window.electron.store.songs.addSongs(uploadedSongs, true);
     setOpen(false);
   };
@@ -59,7 +58,7 @@ const SongStagingDialog = ({
         <List>
           {uploadedSongs.map((song, index) => (
             <ListItem divider key={song.songId}>
-              <Song song={song} setSong={() => updateSong(index)} />
+              <Song song={song} setSong={updateSong(index)} />
               <ListItemIcon>
                 <IconButton
                   aria-label="delete"

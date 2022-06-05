@@ -16,6 +16,11 @@ contextBridge.exposeInMainWorld('electron', {
       return ipcRenderer.invoke('file:read', filePath);
     },
   },
+  music: {
+    getLrc(song: SongProps) {
+      return ipcRenderer.invoke('music:getLrc', song);
+    },
+  },
   store: {
     songs: {
       getSong(songId: string) {

@@ -37,7 +37,6 @@ export const songFunctions = {
     const newSongs = prepend
       ? [...songs, ...store.get('songs')]
       : [...store.get('songs'), ...songs];
-    console.log(newSongs);
     store.set('songs', newSongs);
   },
   deleteSong: (store: Store<SongsType>, songId: string) => {
