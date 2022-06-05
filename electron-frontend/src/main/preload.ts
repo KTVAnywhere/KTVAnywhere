@@ -79,5 +79,8 @@ contextBridge.exposeInMainWorld('electron', {
     getSongDetails(songPaths: string[]) {
       return ipcRenderer.invoke('preprocess:getSongDetails', songPaths);
     },
+    spleeterProcessSong(filePath: string) {
+      return ipcRenderer.invoke('preprocess:spleeterProcessSong', filePath);
+    },
   },
 });
