@@ -128,6 +128,12 @@ describe('Song', () => {
           deleteSong: mockDelete,
         },
       },
+      music: {
+        getLrc: jest.fn().mockResolvedValue({
+          lyricsPath: songTestData[1].lyricsPath,
+          error: '',
+        }),
+      },
     };
   });
 
@@ -181,6 +187,28 @@ describe('Song', () => {
     );
 
     await waitFor(() => expect(mockSetSong).toBeCalledWith(songTestData[1]));
+  });
+
+  test('click fetch lyrics button will set lyrics path to new path', async () => {
+    const mockSetSong = jest.fn();
+    jest
+      .spyOn(SongDialogContext, 'useSongDialog')
+      .mockReturnValue({ open: true, setOpen: jest.fn() });
+    render(
+      <SongDialogProvider>
+        <SongDialog song={songTestData[0]} setSong={mockSetSong} />
+      </SongDialogProvider>
+    );
+
+    const fetchLyricsButton = screen.getByTestId('fetch-lyrics');
+    fireEvent.click(fetchLyricsButton);
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText(songTestData[0].lyricsPath)
+      ).not.toBeInTheDocument()
+    );
+    expect(screen.getByText(songTestData[1].lyricsPath)).toBeInTheDocument();
   });
 
   test('click save button will call the update the song in the database', () => {
