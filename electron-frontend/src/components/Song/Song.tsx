@@ -209,6 +209,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
           {currSong.lyricsPath ? 'change file' : 'upload file'}
         </Button>
         <LoadingButton
+          data-testid="fetch-lyrics"
           loading={isFetchingLyrics}
           variant="outlined"
           onClick={() => getLyrics()}
