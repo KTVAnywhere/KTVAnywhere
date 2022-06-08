@@ -15,6 +15,9 @@ contextBridge.exposeInMainWorld('electron', {
     read(filePath: string) {
       return ipcRenderer.invoke('file:read', filePath);
     },
+    ifFileExists(filePath: string) {
+      return ipcRenderer.sendSync('file:ifFileExists', filePath);
+    },
   },
   music: {
     getLrc(song: SongProps) {
@@ -84,8 +87,25 @@ contextBridge.exposeInMainWorld('electron', {
     getSongDetails(songPaths: string[]) {
       return ipcRenderer.invoke('preprocess:getSongDetails', songPaths);
     },
-    spleeterProcessSong(filePath: string) {
-      return ipcRenderer.invoke('preprocess:spleeterProcessSong', filePath);
+    spleeterProcessSong(song: SongProps) {
+      ipcRenderer.send('preprocess:spleeterProcessSong', song);
+    },
+    spleeterProcessResult(
+      callback: (results: {
+        vocalsPath: string;
+        accompanimentPath: string;
+        songId: string;
+        error?: Error;
+      }) => void
+    ) {
+      ipcRenderer.on('preprocess:spleeterProcessResult', (_event, data) =>
+        callback(data)
+      );
+      return () =>
+        ipcRenderer.removeListener(
+          'preprocess:spleeterProcessResult',
+          (_event, data) => callback(data)
+        );
     },
   },
 });

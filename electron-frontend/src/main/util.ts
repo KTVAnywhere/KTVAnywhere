@@ -3,7 +3,6 @@ import { URL } from 'url';
 import path from 'path';
 import { dialog, app } from 'electron';
 import { parseFile } from 'music-metadata';
-import { spawn } from 'child_process';
 import NeteaseMusic from 'simple-netease-cloud-music';
 import fs from 'fs-extra';
 import { SongProps } from '../components/Song';
@@ -57,24 +56,6 @@ export const processSongDetails = async (songPaths: string[]) => {
     artist: string;
     songPath: string;
   }[];
-};
-
-export const spleeterProcessSong = async (filePath: string) => {
-  const outputPath = 'C:\\Users\\YEW WEI QUAN\\Downloads';
-  const spleeterProcess = spawn('python', [
-    path.join(__dirname, '../python_scripts/spleeter_stems.py'),
-    filePath,
-    outputPath,
-  ]);
-
-  let m = '';
-
-  spleeterProcess.stdout.on('data', (message: any) => {
-    console.log(`${message}`);
-    m = `${message}`;
-  });
-
-  return m;
 };
 
 export const findNeteaseSongId = async (

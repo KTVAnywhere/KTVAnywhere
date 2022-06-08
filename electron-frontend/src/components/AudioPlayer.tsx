@@ -98,18 +98,43 @@ export const AudioPlayer = ({
 }) => {
   const [duration, setDuration] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayingVocals, setIsPlayingVocals] = useState(true);
   const [skipToTime, setSkipToTime] = useState<number | null>();
   const [volume, setVolume] = useState<number>(70);
 
-  useEffect(() => {
-    if (nextSong === null) return;
+  const loadSong = (
+    filePath: string,
+    vocalsToggle: boolean,
+    callback?: () => void
+  ) => {
     const audio: HTMLAudioElement = document.getElementById(
       'audio'
     ) as HTMLAudioElement;
+    let time = 0;
+    if (vocalsToggle) {
+      time = audio.currentTime;
+    }
+
+    try {
+      if (window.electron.file.ifFileExists(filePath)) {
+        audio.src = `atom:///${filePath}`;
+        audio.load();
+        if (vocalsToggle) {
+          audio.currentTime = time;
+        }
+        if (callback) {
+          callback();
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (nextSong === null) return;
     setCurrentSong(nextSong);
-    audio.src = `atom:///${nextSong?.songPath}`;
-    audio.load();
-    setIsPlaying(true);
+    loadSong(nextSong.songPath, false, () => setIsPlaying(true));
   }, [nextSong, setCurrentSong]);
 
   useEffect(() => {
@@ -121,10 +146,10 @@ export const AudioPlayer = ({
         audio.play();
       } else if (!currentSong && GetQueueLength() > 0) {
         const song = DequeueSong();
-        setCurrentSong(song);
-        audio.src = `atom:///${song?.songPath}`;
-        audio.load();
-        audio.play();
+        if (song) {
+          setCurrentSong(song);
+          loadSong(song.songPath, false);
+        }
       }
     } else {
       audio.pause();
@@ -190,16 +215,31 @@ export const AudioPlayer = ({
     setLyricsEnabled((state) => !state);
   };
 
+  const enableVocals = () => {
+    if (currentSong) {
+      loadSong(currentSong.songPath, true, () => setIsPlayingVocals(true));
+    }
+  };
+
+  const disableVocals = () => {
+    if (currentSong) {
+      loadSong(currentSong.accompanimentPath, true, () =>
+        setIsPlayingVocals(false)
+      );
+    }
+  };
+
   const endSong = () => {
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
     if (GetQueueLength() > 0) {
       const song = DequeueSong();
       setCurrentSong(song);
-      audio.src = `atom:///${song?.songPath}`;
-      audio.load();
+      if (song) {
+        loadSong(song.songPath, false);
+      }
     } else {
+      const audio: HTMLAudioElement = document.getElementById(
+        'audio'
+      ) as HTMLAudioElement;
       setCurrentSong(null);
       setIsPlaying(false);
       audio.src = '';
@@ -249,7 +289,10 @@ export const AudioPlayer = ({
           </Typography>
         </Grid>
         <Grid item>
-          <IconButton sx={{ padding: 0 }}>
+          <IconButton
+            sx={{ padding: 0 }}
+            onClick={() => (isPlayingVocals ? disableVocals() : enableVocals())}
+          >
             <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
           </IconButton>
           <Typography>vocals</Typography>

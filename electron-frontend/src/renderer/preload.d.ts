@@ -1,6 +1,6 @@
-import { SongProps } from 'components/Song';
-import { QueueItemProps } from 'components/SongsQueue';
 import { IpcRenderer } from 'electron';
+import { SongProps } from '../components/Song';
+import { QueueItemProps } from '../components/SongsQueue';
 
 declare global {
   interface Window {
@@ -11,6 +11,7 @@ declare global {
       };
       file: {
         read(filePath: string): Promise<string>;
+        ifFileExists(filePath: string): boolean;
       };
       music: {
         getLrc(song: SongProps): Promise<{ lyricsPath: string; error?: Error }>;
@@ -44,6 +45,15 @@ declare global {
         getSongDetails(
           songPaths: string[]
         ): Promise<{ songName: string; artist: string; songPath: string }[]>;
+        spleeterProcessSong(song: SongProps): void;
+        spleeterProcessResult(
+          callback: (results: {
+            vocalsPath: string;
+            accompanimentPath: string;
+            songId: string;
+            error?: Error;
+          }) => void
+        ): () => void;
       };
     };
   }

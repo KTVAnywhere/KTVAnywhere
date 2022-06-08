@@ -6,6 +6,7 @@ import Song, {
 } from './Song';
 import SongDialog from './SongDialog';
 import { SongDialogProvider, useSongDialog } from './SongDialog.context';
+import { SongsStatusProvider, useSongsStatus } from './SongsStatus.context';
 
 export default Song;
 export {
@@ -16,4 +17,6 @@ export {
   SongDialog,
   SongDialogProvider,
   useSongDialog,
+  SongsStatusProvider,
+  useSongsStatus,
 };

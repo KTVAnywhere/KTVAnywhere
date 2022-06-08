@@ -4,6 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import 'react-edit-text/dist/index.css';
 import { Button, Container, Typography } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { useSongsStatus } from './SongsStatus.context';
 
 export interface SongProps {
   songId: string;
@@ -11,6 +12,8 @@ export interface SongProps {
   artist: string;
   songPath: string;
   lyricsPath: string;
+  vocalsPath: string;
+  accompanimentPath: string;
 }
 
 export const emptySongProps = {
@@ -19,6 +22,8 @@ export const emptySongProps = {
   artist: '',
   songPath: '',
   lyricsPath: '',
+  vocalsPath: '',
+  accompanimentPath: '',
 };
 
 export const songPickerOptions: Electron.OpenDialogOptions = {
@@ -49,6 +54,7 @@ interface SongComponentProps {
 const Song = ({ song, setSong }: SongComponentProps) => {
   const [currSong, setCurrSong] = useState(song);
   const [isFetchingLyrics, setIsFetchingLyrics] = useState(false);
+  const { songsStatus, setSongsStatus } = useSongsStatus();
 
   const changeSong = (changedSong: SongProps) => {
     setCurrSong(changedSong);
@@ -93,6 +99,10 @@ const Song = ({ song, setSong }: SongComponentProps) => {
         setIsFetchingLyrics(false);
         return false;
       });
+  };
+
+  const spleeterSeparateVocalsAndMusic = async () => {
+    setSongsStatus([...songsStatus, song.songId]);
   };
 
   return (
@@ -204,6 +214,15 @@ const Song = ({ song, setSong }: SongComponentProps) => {
           onClick={() => getLyrics()}
         >
           fetch lyrics
+        </LoadingButton>
+      </Container>
+      <Container disableGutters>
+        <LoadingButton
+          loading={songsStatus.indexOf(song.songId) !== -1}
+          variant="outlined"
+          onClick={() => spleeterSeparateVocalsAndMusic()}
+        >
+          separate vocals
         </LoadingButton>
       </Container>
     </Container>

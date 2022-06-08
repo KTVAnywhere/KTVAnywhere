@@ -9,6 +9,8 @@ import {
   SongProps,
   SongDialogProvider,
   SongDialog,
+  useSongsStatus,
+  SongsStatusProvider,
 } from '../components/Song';
 import SongList from '../components/SongList';
 import {
@@ -43,7 +45,8 @@ const MainPage = () => {
   const [nextSong, setNextSong] = useState<SongProps | null>(null);
   const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(true);
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
-
+  const { songsStatus, setSongsStatus } = useSongsStatus();
+  const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
   useEffect(() => {
     const songsUnsubsribe = window.electron.store.songs.onChange((_, results) =>
       setSongList(results)
@@ -51,6 +54,7 @@ const MainPage = () => {
     const queueItemsUnsubscribe = window.electron.store.queueItems.onChange(
       (_, results) => setQueue(results)
     );
+
     setSongList(window.electron.store.songs.getAllSongs() ?? []);
     setQueue(window.electron.store.queueItems.getAllQueueItems() ?? []);
 
@@ -59,6 +63,44 @@ const MainPage = () => {
       queueItemsUnsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    const spleeterProcessSongUnsubscribe =
+      window.electron.preprocess.spleeterProcessResult(
+        ({ vocalsPath, accompanimentPath, songId, error }) => {
+          if (!error) {
+            const changedSong = {
+              ...window.electron.store.songs.getSong(songId),
+              vocalsPath,
+              accompanimentPath,
+            };
+            window.electron.store.songs.setSong(changedSong);
+          } else {
+            console.error(error);
+          }
+          setSongsStatus((state) => state.slice(1));
+        }
+      );
+
+    return () => {
+      spleeterProcessSongUnsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (songsStatus.length === 0 && songInSpleeter) {
+      setSongInSpleeter(null);
+    } else if (
+      songsStatus.length !== 0 &&
+      (!songInSpleeter || songInSpleeter !== songsStatus[0])
+    ) {
+      const nextSongId = songsStatus[0];
+      const toProcess = window.electron.store.songs.getSong(nextSongId);
+      setSongInSpleeter(nextSongId);
+      window.electron.preprocess.spleeterProcessSong(toProcess);
+    }
+  }, [songInSpleeter, songsStatus]);
 
   return (
     <Container sx={{ position: 'fixed', top: 0, bottom: 0, left: 0, right: 0 }}>
@@ -127,7 +169,9 @@ export default function App() {
           path="/"
           element={
             <ThemeProvider theme={darkTheme}>
-              <MainPage />
+              <SongsStatusProvider>
+                <MainPage />
+              </SongsStatusProvider>
             </ThemeProvider>
           }
         />

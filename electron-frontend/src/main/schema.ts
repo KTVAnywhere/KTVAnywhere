@@ -1,6 +1,6 @@
-import { SongProps } from 'components/Song';
-import { QueueItemProps } from 'components/SongsQueue';
 import { Schema } from 'electron-store';
+import { SongProps } from '../components/Song';
+import { QueueItemProps } from '../components/SongsQueue';
 
 interface Song {
   song: SongProps;
@@ -27,6 +27,8 @@ const songSchema: Schema<Song> = {
       artist: { type: 'string' },
       songPath: { type: 'string' },
       lyricsPath: { type: 'string' },
+      vocalsPath: { type: 'string' },
+      accompanimentPath: { type: 'string' },
     },
     required: ['songId', 'songName', 'songPath'],
   },
