@@ -1,0 +1,64 @@
+name: Electron
+
+on:
+  push:
+    paths:
+      - electron-frontend/**
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+          cache-dependency-path: electron-frontend/package-lock.json
+
+      - name: npm install
+        run: |
+          npm ci
+        working-directory: electron-frontend
+
+      - name: Install FFMPEG
+        uses: FedericoCarboni/setup-ffmpeg@v1
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+          
+      - name: Install python packages
+        run: pip install - r 'requirements.txt'
+        working-directory: electron-frontend
+
+      - name: npm test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run package
+          npm run lint
+          npm exec tsc
+          npm test
+        working-directory: electron-frontend
+
+      - name: Publish releases
+        env:
+          # These values are used for auto updates signing
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run postinstall
+          npm run package:spleeter
+          npm run build
+          npm exec electron-builder -- --publish always
+        working-directory: electron-frontend
