@@ -11,8 +11,15 @@
 import path from 'path';
 import fs from 'fs-extra';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
+import { spawn } from 'child_process';
 import MenuBuilder from './menu';
-import { resolveHtmlPath, openFile } from './util';
+import {
+  resolveHtmlPath,
+  openFiles,
+  openFile,
+  processSongDetails,
+  getLrcFile,
+} from './util';
 import {
   createSongsStore,
   createQueueItemsStore,
@@ -25,6 +32,10 @@ let mainWindow: BrowserWindow | null = null;
 ipcMain.handle('file:read', async (_, filePath: string) => {
   const data = await fs.promises.readFile(filePath, 'utf-8');
   return data;
+});
+
+ipcMain.on('file:ifFileExists', (event, filePath) => {
+  event.returnValue = fs.existsSync(filePath);
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -120,6 +131,68 @@ app
   .whenReady()
   .then(() => {
     ipcMain.handle('dialog:openFile', (_, config) => openFile(config));
+    ipcMain.handle('dialog:openFiles', (_, config) => openFiles(config));
+    ipcMain.handle('preprocess:getSongDetails', async (_, songPaths) =>
+      processSongDetails(songPaths)
+    );
+    ipcMain.on('preprocess:spleeterProcessSong', async (event, song) => {
+      try {
+        const songFolder = path.join(
+          app.getPath('userData'),
+          'songs',
+          song.songId
+        );
+        if (!fs.existsSync(songFolder)) {
+          fs.mkdirSync(songFolder, { recursive: true });
+        }
+        const spleeterPath = app.isPackaged
+          ? path.join(process.resourcesPath, 'assets', 'spleeter_stems')
+          : path.join(__dirname, '../python_scripts/spleeter_stems.py');
+        console.log(spleeterPath);
+        console.log(process.resourcesPath);
+
+        const spleeterProcess = app.isPackaged
+          ? spawn(spleeterPath, [song.songPath, songFolder, song.songId])
+          : spawn('python', [
+              spleeterPath,
+              song.songPath,
+              songFolder,
+              song.songId,
+            ]);
+        const outputDir = path.parse(song.songPath).name;
+        const audioStemsFolder = path.join(songFolder, outputDir);
+
+        spleeterProcess?.stdout.on('data', (message: string) => {
+          if (`${message}` === `done splitting ${song.songId}`) {
+            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+              vocalsPath: path.join(audioStemsFolder, 'vocals.mp3'),
+              accompanimentPath: path.join(
+                audioStemsFolder,
+                'accompaniment.mp3'
+              ),
+              songId: song.songId,
+            });
+          } else if (`${message}` === `error splitting ${song.songId}`) {
+            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+              vocalsPath: '',
+              accompanimentPath: '',
+              songId: song.songId,
+              error: new Error(`split fail for ${song.songPath}`),
+            });
+          }
+        });
+
+        spleeterProcess.once('close', () => {
+          spleeterProcess.removeAllListeners();
+        });
+      } catch (error) {
+        event.reply('preprocess:spleeterProcessResult', {
+          vocalsPath: '',
+          accompanimentPath: '',
+          error: error as Error,
+        });
+      }
+    });
 
     createWindow();
     app.on('activate', () => {
@@ -129,20 +202,33 @@ app
     });
     // custom protocol for reading local files
     protocol.registerFileProtocol('atom', (request, callback) => {
-      const url = request.url.substring(7);
-      try {
-        callback(decodeURI(path.normalize(url)));
-      } catch (error) {
-        if (error) console.error('Failed to register protocol');
+      const url = request.url.substring(8);
+      if (fs.existsSync(path.normalize(url))) {
+        try {
+          return callback(path.normalize(url));
+        } catch (error) {
+          console.error('Failed to register protocol');
+        }
       }
+      return false;
     });
+  })
+  .then(() => {
+    ipcMain.handle('music:getLrc', (_, song) => getLrcFile(song));
   })
   .then(() => {
     // Database
     const songsStore = createSongsStore();
     const queueItemsStore = createQueueItemsStore();
-    const { getSong, setSong, addSong, deleteSong, getAllSongs, setAllSongs } =
-      songFunctions;
+    const {
+      getSong,
+      setSong,
+      addSong,
+      addSongs,
+      deleteSong,
+      getAllSongs,
+      setAllSongs,
+    } = songFunctions;
     const {
       getQueueItem,
       setQueueItem,
@@ -157,6 +243,9 @@ app
     });
     ipcMain.on('store:addSong', async (_, song) => {
       addSong(songsStore, song);
+    });
+    ipcMain.on('store:addSongs', async (_, songs, prepend) => {
+      addSongs(songsStore, songs, prepend);
     });
     ipcMain.on('store:setSong', async (_, song) => {
       setSong(songsStore, song);

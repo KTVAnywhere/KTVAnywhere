@@ -1,13 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import React, { Component } from 'react';
+import { Button } from '@mui/material';
+import { Component, Dispatch, SetStateAction, FormEvent } from 'react';
 import uniqid from 'uniqid';
 import {
   emptySongProps,
-  lyricsUploadOptions,
+  lyricsPickerOptions,
   SongProps,
-  songUploadOptions,
+  songPickerOptions,
 } from '../Song';
+import { useSongStagingDialog } from './SongStagingDialog.context';
 import './SongUpload.module.css';
+
+interface SongUploadProps {
+  setUploadedSongs: Dispatch<SetStateAction<SongProps[]>>;
+}
 
 interface FormErrorProps {
   songName: string;
@@ -15,7 +21,51 @@ interface FormErrorProps {
   cancelled: string;
 }
 
-class SongUpload extends Component<
+const songUploadOptions: Electron.OpenDialogOptions = {
+  title: 'Select songs',
+  buttonLabel: 'Add',
+  filters: [
+    {
+      name: 'Audio',
+      extensions: ['mp3', 'wav', 'm4a', 'wma'],
+    },
+  ],
+  properties: ['openFile', 'createDirectory', 'multiSelections'],
+};
+
+export const SongUploadButton = ({ setUploadedSongs }: SongUploadProps) => {
+  const { setOpen: setOpenUploadDialog } = useSongStagingDialog();
+  const getFileName = (str: string) =>
+    str.replace(/^.*(\\|\/|:)/, '').replace(/\.[^/.]+$/, '');
+  const chooseSongs = (options: Electron.OpenDialogOptions) => {
+    window.electron.dialog
+      .openFiles(options)
+      .then((songPaths) => window.electron.preprocess.getSongDetails(songPaths))
+      .then((songDetails) =>
+        songDetails.map((songDetail) => ({
+          ...emptySongProps,
+          songId: uniqid(),
+          songName: songDetail.songName ?? getFileName(songDetail.songPath),
+          artist: songDetail.artist ?? '',
+          songPath: songDetail.songPath,
+        }))
+      )
+      .then((results) => {
+        setUploadedSongs(results);
+        return setOpenUploadDialog(true);
+      })
+      .catch((error) => console.log(error));
+  };
+  return (
+    <Button
+      sx={{ alignSelf: 'flex-end', margin: '3%' }}
+      onClick={() => chooseSongs(songUploadOptions)}
+    >
+      Upload
+    </Button>
+  );
+};
+class SongUploadForm extends Component<
   {},
   { song: SongProps; error: FormErrorProps }
 > {
@@ -56,7 +106,7 @@ class SongUpload extends Component<
     this.setState((state) => ({ ...state, song: newSong }));
   }
 
-  submitForm(event: React.FormEvent<HTMLFormElement>) {
+  submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const { song } = this.state;
 
@@ -143,7 +193,7 @@ class SongUpload extends Component<
                   type="button"
                   data-testid="song-picker-button"
                   onClick={() =>
-                    this.chooseFile(songUploadOptions, (path: string) =>
+                    this.chooseFile(songPickerOptions, (path: string) =>
                       this.changeSong({ ...song, songPath: path })
                     )
                   }
@@ -164,7 +214,7 @@ class SongUpload extends Component<
                   type="button"
                   data-testid="lyrics-picker-button"
                   onClick={() =>
-                    this.chooseFile(lyricsUploadOptions, (path: string) =>
+                    this.chooseFile(lyricsPickerOptions, (path: string) =>
                       this.changeSong({ ...song, lyricsPath: path })
                     )
                   }
@@ -181,4 +231,4 @@ class SongUpload extends Component<
   }
 }
 
-export default SongUpload;
+export default SongUploadForm;

@@ -40,6 +40,8 @@ describe('songs store', () => {
       artist: 'Test artist 2',
       songPath: 'C:\\dir\\file2.mp3',
       lyricsPath: 'C:\\dir\\lyrics2.lrc',
+      vocalsPath: '',
+      accompanimentPath: '',
     };
     const { addSong } = songFunctions;
     addSong(songsStore, toAdd);
@@ -74,6 +76,8 @@ describe('songs store', () => {
         artist: 'Test artist 2',
         songPath: 'C:\\dir\\file2.mp3',
         lyricsPath: 'C:\\dir\\lyrics2.lrc',
+        vocalsPath: '',
+        accompanimentPath: '',
       },
       {
         songId: '3',
@@ -81,6 +85,8 @@ describe('songs store', () => {
         artist: 'Test artist 3',
         songPath: 'C:\\dir\\file3.mp3',
         lyricsPath: 'C:\\dir\\lyrics3.lrc',
+        vocalsPath: '',
+        accompanimentPath: '',
       },
     ];
     const { setAllSongs } = songFunctions;
@@ -123,6 +129,8 @@ describe('queueItems store', () => {
         artist: 'Test artist 3',
         songPath: 'C:\\dir\\file3.mp3',
         lyricsPath: 'C:\\dir\\lyrics3.lrc',
+        vocalsPath: '',
+        accompanimentPath: '',
       },
       queueItemId: '3',
     };

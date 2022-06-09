@@ -1,62 +1,50 @@
-import { Dispatch, ReactNode, SetStateAction } from 'react';
-import './Sidebar.css';
+import { ReactNode } from 'react';
+import { Drawer } from '@mui/material';
 
 interface SidebarProps {
   children: ReactNode;
-  trigger: boolean;
-  setTrigger: Dispatch<SetStateAction<boolean>>;
 }
 
-export const LeftSidebar = ({ children, trigger, setTrigger }: SidebarProps) =>
-  trigger ? (
-    <div className="leftsidebar-opened">
-      <div className="leftsidebar-inner">{children}</div>
-      <button
-        type="button"
-        className="toggle-btn"
-        data-testid="toggle-sidebar-button"
-        onClick={() => setTrigger(!trigger)}
-      >
-        ◀
-      </button>
-    </div>
-  ) : (
-    <div className="leftsidebar-collasped">
-      <button
-        type="button"
-        className="toggle-btn"
-        data-testid="toggle-sidebar-button"
-        onClick={() => setTrigger(!trigger)}
-      >
-        ▶
-      </button>
-    </div>
-  );
+const drawerHeight = '88%';
+const backgroundColor = '#2C2F33';
 
-export const RightSidebar = ({ children, trigger, setTrigger }: SidebarProps) =>
-  trigger ? (
-    <div className="rightsidebar-opened">
-      <button
-        type="button"
-        className="toggle-btn"
-        data-testid="toggle-sidebar-button"
-        onClick={() => setTrigger(!trigger)}
-      >
-        ▶
-      </button>
-      <div className="rightsidebar-inner">{children}</div>
-    </div>
-  ) : (
-    <div className="rightsidebar-collasped">
-      <button
-        type="button"
-        className="toggle-btn"
-        data-testid="toggle-sidebar-button"
-        onClick={() => setTrigger(!trigger)}
-      >
-        ◀
-      </button>
-    </div>
+export const LeftSidebar = ({ children }: SidebarProps) => {
+  return (
+    <Drawer
+      sx={{
+        position: 'fixed',
+        '& .MuiDrawer-paper': {
+          height: drawerHeight,
+          boxSizing: 'border-box',
+          background: backgroundColor,
+        },
+      }}
+      variant="permanent"
+      anchor="left"
+    >
+      {children}
+    </Drawer>
   );
+};
+
+export const RightSidebar = ({ children }: SidebarProps) => {
+  return (
+    <Drawer
+      sx={{
+        '& .MuiDrawer-paper': {
+          minWidth: '330px',
+          height: drawerHeight,
+          boxSizing: 'border-box',
+          alignItems: 'center',
+          background: backgroundColor,
+        },
+      }}
+      variant="permanent"
+      anchor="right"
+    >
+      {children}
+    </Drawer>
+  );
+};
 
 export default LeftSidebar;

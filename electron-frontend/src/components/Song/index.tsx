@@ -1,9 +1,22 @@
 import Song, {
   SongProps,
   emptySongProps,
-  songUploadOptions,
-  lyricsUploadOptions,
+  songPickerOptions,
+  lyricsPickerOptions,
 } from './Song';
+import SongDialog from './SongDialog';
+import { SongDialogProvider, useSongDialog } from './SongDialog.context';
+import { SongsStatusProvider, useSongsStatus } from './SongsStatus.context';
 
 export default Song;
-export { SongProps, emptySongProps, songUploadOptions, lyricsUploadOptions };
+export {
+  SongProps,
+  emptySongProps,
+  songPickerOptions,
+  lyricsPickerOptions,
+  SongDialog,
+  SongDialogProvider,
+  useSongDialog,
+  SongsStatusProvider,
+  useSongsStatus,
+};

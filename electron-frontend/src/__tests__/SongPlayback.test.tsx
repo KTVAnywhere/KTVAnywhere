@@ -17,6 +17,7 @@ describe('Lyrics player', () => {
       ...mockedElectron,
       file: {
         read: mockRead,
+        ifFileExists: jest.fn(),
       },
     };
   });
@@ -71,7 +72,13 @@ describe('Audio player component tests', () => {
   const mockSetLyricsEnabled = jest.fn();
 
   beforeEach(() => {
-    global.window.electron = mockedElectron;
+    global.window.electron = {
+      ...mockedElectron,
+      file: {
+        read: jest.fn(),
+        ifFileExists: jest.fn().mockReturnValue(true),
+      },
+    };
   });
 
   afterEach(() => {
@@ -92,13 +99,11 @@ describe('Audio player component tests', () => {
       />
     );
     expect(mockSetCurrentSong).not.toHaveBeenCalled();
-    expect(HTMLMediaElement.prototype.load).toHaveBeenCalledTimes(0);
 
     const playButton = screen.getByTestId('play-button');
     fireEvent.click(playButton);
 
     expect(mockSetCurrentSong).toBeCalledWith(songTestData[0]);
-    expect(HTMLMediaElement.prototype.load).toHaveBeenCalledTimes(1);
   });
 
   test('should play currently paused song when play song button is clicked', async () => {
@@ -113,10 +118,10 @@ describe('Audio player component tests', () => {
       />
     );
 
-    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(0);
+    expect(HTMLMediaElement.prototype.load).toHaveBeenCalledTimes(0);
     const playButton = screen.getByTestId('play-button');
     fireEvent.click(playButton);
-    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+    expect(HTMLMediaElement.prototype.load).toHaveBeenCalledTimes(1);
   });
 
   test('should pause current song when pause song button is clicked', async () => {
@@ -131,8 +136,7 @@ describe('Audio player component tests', () => {
       />
     );
 
-    // implementation already called pause once when component is rendered due to useEffect
-    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalledTimes(1);
+    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalledTimes(0);
 
     // by default play button is displayed, to show the pause button, play button has to be clicked first
     const playButton = screen.getByTestId('play-button');
@@ -140,7 +144,7 @@ describe('Audio player component tests', () => {
     const pauseButton = screen.getByTestId('pause-button');
     fireEvent.click(pauseButton);
 
-    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalledTimes(2);
+    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalledTimes(1);
   });
 
   test('should end current song when end song button is clicked and load next song in queue if available', async () => {
@@ -158,10 +162,8 @@ describe('Audio player component tests', () => {
     const endSongButton = screen.getByTestId('end-song-button');
 
     // there are songs in queue
-    expect(HTMLMediaElement.prototype.load).toHaveBeenCalledTimes(0);
     fireEvent.click(endSongButton);
     expect(mockSetCurrentSong).toBeCalledWith(songTestData[0]);
-    expect(HTMLMediaElement.prototype.load).toHaveBeenCalledTimes(1);
 
     // no song in queue
     const mockGetAllQueueItems = () => {

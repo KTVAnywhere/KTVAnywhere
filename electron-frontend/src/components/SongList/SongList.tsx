@@ -3,40 +3,35 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
+  Container,
   List,
   ListItem,
   Typography,
 } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Dispatch, SetStateAction } from 'react';
-import { SongProps } from '../Song';
+import { SongProps, useSongDialog } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
-import './SongList.module.css';
-
-const deleteSong = (songId: string) => {
-  window.electron.store.songs.deleteSong(songId);
-};
 
 const SongCard = ({
   song,
-  setPopupTriggered,
   setOpenSong,
   setNextSong,
 }: {
   song: SongProps;
-  setPopupTriggered: Dispatch<SetStateAction<boolean>>;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
+  const { setOpen: setOpenSongDialog } = useSongDialog();
   return (
     <Card sx={{ width: 1 }}>
       <CardActionArea
         onClick={() => {
-          setPopupTriggered(true);
+          setOpenSongDialog(true);
           setOpenSong(song);
         }}
       >
-        <CardContent sx={{ height: '40px' }}>
+        <CardContent sx={{ height: '70px' }}>
           <Typography noWrap variant="h5">
             {song.songName}
           </Typography>
@@ -58,30 +53,23 @@ const SongCard = ({
         >
           Enqueue
         </Button>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => deleteSong(song.songId)}
-        >
-          Delete
-        </Button>
       </CardActions>
     </Card>
   );
 };
 
 const SongList = ({
-  setPopupTriggered,
   setOpenSong,
   setNextSong,
 }: {
-  setPopupTriggered: Dispatch<SetStateAction<boolean>>;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
   return (
-    <div>
-      <h2>Song library</h2>
+    <Container>
+      <Typography variant="h5" align="center" gutterBottom>
+        Songs Library
+      </Typography>
       <List
         aria-label="data"
         sx={{
@@ -95,14 +83,13 @@ const SongList = ({
           <ListItem key={song.songId} sx={{ px: 0 }}>
             <SongCard
               song={song}
-              setPopupTriggered={setPopupTriggered}
               setOpenSong={setOpenSong}
               setNextSong={setNextSong}
             />
           </ListItem>
         ))}
       </List>
-    </div>
+    </Container>
   );
 };
 

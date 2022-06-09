@@ -3,11 +3,13 @@ import {
   Button,
   CardActions,
   CardContent,
+  Container,
   List,
   ListItem,
   Typography,
 } from '@mui/material';
 import Card from '@mui/material/Card';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   DragDropContext,
   Droppable,
@@ -16,7 +18,6 @@ import {
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
 import { SongProps } from '../Song';
-import './SongsQueue.module.css';
 
 export interface QueueItemProps {
   song: SongProps;
@@ -87,8 +88,17 @@ export const QueueList = ({
   };
 
   return (
-    <div className="QueueList">
-      <h2>Songs Queue</h2>
+    <Container>
+      <Typography
+        variant="h5"
+        align="center"
+        gutterBottom
+        sx={{
+          paddingTop: '5%',
+        }}
+      >
+        Songs Queue
+      </Typography>
       <Button
         size="small"
         variant="contained"
@@ -132,8 +142,19 @@ export const QueueList = ({
                           data-testid="draggable-queue-item"
                           sx={{ px: 0 }}
                         >
-                          <Card sx={{ width: 1 }}>
-                            <CardContent sx={{ height: '40px' }}>
+                          <Card
+                            sx={{
+                              width: 1,
+                            }}
+                          >
+                            <DragIndicatorIcon
+                              sx={{
+                                position: 'absolute',
+                                top: '40%',
+                                right: 0,
+                              }}
+                            />
+                            <CardContent sx={{ height: '70px' }}>
                               <Typography noWrap variant="h5">
                                 {queueItem.song.songName}
                               </Typography>
@@ -169,20 +190,20 @@ export const QueueList = ({
                                 sx={{ minWidth: '2px' }}
                                 variant="contained"
                                 size="small"
-                                data-testid="delete-song-from-queue-button"
-                                onClick={() => deleteSongFromQueue(index)}
-                                color="error"
+                                data-testid="send-to-front-of-queue-button"
+                                onClick={() => sendSongToFrontOfQueue(index)}
                               >
-                                Delete
+                                First
                               </Button>
                               <Button
                                 sx={{ minWidth: '2px' }}
                                 variant="contained"
                                 size="small"
-                                data-testid="send-to-front-of-queue-button"
-                                onClick={() => sendSongToFrontOfQueue(index)}
+                                data-testid="delete-song-from-queue-button"
+                                onClick={() => deleteSongFromQueue(index)}
+                                color="error"
                               >
-                                First
+                                Delete
                               </Button>
                             </CardActions>
                           </Card>
@@ -197,9 +218,15 @@ export const QueueList = ({
           </Droppable>
         </DragDropContext>
       ) : (
-        <p>No songs in queue</p>
+        <Typography
+          sx={{
+            paddingTop: '5%',
+          }}
+        >
+          No songs in queue
+        </Typography>
       )}
-    </div>
+    </Container>
   );
 };
 

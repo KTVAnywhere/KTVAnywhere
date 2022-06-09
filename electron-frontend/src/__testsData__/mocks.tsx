@@ -7,6 +7,7 @@ const mockedElectron = {
       getSong: jest.fn(),
       setSong: jest.fn(),
       addSong: jest.fn(),
+      addSongs: jest.fn(),
       deleteSong: jest.fn(),
       getAllSongs: () => songListTestData,
       setAllSongs: jest.fn(),
@@ -22,8 +23,14 @@ const mockedElectron = {
       onChange: jest.fn().mockReturnValue(jest.fn()),
     },
   },
+  preprocess: {
+    getSongDetails: jest.fn(),
+    spleeterProcessSong: jest.fn(),
+    spleeterProcessResult: jest.fn().mockReturnValue(jest.fn()),
+  },
   file: {
     read: jest.fn().mockResolvedValue('lyrics'),
+    ifFileExists: jest.fn(),
   },
 };
 export default mockedElectron;

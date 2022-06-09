@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { EditText } from 'react-edit-text';
-import './Song.module.css';
+import EditIcon from '@mui/icons-material/Edit';
 import 'react-edit-text/dist/index.css';
+import { Button, Container, Typography } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { useSongsStatus } from './SongsStatus.context';
 
 export interface SongProps {
   songId: string;
@@ -9,6 +12,8 @@ export interface SongProps {
   artist: string;
   songPath: string;
   lyricsPath: string;
+  vocalsPath: string;
+  accompanimentPath: string;
 }
 
 export const emptySongProps = {
@@ -17,9 +22,11 @@ export const emptySongProps = {
   artist: '',
   songPath: '',
   lyricsPath: '',
+  vocalsPath: '',
+  accompanimentPath: '',
 };
 
-export const songUploadOptions: Electron.OpenDialogOptions = {
+export const songPickerOptions: Electron.OpenDialogOptions = {
   filters: [
     {
       name: 'Audio',
@@ -29,7 +36,7 @@ export const songUploadOptions: Electron.OpenDialogOptions = {
   properties: ['openFile'],
 };
 
-export const lyricsUploadOptions: Electron.OpenDialogOptions = {
+export const lyricsPickerOptions: Electron.OpenDialogOptions = {
   filters: [
     {
       name: 'Lyrics',
@@ -39,11 +46,22 @@ export const lyricsUploadOptions: Electron.OpenDialogOptions = {
   properties: ['openFile'],
 };
 
-const Song = ({ song }: { song: SongProps }) => {
+interface SongComponentProps {
+  song: SongProps;
+  setSong: (song: SongProps) => void;
+}
+
+const Song = ({ song, setSong }: SongComponentProps) => {
   const [currSong, setCurrSong] = useState(song);
+  const [isFetchingLyrics, setIsFetchingLyrics] = useState(false);
+  const { songsStatus, setSongsStatus } = useSongsStatus();
 
   const changeSong = (changedSong: SongProps) => {
     setCurrSong(changedSong);
+  };
+
+  const saveSong = (changedSong: SongProps) => {
+    setSong(changedSong);
   };
 
   const chooseFile = async (
@@ -55,25 +73,57 @@ const Song = ({ song }: { song: SongProps }) => {
       .then((result) => setPathFn(result))
       .then((result) => {
         setCurrSong(result);
-        return window.electron.store.songs.setSong(result);
+        return setSong(result);
       })
       .catch((err) => console.log(err));
   };
 
-  const saveSong = (changedSong: SongProps) => {
-    window.electron.store.songs.setSong(changedSong);
-    setCurrSong(changedSong);
+  const getLyrics = async () => {
+    setIsFetchingLyrics(true);
+    window.electron.music
+      .getLrc(song)
+      .then(({ lyricsPath, error }) => {
+        if (!error) {
+          const changedSong = { ...song, lyricsPath };
+          setSong(changedSong);
+          setCurrSong(changedSong);
+          setIsFetchingLyrics(false);
+          return true;
+        }
+        console.error(error);
+        setIsFetchingLyrics(false);
+        return false;
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsFetchingLyrics(false);
+        return false;
+      });
   };
+
+  const spleeterSeparateVocalsAndMusic = async () => {
+    setSongsStatus([...songsStatus, song.songId]);
+  };
+
   return (
-    <>
-      <div className="fields">
-        <strong>Name: </strong>
+    <Container sx={{ paddingTop: '5%' }}>
+      <Container disableGutters>
+        <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText
-          placeholder="song name"
+          placeholder="Enter song name"
+          showEditButton
+          editButtonContent={
+            <EditIcon data-testid="edit-name" color="action" />
+          }
+          editButtonProps={{ style: { backgroundColor: 'transparent' } }}
           value={currSong.songName}
           onChange={(value: string) =>
             changeSong({ ...currSong, songName: value })
           }
+          style={{
+            marginBottom: '2%',
+            font: 'inherit',
+          }}
           onSave={(event: {
             name: string;
             value: string;
@@ -85,15 +135,21 @@ const Song = ({ song }: { song: SongProps }) => {
             });
           }}
         />
-      </div>
-      <div className="fields">
-        <strong>Artist: </strong>
+      </Container>
+      <Container disableGutters>
+        <Typography sx={{ fontWeight: 600 }}>Artist: </Typography>
         <EditText
-          placeholder="song artist"
+          placeholder="Enter song artist"
+          showEditButton
+          editButtonContent={
+            <EditIcon data-testid="edit-artist" color="action" />
+          }
+          editButtonProps={{ style: { backgroundColor: 'transparent' } }}
           value={currSong.artist}
           onChange={(value: string) =>
             changeSong({ ...currSong, artist: value })
           }
+          style={{ marginBottom: '2%', font: 'inherit' }}
           onSave={(event: {
             name: string;
             value: string;
@@ -105,40 +161,72 @@ const Song = ({ song }: { song: SongProps }) => {
             });
           }}
         />
-      </div>
-      <div className="fields">
-        <strong>Path: </strong>
-        <p>{currSong.songPath}</p>
-        <button
-          type="button"
+      </Container>
+      <Container disableGutters>
+        <Typography sx={{ fontWeight: 600 }}>Path: </Typography>
+        <Typography sx={{ mt: '1%' }}>{currSong.songPath}</Typography>
+        <Button
+          variant="outlined"
           data-testid="song-picker-button"
+          sx={{ mt: '1%', mb: '2%' }}
           onClick={() =>
-            chooseFile(songUploadOptions, (path) => ({
-              ...currSong,
-              songPath: path,
-            }))
+            chooseFile(
+              {
+                ...songPickerOptions,
+                defaultPath: currSong.songPath || undefined,
+              },
+              (path) => ({
+                ...currSong,
+                songPath: path,
+              })
+            )
           }
         >
           change file
-        </button>
-      </div>
-      <div className="fields">
-        <strong>Lyrics: </strong>
-        <p>{currSong.lyricsPath}</p>
-        <button
-          type="button"
+        </Button>
+      </Container>
+      <Container disableGutters>
+        <Typography sx={{ fontWeight: 600 }}>Lyrics: </Typography>
+        <Typography sx={{ mt: '1%' }} noWrap>
+          {currSong.lyricsPath}
+        </Typography>
+        <Button
           data-testid="lyrics-picker-button"
+          variant="outlined"
           onClick={() =>
-            chooseFile(lyricsUploadOptions, (path) => ({
-              ...currSong,
-              lyricsPath: path,
-            }))
+            chooseFile(
+              {
+                ...lyricsPickerOptions,
+                defaultPath: currSong.lyricsPath || undefined,
+              },
+              (path) => ({
+                ...currSong,
+                lyricsPath: path,
+              })
+            )
           }
         >
-          change file
-        </button>
-      </div>
-    </>
+          {currSong.lyricsPath ? 'change file' : 'upload file'}
+        </Button>
+        <LoadingButton
+          data-testid="fetch-lyrics"
+          loading={isFetchingLyrics}
+          variant="outlined"
+          onClick={() => getLyrics()}
+        >
+          fetch lyrics
+        </LoadingButton>
+      </Container>
+      <Container disableGutters>
+        <LoadingButton
+          loading={songsStatus.indexOf(song.songId) !== -1}
+          variant="outlined"
+          onClick={() => spleeterSeparateVocalsAndMusic()}
+        >
+          separate vocals
+        </LoadingButton>
+      </Container>
+    </Container>
   );
 };
 

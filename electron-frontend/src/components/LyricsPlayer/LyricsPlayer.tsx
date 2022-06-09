@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Grid, Typography } from '@mui/material';
 import { Lrc, Runner } from 'lrc-kit';
 import { SongProps } from '../Song';
-import styles from './LyricsPlayer.module.css';
 
 interface LyricsProps {
   currentSong: SongProps | null;
@@ -58,14 +58,29 @@ const LyricsPlayer = ({
   }, [lyricsEnabled]);
 
   return (
-    <div className={styles.lyricsGroup}>
-      <div className={styles.lyrics} data-testid="lyrics">
-        {lyrics}
-      </div>
-      <div className={styles.nextLyrics} data-testid="next-lyrics">
-        {nextLyrics}
-      </div>
-    </div>
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      sx={{ position: 'absolute', bottom: '2%' }}
+    >
+      <Grid item>
+        <Typography
+          sx={{ fontSize: '32px', fontWeight: 600 }}
+          data-testid="lyrics"
+        >
+          {lyrics}
+        </Typography>
+      </Grid>
+      <Grid item>
+        <Typography
+          sx={{ fontSize: '24px', fontWeight: 500, opacity: '40%' }}
+          data-testid="next-lyrics"
+        >
+          {nextLyrics}
+        </Typography>
+      </Grid>
+    </Grid>
   );
 };
 
