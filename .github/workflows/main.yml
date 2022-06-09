@@ -27,7 +27,7 @@ jobs:
 
       - name: npm install
         run: |
-          npm ci --legacy-peer-deps
+          npm ci
         working-directory: electron-frontend
 
       - name: Install FFMPEG
