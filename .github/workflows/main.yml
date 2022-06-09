@@ -38,7 +38,7 @@ jobs:
           python-version: "3.8"
 
       - name: Install python packages
-        run: pip install - r 'requirements.txt'
+        run: pip install -r 'requirements.txt'
         working-directory: electron-frontend
 
       - name: npm test
