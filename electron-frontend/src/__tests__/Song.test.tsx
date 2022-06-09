@@ -10,6 +10,7 @@ import * as Queue from '../components/SongsQueue';
 import SongComponent, {
   SongDialog,
   SongDialogProvider,
+  SongsStatusProvider,
 } from '../components/Song';
 import * as SongDialogContext from '../components/Song/SongDialog.context';
 import SongList from '../components/SongList';
@@ -138,7 +139,11 @@ describe('Song', () => {
   });
 
   test('song item should display song name, artist and paths', async () => {
-    render(<SongComponent song={songTestData[0]} setSong={jest.fn()} />);
+    render(
+      <SongsStatusProvider>
+        <SongComponent song={songTestData[0]} setSong={jest.fn()} />
+      </SongsStatusProvider>
+    );
 
     expect(screen.getByText(songTestData[0].songName)).toBeInTheDocument();
     expect(screen.getByText(songTestData[0].artist)).toBeInTheDocument();
@@ -152,9 +157,11 @@ describe('Song', () => {
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: jest.fn() });
     render(
-      <SongDialogProvider>
-        <SongDialog song={songTestData[0]} setSong={mockSetSong} />
-      </SongDialogProvider>
+      <SongsStatusProvider>
+        <SongDialogProvider>
+          <SongDialog song={songTestData[0]} setSong={mockSetSong} />
+        </SongDialogProvider>
+      </SongsStatusProvider>
     );
 
     const nameButton = screen.getByTestId('edit-name');
@@ -195,9 +202,11 @@ describe('Song', () => {
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: jest.fn() });
     render(
-      <SongDialogProvider>
-        <SongDialog song={songTestData[0]} setSong={mockSetSong} />
-      </SongDialogProvider>
+      <SongsStatusProvider>
+        <SongDialogProvider>
+          <SongDialog song={songTestData[0]} setSong={mockSetSong} />
+        </SongDialogProvider>
+      </SongsStatusProvider>
     );
 
     const fetchLyricsButton = screen.getByTestId('fetch-lyrics');
@@ -216,9 +225,11 @@ describe('Song', () => {
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: jest.fn() });
     render(
-      <SongDialogProvider>
-        <SongDialog song={songTestData[0]} setSong={jest.fn()} />
-      </SongDialogProvider>
+      <SongsStatusProvider>
+        <SongDialogProvider>
+          <SongDialog song={songTestData[0]} setSong={jest.fn()} />
+        </SongDialogProvider>
+      </SongsStatusProvider>
     );
     const saveButton = screen.getByRole('button', { name: /save/i });
     fireEvent.click(saveButton);

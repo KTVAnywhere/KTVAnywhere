@@ -29,6 +29,16 @@ jobs:
           npm ci
         working-directory: electron-frontend
 
+      - name: Install FFMPEG
+        uses: FedericoCarboni/setup-ffmpeg@v1
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+        run: pip install - r 'requirements.txt'
+        working-directory: electron-frontend
+
       - name: npm test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,13 +50,13 @@ jobs:
         working-directory: electron-frontend
 
       - name: Publish releases
-        if: matrix.os == 'macos-latest'
         env:
           # These values are used for auto updates signing
           CSC_IDENTITY_AUTO_DISCOVERY: false
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run postinstall
+          npm run package:spleeter
           npm run build
-          npm exec electron-builder -- --publish always --win --mac --linux
+          npm exec electron-builder -- --publish always
         working-directory: electron-frontend

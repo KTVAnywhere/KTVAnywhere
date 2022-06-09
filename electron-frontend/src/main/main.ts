@@ -11,7 +11,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
-import { exec, fork, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import MenuBuilder from './menu';
 import {
   resolveHtmlPath,
@@ -146,8 +146,10 @@ app
           fs.mkdirSync(songFolder, { recursive: true });
         }
         const spleeterPath = app.isPackaged
-          ? path.join(__dirname, 'dist', 'spleeter_stems')
+          ? path.join(process.resourcesPath, 'assets', 'spleeter_stems')
           : path.join(__dirname, '../python_scripts/spleeter_stems.py');
+        console.log(spleeterPath);
+        console.log(process.resourcesPath);
 
         const spleeterProcess = app.isPackaged
           ? spawn(spleeterPath, [song.songPath, songFolder, song.songId])

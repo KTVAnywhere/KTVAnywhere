@@ -141,25 +141,6 @@ export const AudioPlayer = ({
     const audio: HTMLAudioElement = document.getElementById(
       'audio'
     ) as HTMLAudioElement;
-    if (isPlaying) {
-      if (audio.readyState) {
-        audio.play();
-      } else if (!currentSong && GetQueueLength() > 0) {
-        const song = DequeueSong();
-        if (song) {
-          setCurrentSong(song);
-          loadSong(song.songPath, false);
-        }
-      }
-    } else {
-      audio.pause();
-    }
-  }, [isPlaying, setIsPlaying, currentSong, setCurrentSong]);
-
-  useEffect(() => {
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
     if (skipToTime) {
       audio.currentTime = skipToTime;
     }
@@ -204,11 +185,28 @@ export const AudioPlayer = ({
   };
 
   const playSong = () => {
-    setIsPlaying(true);
+    const audio: HTMLAudioElement = document.getElementById(
+      'audio'
+    ) as HTMLAudioElement;
+    if (audio.readyState) {
+      setIsPlaying(true);
+      audio.play();
+    } else if (!currentSong && GetQueueLength() > 0) {
+      setIsPlaying(true);
+      const song = DequeueSong();
+      if (song) {
+        setCurrentSong(song);
+        loadSong(song.songPath, false);
+      }
+    }
   };
 
   const pauseSong = () => {
     setIsPlaying(false);
+    const audio: HTMLAudioElement = document.getElementById(
+      'audio'
+    ) as HTMLAudioElement;
+    audio.pause();
   };
 
   const toggleLyrics = () => {

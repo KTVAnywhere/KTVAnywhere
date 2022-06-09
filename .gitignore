@@ -23,3 +23,10 @@ electron-frontend/npm-debug.log.*
 electron-frontend/*.css.d.ts
 electron-frontend/*.sass.d.ts
 electron-frontend/*.scss.d.ts
+
+# Spleeter build
+electron-frontend/build
+electron-frontend/*.spec
+electron-frontend/pretrained_models
+electron-frontend/src/python_scripts/extra-hooks/__pycache__
+electron-frontend/assets/spleeter_stems.*

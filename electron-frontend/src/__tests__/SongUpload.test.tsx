@@ -6,6 +6,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import { SongsStatusProvider } from '../components/Song';
 import SongUploadForm, {
   SongStagingDialog,
   SongStagingDialogProvider,
@@ -39,6 +40,8 @@ describe('SongUploadButton', () => {
       },
       preprocess: {
         getSongDetails: mockGetSongDetails,
+        spleeterProcessSong: jest.fn(),
+        spleeterProcessResult: jest.fn(),
       },
     };
   });
@@ -48,9 +51,11 @@ describe('SongUploadButton', () => {
 
   test('getSongDetails should be called with array of song paths', async () => {
     render(
-      <SongStagingDialogProvider>
-        <SongUploadButton setUploadedSongs={jest.fn()} />
-      </SongStagingDialogProvider>
+      <SongsStatusProvider>
+        <SongStagingDialogProvider>
+          <SongUploadButton setUploadedSongs={jest.fn()} />
+        </SongStagingDialogProvider>
+      </SongsStatusProvider>
     );
     const songUploadButton = screen.getByRole('button');
     fireEvent.click(songUploadButton);
@@ -70,9 +75,11 @@ describe('SongUploadButton', () => {
       .spyOn(SongStagingDialogContext, 'useSongStagingDialog')
       .mockReturnValue({ open: false, setOpen: mockSetOpen });
     render(
-      <SongStagingDialogProvider>
-        <SongUploadButton setUploadedSongs={mockSetSong} />
-      </SongStagingDialogProvider>
+      <SongsStatusProvider>
+        <SongStagingDialogProvider>
+          <SongUploadButton setUploadedSongs={mockSetSong} />
+        </SongStagingDialogProvider>
+      </SongsStatusProvider>
     );
     const songUploadButton = screen.getByRole('button');
     fireEvent.click(songUploadButton);
@@ -111,12 +118,14 @@ describe('SongStagingDialog', () => {
   });
   test('should display the list of chosen songs', () => {
     render(
-      <SongStagingDialogProvider>
-        <SongStagingDialog
-          uploadedSongs={songListTestData}
-          setUploadedSongs={jest.fn()}
-        />
-      </SongStagingDialogProvider>
+      <SongsStatusProvider>
+        <SongStagingDialogProvider>
+          <SongStagingDialog
+            uploadedSongs={songListTestData}
+            setUploadedSongs={jest.fn()}
+          />
+        </SongStagingDialogProvider>
+      </SongsStatusProvider>
     );
     const { getAllByRole } = within(screen.getByRole('list'));
 
@@ -125,12 +134,14 @@ describe('SongStagingDialog', () => {
 
   test('click upload songs button should add songs to database', async () => {
     render(
-      <SongStagingDialogProvider>
-        <SongStagingDialog
-          uploadedSongs={songListTestData}
-          setUploadedSongs={jest.fn()}
-        />
-      </SongStagingDialogProvider>
+      <SongsStatusProvider>
+        <SongStagingDialogProvider>
+          <SongStagingDialog
+            uploadedSongs={songListTestData}
+            setUploadedSongs={jest.fn()}
+          />
+        </SongStagingDialogProvider>
+      </SongsStatusProvider>
     );
     const uploadButton = screen.getByRole('button', { name: /upload/i });
     fireEvent.click(uploadButton);
@@ -142,12 +153,14 @@ describe('SongStagingDialog', () => {
   test('click delete button should remove the song from the list', () => {
     const mockSet = jest.fn();
     render(
-      <SongStagingDialogProvider>
-        <SongStagingDialog
-          uploadedSongs={songListTestData}
-          setUploadedSongs={mockSet}
-        />
-      </SongStagingDialogProvider>
+      <SongsStatusProvider>
+        <SongStagingDialogProvider>
+          <SongStagingDialog
+            uploadedSongs={songListTestData}
+            setUploadedSongs={mockSet}
+          />
+        </SongStagingDialogProvider>
+      </SongsStatusProvider>
     );
     const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
     fireEvent.click(deleteButtons[0]);
@@ -159,12 +172,14 @@ describe('SongStagingDialog', () => {
   test('edit song should edit song in the list', () => {
     const mockSet = jest.fn();
     render(
-      <SongStagingDialogProvider>
-        <SongStagingDialog
-          uploadedSongs={songListTestData}
-          setUploadedSongs={mockSet}
-        />
-      </SongStagingDialogProvider>
+      <SongsStatusProvider>
+        <SongStagingDialogProvider>
+          <SongStagingDialog
+            uploadedSongs={songListTestData}
+            setUploadedSongs={mockSet}
+          />
+        </SongStagingDialogProvider>
+      </SongsStatusProvider>
     );
     const editNameButtons = screen.getAllByTestId('edit-name');
     fireEvent.click(editNameButtons[0]);
