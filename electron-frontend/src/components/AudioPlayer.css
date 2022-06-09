@@ -12,6 +12,6 @@
   margin: 0 20px;
   height: 10px;
   display: flex;
-  cursor: pointer;
   align-items: center;
+  cursor: pointer;
 }
