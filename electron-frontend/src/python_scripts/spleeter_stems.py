@@ -1,9 +1,10 @@
 def spleeter(source, output, songId):
   try:
     separator = Separator('spleeter:2stems')
-    separator.separate_to_file('{}'.format(source), '{}'.format(output), codec="mp3", bitrate="128k")
+    naming_format = "{instrument}.{codec}"
+    separator.separate_to_file('{}'.format(source), '{}'.format(output), codec="mp3", bitrate="128k", filename_format=naming_format)
     sys.stdout.write('done splitting {}'.format(songId))
-  except Exception as e:
+  except:
     sys.stdout.write('error splitting {}'.format(songId))
 
 

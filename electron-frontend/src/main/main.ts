@@ -148,8 +148,6 @@ app
         const spleeterPath = app.isPackaged
           ? path.join(process.resourcesPath, 'assets', 'spleeter_stems')
           : path.join(__dirname, '../python_scripts/spleeter_stems.py');
-        console.log(spleeterPath);
-        console.log(process.resourcesPath);
 
         const spleeterProcess = app.isPackaged
           ? spawn(spleeterPath, [song.songPath, songFolder, song.songId])
@@ -159,17 +157,13 @@ app
               songFolder,
               song.songId,
             ]);
-        const outputDir = path.parse(song.songPath).name;
-        const audioStemsFolder = path.join(songFolder, outputDir);
 
         spleeterProcess?.stdout.on('data', (message: string) => {
+          console.log(`${message}`);
           if (`${message}` === `done splitting ${song.songId}`) {
             mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
-              vocalsPath: path.join(audioStemsFolder, 'vocals.mp3'),
-              accompanimentPath: path.join(
-                audioStemsFolder,
-                'accompaniment.mp3'
-              ),
+              vocalsPath: path.join(songFolder, 'vocals.mp3'),
+              accompanimentPath: path.join(songFolder, 'accompaniment.mp3'),
               songId: song.songId,
             });
           } else if (`${message}` === `error splitting ${song.songId}`) {
@@ -203,9 +197,9 @@ app
     // custom protocol for reading local files
     protocol.registerFileProtocol('atom', (request, callback) => {
       const url = request.url.substring(8);
-      if (fs.existsSync(path.normalize(url))) {
+      if (fs.existsSync(decodeURI(path.normalize(url)))) {
         try {
-          return callback(path.normalize(url));
+          return callback(decodeURI(path.normalize(url)));
         } catch (error) {
           console.error('Failed to register protocol');
         }
