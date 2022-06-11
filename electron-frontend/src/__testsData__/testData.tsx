@@ -7,8 +7,8 @@ export const songTestData = [
     artist: 'bensound',
     songPath: 'C:\\dir\\bensound-energy.mp3',
     lyricsPath: 'C:\\dir\\bensound-energy.lrc',
-    vocalsPath: 'C:\\dir\\bensound-energy\\vocals.mp3',
-    accompanimentPath: 'C:\\dir\\bensound-energy\\accompaniment.mp3',
+    vocalsPath: '',
+    accompanimentPath: '',
   },
   {
     songId: expect.any(String),

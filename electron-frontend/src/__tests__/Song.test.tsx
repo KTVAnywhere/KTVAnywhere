@@ -198,7 +198,13 @@ describe('Song', () => {
       expect(screen.getByText(songTestData[1].lyricsPath)).toBeInTheDocument()
     );
 
-    await waitFor(() => expect(mockSetSong).toBeCalledWith(songTestData[1]));
+    await waitFor(() =>
+      expect(mockSetSong).toBeCalledWith({
+        ...songTestData[1],
+        vocalsPath: expect.any(String),
+        accompanimentPath: expect.any(String),
+      })
+    );
   });
 
   test('click fetch lyrics button will set lyrics path to new path', async () => {

@@ -38,6 +38,7 @@ describe('Process song with spleeter', () => {
     const { getAllByRole } = within(
       screen.getByRole('list', { name: /data/i })
     );
+
     const firstProcessButton = getAllByRole('button', {
       name: /Process/i,
     })[0];

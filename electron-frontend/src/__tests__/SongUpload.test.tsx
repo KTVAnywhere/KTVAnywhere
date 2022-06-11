@@ -86,6 +86,8 @@ describe('SongUploadButton', () => {
     const expectedResult = songTestData.map((song) => ({
       ...song,
       lyricsPath: expect.any(String),
+      vocalsPath: expect.any(String),
+      accompanimentPath: expect.any(String),
     }));
 
     await waitFor(() => expect(mockGetSongDetails).toBeCalled());

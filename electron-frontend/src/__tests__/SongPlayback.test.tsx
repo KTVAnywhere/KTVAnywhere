@@ -248,7 +248,7 @@ describe('Audio player component tests', () => {
       <AudioPlayer
         currentTime={0}
         setCurrentTime={mockSetCurrentTime}
-        currentSong={songTestData[0]}
+        currentSong={songTestData[1]}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
         lyricsEnabled
