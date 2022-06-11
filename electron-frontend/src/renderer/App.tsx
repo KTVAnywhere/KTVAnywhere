@@ -87,12 +87,19 @@ const MainPage = () => {
       window.electron.preprocess.spleeterProcessResult(
         ({ vocalsPath, accompanimentPath, songId, error }) => {
           if (!error) {
+            const songProcessedSuccessfully =
+              window.electron.store.songs.getSong(songId);
             const changedSong = {
-              ...window.electron.store.songs.getSong(songId),
+              ...songProcessedSuccessfully,
               vocalsPath,
               accompanimentPath,
             };
             window.electron.store.songs.setSong(changedSong);
+            setAlertMessage({
+              message: `Vocals separated successfully for ${songProcessedSuccessfully.songName}`,
+              severity: 'success',
+            });
+            setShowAlertMessage(true);
           } else {
             console.error(error);
             setAlertMessage({

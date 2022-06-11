@@ -58,7 +58,7 @@ const LyricsPlayer = ({
   }, [lyricsEnabled]);
 
   return (
-    <Grid container direction="column" alignItems="center">
+    <Grid container direction="column" alignItems="center" textAlign="center">
       <Grid item>
         <Typography
           sx={{ fontSize: '32px', fontWeight: 600 }}
