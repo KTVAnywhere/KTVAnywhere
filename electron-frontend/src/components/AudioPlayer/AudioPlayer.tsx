@@ -1,4 +1,4 @@
-import { Grid, IconButton, Slider, Typography } from '@mui/material';
+import { Grid, IconButton, Slider, Switch, Typography } from '@mui/material';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import FastForwardIcon from '@mui/icons-material/FastForward';
@@ -87,6 +87,7 @@ export const AudioPlayer = ({
   currentSong,
   setCurrentSong,
   nextSong,
+  lyricsEnabled,
   setLyricsEnabled,
 }: {
   currentTime: number;
@@ -94,6 +95,7 @@ export const AudioPlayer = ({
   currentSong: SongProps | null;
   setCurrentSong: Dispatch<SetStateAction<SongProps | null>>;
   nextSong: SongProps | null;
+  lyricsEnabled: boolean;
   setLyricsEnabled: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [duration, setDuration] = useState<number>(0);
@@ -287,13 +289,17 @@ export const AudioPlayer = ({
           </Typography>
         </Grid>
         <Grid item>
-          <IconButton
-            sx={{ padding: 0 }}
-            onClick={() => (isPlayingVocals ? disableVocals() : enableVocals())}
-          >
+          <Grid container direction="row" alignItems="center">
             <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
-          </IconButton>
-          <Typography>vocals</Typography>
+            <Switch
+              checked={isPlayingVocals}
+              onChange={() =>
+                isPlayingVocals ? disableVocals() : enableVocals()
+              }
+              color="secondary"
+            />
+          </Grid>
+          <Typography align="center">vocals</Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '2%' }}>
           <IconButton sx={{ padding: 0 }}>
@@ -364,14 +370,16 @@ export const AudioPlayer = ({
           <Typography>Volume: {volume}%</Typography>
         </Grid>
         <Grid item>
-          <IconButton
-            sx={{ padding: 0 }}
-            data-testid="toggle-lyrics-button"
-            onClick={toggleLyrics}
-          >
+          <Grid container direction="row" alignItems="center">
             <LyricsIcon sx={{ fontSize: '30px' }} />
-          </IconButton>
-          <Typography>lyrics</Typography>
+            <Switch
+              checked={lyricsEnabled}
+              data-testid="toggle-lyrics-button"
+              onChange={toggleLyrics}
+              color="secondary"
+            />
+          </Grid>
+          <Typography align="center">lyrics</Typography>
         </Grid>
       </Grid>
     </Grid>

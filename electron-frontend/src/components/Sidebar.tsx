@@ -5,14 +5,12 @@ interface SidebarProps {
   children: ReactNode;
 }
 
-const drawerHeight = '88%';
 const backgroundColor = '#2C2F33';
-
+const drawerHeight = 'calc(100vh - 130px)';
 export const LeftSidebar = ({ children }: SidebarProps) => {
   return (
     <Drawer
       sx={{
-        position: 'fixed',
         '& .MuiDrawer-paper': {
           height: drawerHeight,
           boxSizing: 'border-box',
