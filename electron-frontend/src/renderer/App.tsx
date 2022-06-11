@@ -18,6 +18,10 @@ import {
   SongStagingDialog,
   SongStagingDialogProvider,
 } from '../components/SongUpload';
+import {
+  AlertMessageProvider,
+  useAlertMessage,
+} from '../components/Alert.context';
 import AudioPlayer from '../components/AudioPlayer';
 import LyricsPlayer from '../components/LyricsPlayer';
 import './App.css';
@@ -47,8 +51,12 @@ const MainPage = () => {
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
-  const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const {
+    alertMessage,
+    setAlertMessage,
+    showAlertMessage,
+    setShowAlertMessage,
+  } = useAlertMessage();
 
   useEffect(() => {
     const songsUnsubsribe = window.electron.store.songs.onChange((_, results) =>
@@ -80,8 +88,11 @@ const MainPage = () => {
             window.electron.store.songs.setSong(changedSong);
           } else {
             console.error(error);
-            setErrorMessage(error.message);
-            setShowErrorMessage(true);
+            setAlertMessage({
+              message: error.message,
+              severity: 'error',
+            });
+            setShowAlertMessage(true);
           }
           setSongsStatus((state) => state.slice(1));
         }
@@ -111,29 +122,29 @@ const MainPage = () => {
     <Container sx={{ position: 'fixed', top: 0, bottom: 0, left: 0, right: 0 }}>
       <CssBaseline enableColorScheme />
       <Snackbar
-        open={showErrorMessage}
+        open={showAlertMessage}
         autoHideDuration={5000}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         onClose={(_event, reason) => {
           if (reason === 'clickaway') return;
-          setShowErrorMessage(false);
+          setShowAlertMessage(false);
         }}
       >
         <Alert
           variant="filled"
-          severity="error"
+          severity={alertMessage.severity}
           action={
             <Button
               variant="outlined"
               color="inherit"
               size="small"
-              onClick={() => setShowErrorMessage(false)}
+              onClick={() => setShowAlertMessage(false)}
             >
               Close
             </Button>
           }
         >
-          {errorMessage}
+          {alertMessage.message}
         </Alert>
       </Snackbar>
       <Container
@@ -200,9 +211,11 @@ export default function App() {
           path="/"
           element={
             <ThemeProvider theme={darkTheme}>
-              <SongsStatusProvider>
-                <MainPage />
-              </SongsStatusProvider>
+              <AlertMessageProvider>
+                <SongsStatusProvider>
+                  <MainPage />
+                </SongsStatusProvider>
+              </AlertMessageProvider>
             </ThemeProvider>
           }
         />
