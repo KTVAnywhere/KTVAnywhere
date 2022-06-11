@@ -1,7 +1,14 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import { Alert, Button, Container, CssBaseline, Snackbar } from '@mui/material';
+import {
+  Alert,
+  Button,
+  Grid,
+  Container,
+  CssBaseline,
+  Snackbar,
+} from '@mui/material';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList, { QueueItemProps } from '../components/SongsQueue';
 import {
@@ -108,7 +115,7 @@ const MainPage = () => {
   }, [songInSpleeter, songsStatus]);
 
   return (
-    <Container sx={{ position: 'fixed', top: 0, bottom: 0, left: 0, right: 0 }}>
+    <Container>
       <CssBaseline enableColorScheme />
       <Snackbar
         open={showErrorMessage}
@@ -139,18 +146,12 @@ const MainPage = () => {
       <Container
         maxWidth={false}
         sx={{
-          height: '88%',
           position: 'fixed',
-          top: 0,
           left: 0,
           right: 0,
+          bottom: '130px',
         }}
       >
-        <LyricsPlayer
-          currentSong={currentSong}
-          currentTime={currentTime}
-          lyricsEnabled={lyricsEnabled}
-        />
         <SongStagingDialogProvider>
           <SongDialogProvider>
             <LeftSidebar>
@@ -164,6 +165,25 @@ const MainPage = () => {
             </LeftSidebar>
           </SongDialogProvider>
         </SongStagingDialogProvider>
+        <Grid container direction="column" alignItems="center">
+          <Grid
+            item
+            sx={{
+              position: 'absolute',
+              bottom: '0',
+              left: '330px',
+              right: '330px',
+              px: '2%',
+              pb: '1%',
+            }}
+          >
+            <LyricsPlayer
+              currentSong={currentSong}
+              currentTime={currentTime}
+              lyricsEnabled={lyricsEnabled}
+            />
+          </Grid>
+        </Grid>
         <RightSidebar>
           <QueueList setNextSong={setNextSong} />
         </RightSidebar>
@@ -172,11 +192,10 @@ const MainPage = () => {
         maxWidth={false}
         sx={{
           bgcolor: '#1f2232',
-          height: '12%',
+          height: '130px',
           position: 'fixed',
-          bottom: 0,
           left: 0,
-          right: 0,
+          bottom: 0,
         }}
       >
         <AudioPlayer
@@ -185,6 +204,7 @@ const MainPage = () => {
           currentSong={currentSong}
           setCurrentSong={setCurrentSong}
           nextSong={nextSong}
+          lyricsEnabled={lyricsEnabled}
           setLyricsEnabled={setLyricsEnabled}
         />
       </Container>

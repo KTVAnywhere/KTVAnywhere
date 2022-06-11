@@ -95,6 +95,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -114,6 +115,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -132,6 +134,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -155,6 +158,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -203,6 +207,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
