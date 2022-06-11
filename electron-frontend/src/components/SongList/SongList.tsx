@@ -50,10 +50,10 @@ const SongCard = ({
           variant="contained"
           sx={{ minWidth: '70px' }}
           loading={songsStatus.indexOf(song.songId) !== -1}
-          disabled={!!song.vocalsPath}
+          disabled={!!song.accompanimentPath}
           onClick={() => spleeterSeparateVocalsAndMusic()}
         >
-          {song.vocalsPath ? 'Done!' : 'Process'}
+          {song.accompanimentPath ? 'Done!' : 'Process'}
         </LoadingButton>
         <Button
           size="small"

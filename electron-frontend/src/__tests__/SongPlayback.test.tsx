@@ -8,7 +8,7 @@ import {
   lineAt10s,
 } from '../__testsData__/testData';
 import LyricsPlayer from '../components/LyricsPlayer';
-import { AudioPlayer } from '../components/AudioPlayer';
+import AudioPlayer from '../components/AudioPlayer';
 
 describe('Lyrics player', () => {
   const mockRead = jest.fn().mockResolvedValue(testLyrics);

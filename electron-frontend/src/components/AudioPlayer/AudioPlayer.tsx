@@ -10,8 +10,8 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import './AudioPlayer.css';
-import { SongProps } from './Song';
-import { DequeueSong, GetQueueLength } from './SongsQueue';
+import { SongProps } from '../Song';
+import { DequeueSong, GetQueueLength } from '../SongsQueue';
 
 const ProgressBar = ({
   duration,

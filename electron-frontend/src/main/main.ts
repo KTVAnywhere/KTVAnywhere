@@ -166,12 +166,30 @@ app
               accompanimentPath: path.join(songFolder, 'accompaniment.mp3'),
               songId: song.songId,
             });
-          } else if (`${message}` === `error splitting ${song.songId}`) {
+          } else if (`${message}` === 'ffmpeg binary not found') {
             mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
               vocalsPath: '',
               accompanimentPath: '',
               songId: song.songId,
-              error: new Error(`split fail for ${song.songPath}`),
+              error: new Error(
+                'Failed to run spleeter: ffmpeg binary not found'
+              ),
+            });
+          } else if (`${message}` === 'input file does not exist') {
+            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+              vocalsPath: '',
+              accompanimentPath: '',
+              songId: song.songId,
+              error: new Error(
+                `Failed to run spleeter: ${song.songPath} does not exist`
+              ),
+            });
+          } else if (`${message}` === 'generic error message') {
+            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+              vocalsPath: '',
+              accompanimentPath: '',
+              songId: song.songId,
+              error: new Error('Failed to run spleeter'),
             });
           }
         });

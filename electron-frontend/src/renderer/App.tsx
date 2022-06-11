@@ -1,7 +1,7 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import { Container, CssBaseline } from '@mui/material';
+import { Alert, Button, Container, CssBaseline, Snackbar } from '@mui/material';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList, { QueueItemProps } from '../components/SongsQueue';
 import {
@@ -18,7 +18,7 @@ import {
   SongStagingDialog,
   SongStagingDialogProvider,
 } from '../components/SongUpload';
-import { AudioPlayer } from '../components/AudioPlayer';
+import AudioPlayer from '../components/AudioPlayer';
 import LyricsPlayer from '../components/LyricsPlayer';
 import './App.css';
 
@@ -47,6 +47,9 @@ const MainPage = () => {
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
+  const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
   useEffect(() => {
     const songsUnsubsribe = window.electron.store.songs.onChange((_, results) =>
       setSongList(results)
@@ -77,6 +80,8 @@ const MainPage = () => {
             window.electron.store.songs.setSong(changedSong);
           } else {
             console.error(error);
+            setErrorMessage(error.message);
+            setShowErrorMessage(true);
           }
           setSongsStatus((state) => state.slice(1));
         }
@@ -105,6 +110,32 @@ const MainPage = () => {
   return (
     <Container sx={{ position: 'fixed', top: 0, bottom: 0, left: 0, right: 0 }}>
       <CssBaseline enableColorScheme />
+      <Snackbar
+        open={showErrorMessage}
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        onClose={(_event, reason) => {
+          if (reason === 'clickaway') return;
+          setShowErrorMessage(false);
+        }}
+      >
+        <Alert
+          variant="filled"
+          severity="error"
+          action={
+            <Button
+              variant="outlined"
+              color="inherit"
+              size="small"
+              onClick={() => setShowErrorMessage(false)}
+            >
+              Close
+            </Button>
+          }
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       <Container
         maxWidth={false}
         sx={{

@@ -223,7 +223,7 @@ describe('Song', () => {
     expect(screen.getByText(songTestData[1].lyricsPath)).toBeInTheDocument();
   });
 
-  test('click save button will call the update the song in the database', () => {
+  test('click save button will update the song in the database', () => {
     jest
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: jest.fn() });
