@@ -1,6 +1,7 @@
 name: Electron
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - electron-frontend/**
@@ -26,7 +27,7 @@ jobs:
 
       - name: npm install
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
         working-directory: electron-frontend
 
       - name: Install FFMPEG
@@ -36,9 +37,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.8"
-          
+
       - name: Install python packages
-        run: pip install - r 'requirements.txt'
+        run: pip install -r 'requirements.txt'
         working-directory: electron-frontend
 
       - name: npm test

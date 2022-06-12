@@ -8,7 +8,7 @@ import {
   lineAt10s,
 } from '../__testsData__/testData';
 import LyricsPlayer from '../components/LyricsPlayer';
-import { AudioPlayer } from '../components/AudioPlayer';
+import AudioPlayer from '../components/AudioPlayer';
 
 describe('Lyrics player', () => {
   const mockRead = jest.fn().mockResolvedValue(testLyrics);
@@ -95,6 +95,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -114,6 +115,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -132,6 +134,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -155,6 +158,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -203,6 +207,7 @@ describe('Audio player component tests', () => {
         currentSong={null}
         setCurrentSong={mockSetCurrentSong}
         nextSong={null}
+        lyricsEnabled
         setLyricsEnabled={mockSetLyricsEnabled}
       />
     );
@@ -234,5 +239,27 @@ describe('Audio player component tests', () => {
     expect(HTMLMediaElement.prototype.volume).toEqual(1);
 
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+
+  test('toggle vocals button should turn off vocals when clicked and when song accompanimentPath exist', async () => {
+    const mockIfFileExists = jest.fn().mockReturnValue(true);
+    window.electron.file.ifFileExists = mockIfFileExists;
+    render(
+      <AudioPlayer
+        currentTime={0}
+        setCurrentTime={mockSetCurrentTime}
+        currentSong={songTestData[1]}
+        setCurrentSong={mockSetCurrentSong}
+        nextSong={null}
+        lyricsEnabled
+        setLyricsEnabled={mockSetLyricsEnabled}
+      />
+    );
+
+    const toggleVocalsSwitch = screen.getByTestId('toggle-vocals-switch');
+    expect(HTMLMediaElement.prototype.load).not.toHaveBeenCalled();
+    fireEvent.click(toggleVocalsSwitch);
+    expect(mockIfFileExists).toHaveBeenCalled();
+    expect(HTMLMediaElement.prototype.load).toHaveBeenCalled();
   });
 });

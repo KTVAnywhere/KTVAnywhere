@@ -1,4 +1,4 @@
-import { Grid, IconButton, Slider, Typography } from '@mui/material';
+import { Grid, IconButton, Slider, Switch, Typography } from '@mui/material';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import FastForwardIcon from '@mui/icons-material/FastForward';
@@ -10,8 +10,9 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import './AudioPlayer.css';
-import { SongProps } from './Song';
-import { DequeueSong, GetQueueLength } from './SongsQueue';
+import { SongProps } from '../Song';
+import { DequeueSong, GetQueueLength } from '../SongsQueue';
+import { useAlertMessage } from '../Alert.context';
 
 const ProgressBar = ({
   duration,
@@ -87,6 +88,7 @@ export const AudioPlayer = ({
   currentSong,
   setCurrentSong,
   nextSong,
+  lyricsEnabled,
   setLyricsEnabled,
 }: {
   currentTime: number;
@@ -94,6 +96,7 @@ export const AudioPlayer = ({
   currentSong: SongProps | null;
   setCurrentSong: Dispatch<SetStateAction<SongProps | null>>;
   nextSong: SongProps | null;
+  lyricsEnabled: boolean;
   setLyricsEnabled: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [duration, setDuration] = useState<number>(0);
@@ -101,6 +104,7 @@ export const AudioPlayer = ({
   const [isPlayingVocals, setIsPlayingVocals] = useState(true);
   const [skipToTime, setSkipToTime] = useState<number | null>();
   const [volume, setVolume] = useState<number>(70);
+  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
 
   const loadSong = (
     filePath: string,
@@ -125,6 +129,12 @@ export const AudioPlayer = ({
         if (callback) {
           callback();
         }
+      } else {
+        setAlertMessage({
+          message: `${filePath} does not exist`,
+          severity: 'error',
+        });
+        setShowAlertMessage(true);
       }
     } catch (error) {
       console.error(error);
@@ -133,9 +143,12 @@ export const AudioPlayer = ({
 
   useEffect(() => {
     if (nextSong === null) return;
-    setCurrentSong(nextSong);
-    loadSong(nextSong.songPath, false, () => setIsPlaying(true));
-  }, [nextSong, setCurrentSong]);
+    loadSong(nextSong.songPath, false, () => {
+      setCurrentSong(nextSong);
+      setIsPlaying(true);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextSong]);
 
   useEffect(() => {
     const audio: HTMLAudioElement = document.getElementById(
@@ -195,8 +208,7 @@ export const AudioPlayer = ({
       setIsPlaying(true);
       const song = DequeueSong();
       if (song) {
-        setCurrentSong(song);
-        loadSong(song.songPath, false);
+        loadSong(song.songPath, false, () => setCurrentSong(song));
       }
     }
   };
@@ -221,18 +233,25 @@ export const AudioPlayer = ({
 
   const disableVocals = () => {
     if (currentSong) {
-      loadSong(currentSong.accompanimentPath, true, () =>
-        setIsPlayingVocals(false)
-      );
+      if (currentSong.accompanimentPath === '') {
+        setAlertMessage({
+          message: 'Song must be processed for vocals to be turned off',
+          severity: 'info',
+        });
+        setShowAlertMessage(true);
+      } else {
+        loadSong(currentSong.accompanimentPath, true, () =>
+          setIsPlayingVocals(false)
+        );
+      }
     }
   };
 
   const endSong = () => {
     if (GetQueueLength() > 0) {
       const song = DequeueSong();
-      setCurrentSong(song);
       if (song) {
-        loadSong(song.songPath, false);
+        loadSong(song.songPath, false, () => setCurrentSong(song));
       }
     } else {
       const audio: HTMLAudioElement = document.getElementById(
@@ -287,13 +306,18 @@ export const AudioPlayer = ({
           </Typography>
         </Grid>
         <Grid item>
-          <IconButton
-            sx={{ padding: 0 }}
-            onClick={() => (isPlayingVocals ? disableVocals() : enableVocals())}
-          >
+          <Grid container direction="row" alignItems="center">
             <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
-          </IconButton>
-          <Typography>vocals</Typography>
+            <Switch
+              checked={isPlayingVocals}
+              onClick={() =>
+                isPlayingVocals ? disableVocals() : enableVocals()
+              }
+              color="secondary"
+              data-testid="toggle-vocals-switch"
+            />
+          </Grid>
+          <Typography align="center">vocals</Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '2%' }}>
           <IconButton sx={{ padding: 0 }}>
@@ -336,7 +360,7 @@ export const AudioPlayer = ({
             >
               <PlayCircleIcon sx={{ fontSize: '64px' }} />
             </IconButton>
-          )}{' '}
+          )}
           <IconButton
             sx={{ padding: 0 }}
             data-testid="forward-10-button"
@@ -364,14 +388,16 @@ export const AudioPlayer = ({
           <Typography>Volume: {volume}%</Typography>
         </Grid>
         <Grid item>
-          <IconButton
-            sx={{ padding: 0 }}
-            data-testid="toggle-lyrics-button"
-            onClick={toggleLyrics}
-          >
+          <Grid container direction="row" alignItems="center">
             <LyricsIcon sx={{ fontSize: '30px' }} />
-          </IconButton>
-          <Typography>lyrics</Typography>
+            <Switch
+              checked={lyricsEnabled}
+              data-testid="toggle-lyrics-button"
+              onClick={toggleLyrics}
+              color="secondary"
+            />
+          </Grid>
+          <Typography align="center">lyrics</Typography>
         </Grid>
       </Grid>
     </Grid>

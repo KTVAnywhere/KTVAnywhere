@@ -44,7 +44,9 @@ describe('SongList', () => {
   });
   test('song library should display list of songs', async () => {
     render(
-      <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
+      <SongsStatusProvider>
+        <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
+      </SongsStatusProvider>
     );
     const { getAllByRole } = within(
       screen.getByRole('list', { name: /data/i })
@@ -55,7 +57,9 @@ describe('SongList', () => {
 
   test('click play button should call setNextSong with the song clicked', async () => {
     render(
-      <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
+      <SongsStatusProvider>
+        <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
+      </SongsStatusProvider>
     );
     const { getAllByRole } = within(
       screen.getByRole('list', { name: /data/i })
@@ -71,7 +75,9 @@ describe('SongList', () => {
   test('click enqueue button should add song to queue', async () => {
     const enqueueSpy = jest.spyOn(Queue, 'EnqueueSong');
     render(
-      <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
+      <SongsStatusProvider>
+        <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
+      </SongsStatusProvider>
     );
     const { getAllByRole } = within(
       screen.getByRole('list', { name: /data/i })
@@ -90,9 +96,14 @@ describe('SongList', () => {
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: mockSetOpen });
     render(
-      <SongDialogProvider>
-        <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
-      </SongDialogProvider>
+      <SongsStatusProvider>
+        <SongDialogProvider>
+          <SongList
+            setOpenSong={mockSetOpenSong}
+            setNextSong={mockSetNextSong}
+          />
+        </SongDialogProvider>
+      </SongsStatusProvider>
     );
 
     const song1button = screen.getByRole('button', {
@@ -139,11 +150,7 @@ describe('Song', () => {
   });
 
   test('song item should display song name, artist and paths', async () => {
-    render(
-      <SongsStatusProvider>
-        <SongComponent song={songTestData[0]} setSong={jest.fn()} />
-      </SongsStatusProvider>
-    );
+    render(<SongComponent song={songTestData[0]} setSong={jest.fn()} />);
 
     expect(screen.getByText(songTestData[0].songName)).toBeInTheDocument();
     expect(screen.getByText(songTestData[0].artist)).toBeInTheDocument();
@@ -157,11 +164,9 @@ describe('Song', () => {
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: jest.fn() });
     render(
-      <SongsStatusProvider>
-        <SongDialogProvider>
-          <SongDialog song={songTestData[0]} setSong={mockSetSong} />
-        </SongDialogProvider>
-      </SongsStatusProvider>
+      <SongDialogProvider>
+        <SongDialog song={songTestData[0]} setSong={mockSetSong} />
+      </SongDialogProvider>
     );
 
     const nameButton = screen.getByTestId('edit-name');
@@ -193,7 +198,13 @@ describe('Song', () => {
       expect(screen.getByText(songTestData[1].lyricsPath)).toBeInTheDocument()
     );
 
-    await waitFor(() => expect(mockSetSong).toBeCalledWith(songTestData[1]));
+    await waitFor(() =>
+      expect(mockSetSong).toBeCalledWith({
+        ...songTestData[1],
+        vocalsPath: expect.any(String),
+        accompanimentPath: expect.any(String),
+      })
+    );
   });
 
   test('click fetch lyrics button will set lyrics path to new path', async () => {
@@ -202,11 +213,9 @@ describe('Song', () => {
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: jest.fn() });
     render(
-      <SongsStatusProvider>
-        <SongDialogProvider>
-          <SongDialog song={songTestData[0]} setSong={mockSetSong} />
-        </SongDialogProvider>
-      </SongsStatusProvider>
+      <SongDialogProvider>
+        <SongDialog song={songTestData[0]} setSong={mockSetSong} />
+      </SongDialogProvider>
     );
 
     const fetchLyricsButton = screen.getByTestId('fetch-lyrics');
@@ -220,16 +229,14 @@ describe('Song', () => {
     expect(screen.getByText(songTestData[1].lyricsPath)).toBeInTheDocument();
   });
 
-  test('click save button will call the update the song in the database', () => {
+  test('click save button will update the song in the database', () => {
     jest
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: jest.fn() });
     render(
-      <SongsStatusProvider>
-        <SongDialogProvider>
-          <SongDialog song={songTestData[0]} setSong={jest.fn()} />
-        </SongDialogProvider>
-      </SongsStatusProvider>
+      <SongDialogProvider>
+        <SongDialog song={songTestData[0]} setSong={jest.fn()} />
+      </SongDialogProvider>
     );
     const saveButton = screen.getByRole('button', { name: /save/i });
     fireEvent.click(saveButton);

@@ -80,6 +80,8 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    minWidth: 1024,
+    minHeight: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -148,8 +150,6 @@ app
         const spleeterPath = app.isPackaged
           ? path.join(process.resourcesPath, 'assets', 'spleeter_stems')
           : path.join(__dirname, '../python_scripts/spleeter_stems.py');
-        console.log(spleeterPath);
-        console.log(process.resourcesPath);
 
         const spleeterProcess = app.isPackaged
           ? spawn(spleeterPath, [song.songPath, songFolder, song.songId])
@@ -159,25 +159,39 @@ app
               songFolder,
               song.songId,
             ]);
-        const outputDir = path.parse(song.songPath).name;
-        const audioStemsFolder = path.join(songFolder, outputDir);
 
         spleeterProcess?.stdout.on('data', (message: string) => {
+          console.log(`${message}`);
           if (`${message}` === `done splitting ${song.songId}`) {
             mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
-              vocalsPath: path.join(audioStemsFolder, 'vocals.mp3'),
-              accompanimentPath: path.join(
-                audioStemsFolder,
-                'accompaniment.mp3'
-              ),
+              vocalsPath: path.join(songFolder, 'vocals.mp3'),
+              accompanimentPath: path.join(songFolder, 'accompaniment.mp3'),
               songId: song.songId,
             });
-          } else if (`${message}` === `error splitting ${song.songId}`) {
+          } else if (`${message}` === 'ffmpeg binary not found') {
             mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
               vocalsPath: '',
               accompanimentPath: '',
               songId: song.songId,
-              error: new Error(`split fail for ${song.songPath}`),
+              error: new Error(
+                'Failed to run spleeter: ffmpeg binary not found'
+              ),
+            });
+          } else if (`${message}` === 'input file does not exist') {
+            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+              vocalsPath: '',
+              accompanimentPath: '',
+              songId: song.songId,
+              error: new Error(
+                `Failed to run spleeter: ${song.songPath} does not exist`
+              ),
+            });
+          } else if (`${message}` === 'generic error message') {
+            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+              vocalsPath: '',
+              accompanimentPath: '',
+              songId: song.songId,
+              error: new Error('Failed to run spleeter'),
             });
           }
         });
@@ -203,9 +217,9 @@ app
     // custom protocol for reading local files
     protocol.registerFileProtocol('atom', (request, callback) => {
       const url = request.url.substring(8);
-      if (fs.existsSync(path.normalize(url))) {
+      if (fs.existsSync(decodeURI(path.normalize(url)))) {
         try {
-          return callback(path.normalize(url));
+          return callback(decodeURI(path.normalize(url)));
         } catch (error) {
           console.error('Failed to register protocol');
         }

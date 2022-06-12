@@ -7,10 +7,11 @@ import {
   List,
   ListItem,
   Typography,
+  Card,
 } from '@mui/material';
-import Card from '@mui/material/Card';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { Dispatch, SetStateAction } from 'react';
-import { SongProps, useSongDialog } from '../Song';
+import { SongProps, useSongDialog, useSongsStatus } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
 
 const SongCard = ({
@@ -23,6 +24,11 @@ const SongCard = ({
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
   const { setOpen: setOpenSongDialog } = useSongDialog();
+  const { songsStatus, setSongsStatus } = useSongsStatus();
+
+  const spleeterSeparateVocalsAndMusic = async () => {
+    setSongsStatus([...songsStatus, song.songId]);
+  };
   return (
     <Card sx={{ width: 1 }}>
       <CardActionArea
@@ -39,6 +45,16 @@ const SongCard = ({
         </CardContent>
       </CardActionArea>
       <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <LoadingButton
+          size="small"
+          variant="contained"
+          sx={{ minWidth: '70px' }}
+          loading={songsStatus.indexOf(song.songId) !== -1}
+          disabled={!!song.accompanimentPath}
+          onClick={() => spleeterSeparateVocalsAndMusic()}
+        >
+          {song.accompanimentPath ? 'Done!' : 'Process'}
+        </LoadingButton>
         <Button
           size="small"
           variant="contained"
