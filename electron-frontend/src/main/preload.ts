@@ -54,6 +54,9 @@ contextBridge.exposeInMainWorld('electron', {
         return () =>
           ipcRenderer.removeListener('store:onSongsChange', callback);
       },
+      search(query: string) {
+        return ipcRenderer.invoke('store:searchSongs', query);
+      },
     },
     queueItems: {
       getQueueItem(key: string) {

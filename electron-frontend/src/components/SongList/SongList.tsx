@@ -8,9 +8,10 @@ import {
   ListItem,
   Typography,
   Card,
+  TextField,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { SongProps, useSongDialog, useSongsStatus } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
 
@@ -81,11 +82,51 @@ const SongList = ({
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
+  const [songList, setSongList] = useState<SongProps[]>([]);
+  const [query, setQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SongProps[] | undefined>(
+    []
+  );
+  useEffect(() => {
+    setSongList(window.electron.store.songs.getAllSongs() ?? []);
+    const songsUnsubscribe = window.electron.store.songs.onChange(
+      (_, results) => {
+        setSongList(results);
+      }
+    );
+    return () => {
+      songsUnsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (query) {
+      window.electron.store.songs
+        .search(query)
+        .then((results) => setSearchResults(results))
+        .catch(console.error);
+    } else {
+      setSearchResults(songList);
+    }
+  }, [query, songList]);
+
+  const changeQuery = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(event.target.value);
+  };
   return (
     <Container>
       <Typography variant="h5" align="center" gutterBottom>
         Songs Library
       </Typography>
+      <TextField
+        aria-label="searchbox"
+        size="small"
+        variant="outlined"
+        placeholder="Search songs"
+        fullWidth
+        value={query}
+        onChange={changeQuery}
+      />
       <List
         aria-label="data"
         sx={{
@@ -95,15 +136,17 @@ const SongList = ({
           alignItems: 'stretch',
         }}
       >
-        {window.electron.store.songs.getAllSongs().map((song) => (
-          <ListItem key={song.songId} sx={{ px: 0 }}>
-            <SongCard
-              song={song}
-              setOpenSong={setOpenSong}
-              setNextSong={setNextSong}
-            />
-          </ListItem>
-        ))}
+        {searchResults === undefined
+          ? 'Loading...'
+          : searchResults.map((song) => (
+              <ListItem key={song.songId} sx={{ px: 0 }}>
+                <SongCard
+                  song={song}
+                  setOpenSong={setOpenSong}
+                  setNextSong={setNextSong}
+                />
+              </ListItem>
+            ))}
       </List>
     </Container>
   );

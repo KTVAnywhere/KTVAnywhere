@@ -28,6 +28,7 @@ declare global {
           onChange(
             callback: (_event: IpcRenderer, results: SongProps[]) => void
           ): () => void;
+          search(query: string): Promise<SongProps[]>;
         };
         queueItems: {
           getQueueItem(queueItemId: string): QueueItemProps;

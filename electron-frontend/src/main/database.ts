@@ -1,4 +1,5 @@
 import Store from 'electron-store';
+import Fuse from 'fuse.js';
 import schemas, { SongsType, QueueItemsType } from './schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
@@ -23,31 +24,59 @@ export const songFunctions = {
   getSong: (store: Store<SongsType>, songId: string) =>
     store.get('songs').find((song) => song.songId === songId),
 
-  setSong: (store: Store<SongsType>, song: SongProps) => {
+  setSong: (
+    store: Store<SongsType>,
+    songSearcher: Fuse<SongProps>,
+    song: SongProps
+  ) => {
     const newSongs = store
       .get('songs')
       .map((oldSong) => (oldSong.songId === song.songId ? song : oldSong));
     store.set('songs', newSongs);
+    songSearcher.remove((oldSong) => oldSong.songId === song.songId);
+    songSearcher.add(song);
   },
-  addSong: (store: Store<SongsType>, song: SongProps) => {
+  addSong: (
+    store: Store<SongsType>,
+    songSearcher: Fuse<SongProps>,
+    song: SongProps
+  ) => {
     const newSongs = [...store.get('songs'), song];
     store.set('songs', newSongs);
+    songSearcher.add(song);
   },
-  addSongs: (store: Store<SongsType>, songs: SongProps[], prepend: boolean) => {
+  addSongs: (
+    store: Store<SongsType>,
+    songs: SongProps[],
+    songSearcher: Fuse<SongProps>,
+    prepend: boolean
+  ) => {
     const newSongs = prepend
       ? [...songs, ...store.get('songs')]
       : [...store.get('songs'), ...songs];
     store.set('songs', newSongs);
+    songs.forEach((song) => songSearcher.add(song));
   },
-  deleteSong: (store: Store<SongsType>, songId: string) => {
+  deleteSong: (
+    store: Store<SongsType>,
+    songSearcher: Fuse<SongProps>,
+    songId: string
+  ) => {
     store.set(
       'songs',
       store.get('songs').filter((song) => song.songId !== songId)
     );
+    songSearcher.remove((song) => song.songId === songId);
   },
   getAllSongs: (store: Store<SongsType>) => store.get('songs'),
-  setAllSongs: (store: Store<SongsType>, songs: SongProps[]) =>
-    store.set('songs', songs),
+  setAllSongs: (
+    store: Store<SongsType>,
+    songSearcher: Fuse<SongProps>,
+    songs: SongProps[]
+  ) => {
+    store.set('songs', songs);
+    songSearcher.setCollection(songs);
+  },
 };
 
 export const queueItemFunctions = {

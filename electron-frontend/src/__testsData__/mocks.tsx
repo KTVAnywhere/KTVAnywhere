@@ -12,6 +12,7 @@ const mockedElectron = {
       getAllSongs: () => songListTestData,
       setAllSongs: jest.fn(),
       onChange: jest.fn().mockReturnValue(jest.fn()),
+      search: jest.fn(),
     },
     queueItems: {
       getQueueItem: jest.fn(),

@@ -10,6 +10,7 @@
  */
 import path from 'path';
 import fs from 'fs-extra';
+import Fuse from 'fuse.js';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import { spawn } from 'child_process';
 import MenuBuilder from './menu';
@@ -26,6 +27,7 @@ import {
   songFunctions,
   queueItemFunctions,
 } from './database';
+import { SongProps } from '../components/Song';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -251,31 +253,64 @@ app
       getAllQueueItems,
       setAllQueueItems,
     } = queueItemFunctions;
+    const fuseOptions = {
+      keys: ['songName', 'artist'],
+      findAllMatches: true,
+      shouldSort: true,
+      threshold: 0.4,
+      ignoreLocation: true,
+    };
+    const indexPath = path.join(app.getPath('userData'), 'songIndex.json');
+    let songSearcher: Fuse<SongProps>;
+    const saveSongIndex = () => {
+      fs.promises.writeFile(
+        indexPath,
+        JSON.stringify(songSearcher.getIndex().toJSON)
+      );
+    };
+    try {
+      const songs = getAllSongs(songsStore);
+      const index = fs.readFileSync(indexPath);
+      const songsIndex = Fuse.parseIndex<SongProps>(index);
+      songSearcher = new Fuse(songs, fuseOptions, songsIndex);
+    } catch {
+      const songs = getAllSongs(songsStore);
+      songSearcher = new Fuse(songs, fuseOptions);
+    }
 
     ipcMain.on('store:getSong', async (event, songId) => {
       event.returnValue = getSong(songsStore, songId);
     });
     ipcMain.on('store:addSong', async (_, song) => {
-      addSong(songsStore, song);
+      addSong(songsStore, songSearcher, song);
+      saveSongIndex();
     });
     ipcMain.on('store:addSongs', async (_, songs, prepend) => {
-      addSongs(songsStore, songs, prepend);
+      addSongs(songsStore, songs, songSearcher, prepend);
+      saveSongIndex();
     });
     ipcMain.on('store:setSong', async (_, song) => {
-      setSong(songsStore, song);
+      setSong(songsStore, songSearcher, song);
+      saveSongIndex();
     });
     ipcMain.on('store:deleteSong', async (_, songId) => {
-      deleteSong(songsStore, songId);
+      deleteSong(songsStore, songSearcher, songId);
+      saveSongIndex();
     });
     ipcMain.on('store:getAllSongs', async (event) => {
       event.returnValue = getAllSongs(songsStore);
     });
     ipcMain.on('store:setAllSongs', async (_, songs) => {
-      setAllSongs(songsStore, songs);
+      setAllSongs(songsStore, songSearcher, songs);
+      saveSongIndex();
     });
 
     songsStore.onDidChange('songs', (results) =>
       mainWindow?.webContents.send('store:onSongsChange', results)
+    );
+
+    ipcMain.handle('store:searchSongs', (_, query) =>
+      songSearcher.search(query).map((result) => result.item)
     );
 
     ipcMain.on('store:getQueueItem', async (event, queueItemId) => {

@@ -10,7 +10,7 @@ import {
   Snackbar,
 } from '@mui/material';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
-import QueueList, { QueueItemProps } from '../components/SongsQueue';
+import QueueList from '../components/SongsQueue';
 import {
   emptySongProps,
   SongProps,
@@ -48,8 +48,6 @@ const darkTheme = createTheme({
 });
 
 const MainPage = () => {
-  const [, setSongList] = useState<SongProps[]>([]);
-  const [, setQueue] = useState<QueueItemProps[]>([]);
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
@@ -64,23 +62,6 @@ const MainPage = () => {
     showAlertMessage,
     setShowAlertMessage,
   } = useAlertMessage();
-
-  useEffect(() => {
-    const songsUnsubsribe = window.electron.store.songs.onChange((_, results) =>
-      setSongList(results)
-    );
-    const queueItemsUnsubscribe = window.electron.store.queueItems.onChange(
-      (_, results) => setQueue(results)
-    );
-
-    setSongList(window.electron.store.songs.getAllSongs() ?? []);
-    setQueue(window.electron.store.queueItems.getAllQueueItems() ?? []);
-
-    return () => {
-      songsUnsubsribe();
-      queueItemsUnsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     const spleeterProcessSongUnsubscribe =

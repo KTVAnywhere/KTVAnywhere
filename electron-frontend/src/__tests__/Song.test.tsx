@@ -20,7 +20,7 @@ import mockedElectron from '../__testsData__/mocks';
 describe('SongList', () => {
   const mockGetAll = () => songListTestData;
   const mockDelete = jest.fn();
-
+  const mockSearch = jest.fn();
   const mockSetOpenSong = jest.fn();
   const mockSetNextSong = jest.fn();
 
@@ -33,14 +33,15 @@ describe('SongList', () => {
           ...mockedElectron.store.songs,
           getAllSongs: mockGetAll,
           deleteSong: mockDelete,
+          onChange: jest.fn().mockReturnValue(jest.fn()),
+          search: mockSearch.mockResolvedValue(''),
         },
       },
     };
   });
+
   afterEach(() => {
-    jest.restoreAllMocks();
     jest.resetAllMocks();
-    jest.clearAllMocks();
   });
   test('song library should display list of songs', async () => {
     render(
@@ -116,6 +117,26 @@ describe('SongList', () => {
       ...songListTestData[0],
       songId: expect.any(String),
     });
+  });
+
+  test('typing a query should call searching function', async () => {
+    jest
+      .spyOn(SongDialogContext, 'useSongDialog')
+      .mockReturnValue({ open: false, setOpen: jest.fn() });
+    render(
+      <SongDialogProvider>
+        <SongsStatusProvider>
+          <SongList setOpenSong={jest.fn()} setNextSong={jest.fn()} />
+        </SongsStatusProvider>
+      </SongDialogProvider>
+    );
+    const searchBox = screen.getByRole('textbox');
+    fireEvent.change(searchBox, {
+      target: { value: songListTestData[1].songName },
+    });
+    await waitFor(() =>
+      expect(mockSearch).toBeCalledWith(songListTestData[1].songName)
+    );
   });
 });
 

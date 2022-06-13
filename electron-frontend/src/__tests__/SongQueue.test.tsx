@@ -33,6 +33,7 @@ describe('QueueList component buttons tests', () => {
           ...mockedElectron.store.queueItems,
           getAllQueueItems: mockGetAllQueueItems,
           setAllQueueItems: mockSetAllQueueItems,
+          onChange: jest.fn().mockReturnValue(jest.fn()),
         },
       },
     };
@@ -96,6 +97,7 @@ describe('Drag and Drop tests on QueueList component', () => {
           ...mockedElectron.store.queueItems,
           getAllQueueItems: mockGetAllQueueItems,
           setAllQueueItems: mockSetAllQueueItems,
+          onChange: jest.fn().mockReturnValue(jest.fn()),
         },
       },
     };
@@ -137,6 +139,7 @@ describe('Enqueue and Dequeue tests', () => {
           ...mockedElectron.store.queueItems,
           getAllQueueItems: mockGetAllQueueItems,
           setAllQueueItems: mockSetAllQueueItems,
+          onChange: jest.fn().mockReturnValue(jest.fn()),
         },
       },
     };
@@ -169,6 +172,7 @@ describe('Enqueue and Dequeue tests', () => {
           ...mockedElectron.store.queueItems,
           getAllQueueItems: () => [],
           setAllQueueItems: mockSetAllQueueItems,
+          onChange: jest.fn().mockReturnValue(jest.fn()),
         },
       },
     };
