@@ -32,6 +32,10 @@ import {
 import AudioPlayer from '../components/AudioPlayer';
 import LyricsPlayer from '../components/LyricsPlayer';
 import './App.css';
+import {
+  ConfirmationDialog,
+  ConfirmationProvider,
+} from '../components/ConfirmationDialog';
 
 const darkTheme = createTheme({
   palette: {
@@ -151,19 +155,22 @@ const MainPage = () => {
           bottom: '130px',
         }}
       >
-        <SongStagingDialogProvider>
-          <SongDialogProvider>
-            <LeftSidebar>
-              <SongUploadButton setUploadedSongs={setUploadedSongs} />
-              <SongList setOpenSong={setOpenSong} setNextSong={setNextSong} />
-              <SongDialog song={openSong} setSong={setOpenSong} />
-              <SongStagingDialog
-                uploadedSongs={uploadedSongs}
-                setUploadedSongs={setUploadedSongs}
-              />
-            </LeftSidebar>
-          </SongDialogProvider>
-        </SongStagingDialogProvider>
+        <ConfirmationProvider>
+          <SongStagingDialogProvider>
+            <SongDialogProvider>
+              <LeftSidebar>
+                <SongUploadButton setUploadedSongs={setUploadedSongs} />
+                <SongList setOpenSong={setOpenSong} setNextSong={setNextSong} />
+                <SongDialog song={openSong} setSong={setOpenSong} />
+                <ConfirmationDialog />
+                <SongStagingDialog
+                  uploadedSongs={uploadedSongs}
+                  setUploadedSongs={setUploadedSongs}
+                />
+              </LeftSidebar>
+            </SongDialogProvider>
+          </SongStagingDialogProvider>
+        </ConfirmationProvider>
         <Grid container direction="column" alignItems="center">
           <Grid
             item
