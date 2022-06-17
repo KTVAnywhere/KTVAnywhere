@@ -97,6 +97,9 @@
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!soundtouchjs)"
+    ],
     "resetMocks": false
   },
   "dependencies": {
@@ -120,6 +123,7 @@
     "react-edit-text": "^4.4.0",
     "react-router-dom": "^6.3.0",
     "simple-netease-cloud-music": "^0.5.2",
+    "soundtouchjs": "^0.1.30",
     "uniqid": "^5.4.0"
   },
   "devDependencies": {
@@ -181,6 +185,7 @@
     "rimraf": "^3.0.2",
     "sass": "^1.51.0",
     "sass-loader": "^12.6.0",
+    "standardized-audio-context-mock": "^9.5.4",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "ts-jest": "^28.0.2",

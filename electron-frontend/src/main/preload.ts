@@ -15,6 +15,9 @@ contextBridge.exposeInMainWorld('electron', {
     read(filePath: string) {
       return ipcRenderer.invoke('file:read', filePath);
     },
+    readAsBuffer(filePath: string) {
+      return ipcRenderer.invoke('file:readAsBuffer', filePath);
+    },
     ifFileExists(filePath: string) {
       return ipcRenderer.sendSync('file:ifFileExists', filePath);
     },

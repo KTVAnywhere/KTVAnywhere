@@ -1,4 +1,5 @@
 import { Grid, IconButton, Slider, Switch, Typography } from '@mui/material';
+import { PitchShifter } from 'soundtouchjs';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import FastForwardIcon from '@mui/icons-material/FastForward';
@@ -8,21 +9,15 @@ import LyricsIcon from '@mui/icons-material/Lyrics';
 import VolumeMuteIcon from '@mui/icons-material/VolumeMute';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import './AudioPlayer.css';
-import { SongProps } from '../Song';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../Alert.context';
+import { useAudioStatus } from './AudioStatus.context';
 
-const ProgressBar = ({
-  duration,
-  currentTime,
-  setSkipToTime,
-}: {
-  duration: number;
-  currentTime: number;
-  setSkipToTime: Dispatch<SetStateAction<number | null | undefined>>;
-}) => {
+const ProgressBar = () => {
+  const { duration, currentTime, setSkipToTime } = useAudioStatus();
+
   function formatSecondsToMinutesAndSeconds(seconds: number) {
     return `${Math.floor(seconds / 60)}:${`0${Math.floor(seconds % 60)}`.slice(
       -2
@@ -82,50 +77,105 @@ const ProgressBar = ({
   );
 };
 
-export const AudioPlayer = ({
-  currentTime,
-  setCurrentTime,
-  currentSong,
-  setCurrentSong,
-  nextSong,
-  lyricsEnabled,
-  setLyricsEnabled,
-}: {
-  currentTime: number;
-  setCurrentTime: Dispatch<SetStateAction<number>>;
-  currentSong: SongProps | null;
-  setCurrentSong: Dispatch<SetStateAction<SongProps | null>>;
-  nextSong: SongProps | null;
-  lyricsEnabled: boolean;
-  setLyricsEnabled: Dispatch<SetStateAction<boolean>>;
-}) => {
-  const [duration, setDuration] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isPlayingVocals, setIsPlayingVocals] = useState(true);
-  const [skipToTime, setSkipToTime] = useState<number | null>();
-  const [volume, setVolume] = useState<number>(70);
+export const AudioPlayer = () => {
+  const {
+    duration,
+    setDuration,
+    songEnded,
+    setSongEnded,
+    isPlaying,
+    setIsPlaying,
+    isPlayingVocals,
+    setIsPlayingVocals,
+    skipToTime,
+    setSkipToTime,
+    volume,
+    setVolume,
+    pitch,
+    setPitch,
+    currentTime,
+    setCurrentTime,
+    currentSong,
+    setCurrentSong,
+    nextSong,
+    lyricsEnabled,
+    setLyricsEnabled,
+    audioContext,
+    gainNode,
+    source,
+    setSource,
+  } = useAudioStatus();
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
 
-  const loadSong = (
+  const reconnectNodes = () => {
+    if (source) {
+      gainNode.disconnect();
+      source.disconnect();
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+    }
+  };
+
+  const onPlay = ({
+    timePlayed,
+    percentagePlayed,
+  }: {
+    timePlayed: number;
+    percentagePlayed: number;
+  }) => {
+    setCurrentTime(timePlayed);
+    if (percentagePlayed === 100) {
+      setSongEnded(true);
+    }
+  };
+
+  const destroySource = () => {
+    if (source) {
+      source.disconnect();
+      setSource(null);
+    }
+  };
+
+  const toArrayBuffer = (buffer: Buffer) => {
+    const ab = new ArrayBuffer(buffer.length);
+    const view = new Uint8Array(ab);
+    let i;
+    for (i = 0; i < buffer.length; i += 1) {
+      view[i] = buffer[i];
+    }
+    return ab;
+  };
+
+  const createSource = (audioBuffer: AudioBuffer, percentagePlayed: number) => {
+    setDuration(audioBuffer.duration);
+    const newSource = new PitchShifter(audioContext, audioBuffer, 4096);
+    newSource.on('play', onPlay);
+    newSource.percentagePlayed = percentagePlayed;
+    newSource.pitchSemitones = pitch;
+    destroySource();
+    newSource.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    setSource(newSource);
+  };
+
+  const loadSong = async (
     filePath: string,
     vocalsToggle: boolean,
     callback?: () => void
   ) => {
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
-    let time = 0;
-    if (vocalsToggle) {
-      time = audio.currentTime;
+    let percentagePlayed = 0;
+    if (vocalsToggle && duration !== 0) {
+      percentagePlayed = currentTime / duration;
     }
 
     try {
       if (window.electron.file.ifFileExists(filePath)) {
-        audio.src = `atom:///${filePath}`;
-        audio.load();
-        if (vocalsToggle) {
-          audio.currentTime = time;
-        }
+        const arrayBuffer = toArrayBuffer(
+          await window.electron.file.readAsBuffer(filePath)
+        );
+        audioContext.decodeAudioData(arrayBuffer, (buffer: AudioBuffer) => {
+          createSource(buffer, percentagePlayed);
+        });
         if (callback) {
           callback();
         }
@@ -137,88 +187,56 @@ export const AudioPlayer = ({
         setShowAlertMessage(true);
       }
     } catch (error) {
-      console.error(error);
+      setAlertMessage({
+        message: `${error}`,
+        severity: 'error',
+      });
+      setShowAlertMessage(true);
     }
   };
 
-  useEffect(() => {
-    if (nextSong === null) return;
-    loadSong(nextSong.songPath, false, () => {
-      setCurrentSong(nextSong);
-      setIsPlaying(true);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nextSong]);
-
-  useEffect(() => {
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
-    if (skipToTime) {
-      audio.currentTime = skipToTime;
-    }
-  }, [skipToTime]);
-
-  useEffect(() => {
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
-
-    const setAudioData = () => {
-      audio.play();
-      setDuration(audio.duration);
-      setCurrentTime(audio.currentTime);
-    };
-
-    const setAudioTime = () => setCurrentTime(audio.currentTime);
-
-    audio.addEventListener('loadeddata', setAudioData);
-    audio.addEventListener('timeupdate', setAudioTime);
-
-    return () => {
-      audio.removeEventListener('loadeddata', setAudioData);
-      audio.removeEventListener('timeupdate', setAudioTime);
-    };
-  }, [setCurrentTime]);
-
   const volumeChange = (_event: Event, newValue: number | number[]) => {
     setVolume(newValue as number);
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
-    audio.volume = (newValue as number) / 100;
+    gainNode.gain.value = (newValue as number) / 100;
   };
 
   const volumeZero = () => {
     setVolume(0);
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
-    audio.volume = 0;
+    gainNode.gain.value = 0;
+  };
+
+  const pitchChange = (_event: Event, newValue: number | number[]) => {
+    if (source) {
+      source.pitchSemitones = newValue as number;
+    }
+    setPitch(newValue as number);
+  };
+
+  const pitchZero = () => {
+    if (source) {
+      source.pitchSemitones = 0;
+    }
+    setPitch(0);
   };
 
   const playSong = () => {
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
-    if (audio.readyState) {
+    if (source) {
       setIsPlaying(true);
-      audio.play();
+      reconnectNodes();
     } else if (!currentSong && GetQueueLength() > 0) {
-      setIsPlaying(true);
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, () => setCurrentSong(song));
+        loadSong(song.songPath, false, () => {
+          setCurrentSong(song);
+          setIsPlaying(true);
+        });
       }
     }
   };
 
   const pauseSong = () => {
     setIsPlaying(false);
-    const audio: HTMLAudioElement = document.getElementById(
-      'audio'
-    ) as HTMLAudioElement;
-    audio.pause();
+    gainNode.disconnect();
   };
 
   const toggleLyrics = () => {
@@ -251,18 +269,21 @@ export const AudioPlayer = ({
     if (GetQueueLength() > 0) {
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, () => setCurrentSong(song));
+        loadSong(song.songPath, false, () => {
+          setCurrentSong(song);
+          setIsPlaying(true);
+          setIsPlayingVocals(true);
+        });
       }
     } else {
-      const audio: HTMLAudioElement = document.getElementById(
-        'audio'
-      ) as HTMLAudioElement;
+      destroySource();
       setCurrentSong(null);
       setIsPlaying(false);
-      audio.src = '';
+      setIsPlayingVocals(true);
       setDuration(0);
       setCurrentTime(0);
     }
+    setSongEnded(false);
   };
 
   const backwardTenSeconds = () => {
@@ -275,10 +296,32 @@ export const AudioPlayer = ({
     );
   };
 
+  useEffect(() => {
+    if (nextSong === null) return;
+    loadSong(nextSong.songPath, false, () => {
+      setCurrentSong(nextSong);
+      setIsPlaying(true);
+      setIsPlayingVocals(true);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextSong]);
+
+  useEffect(() => {
+    if (skipToTime && source && audioContext) {
+      source.percentagePlayed = skipToTime / duration;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skipToTime]);
+
+  useEffect(() => {
+    if (songEnded) {
+      endSong();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [songEnded]);
+
   return (
     <Grid container direction="column">
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio id="audio" data-testid="audio-element" onEnded={endSong} />
       <Grid item container sx={{ justifyContent: 'center' }}>
         <ProgressBar
           duration={duration}
@@ -320,21 +363,22 @@ export const AudioPlayer = ({
           <Typography align="center">vocals</Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '2%' }}>
-          <IconButton sx={{ padding: 0 }}>
+          <IconButton sx={{ padding: 0 }} onClick={pitchZero}>
             <GraphicEqIcon sx={{ fontSize: '35px' }} />
           </IconButton>
         </Grid>
         <Grid item sx={{ marginLeft: '1%', width: '8%' }}>
           <Slider
-            className="volume-slider"
-            aria-label="Volume"
-            value={volume}
-            onChange={volumeChange}
-            min={0}
-            max={100}
+            aria-label="Pitch"
+            value={pitch}
+            onChange={pitchChange}
+            marks
+            min={-3.5}
+            max={3.5}
+            step={0.5}
             color="secondary"
           />
-          <Typography>Pitch: {volume}%</Typography>
+          <Typography>Pitch: {pitch > 0 ? `+${pitch}` : pitch}</Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '3%', marginRight: '3%' }}>
           <IconButton
@@ -376,7 +420,6 @@ export const AudioPlayer = ({
         </Grid>
         <Grid item sx={{ marginRight: '2%', width: '8%' }}>
           <Slider
-            className="volume-slider"
             aria-label="Volume"
             value={volume}
             onChange={volumeChange}

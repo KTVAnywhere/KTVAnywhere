@@ -36,6 +36,11 @@ ipcMain.handle('file:read', async (_, filePath: string) => {
   return data;
 });
 
+ipcMain.handle('file:readAsBuffer', async (_, filePath: string) => {
+  const data = await fs.promises.readFile(filePath, null);
+  return data;
+});
+
 ipcMain.on('file:ifFileExists', (event, filePath) => {
   event.returnValue = fs.existsSync(filePath);
 });

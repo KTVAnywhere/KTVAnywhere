@@ -128,6 +128,9 @@ describe('Drag and Drop tests on QueueList component', () => {
 
 describe('Enqueue and Dequeue tests', () => {
   const mockGetAllQueueItems = () => queueTestDataWithSong0;
+  const mockGetSong = () => {
+    return songTestData[0];
+  };
   const mockSetAllQueueItems = jest.fn();
 
   beforeEach(() => {
@@ -135,6 +138,10 @@ describe('Enqueue and Dequeue tests', () => {
       ...mockedElectron,
       store: {
         ...mockedElectron.store,
+        songs: {
+          ...mockedElectron.store.songs,
+          getSong: mockGetSong,
+        },
         queueItems: {
           ...mockedElectron.store.queueItems,
           getAllQueueItems: mockGetAllQueueItems,

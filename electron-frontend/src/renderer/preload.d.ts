@@ -11,6 +11,7 @@ declare global {
       };
       file: {
         read(filePath: string): Promise<string>;
+        readAsBuffer(filePath: string): Promise<Buffer>;
         ifFileExists(filePath: string): boolean;
       };
       music: {

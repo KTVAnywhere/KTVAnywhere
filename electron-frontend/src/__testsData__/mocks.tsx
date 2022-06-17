@@ -31,6 +31,7 @@ const mockedElectron = {
   },
   file: {
     read: jest.fn().mockResolvedValue('lyrics'),
+    readAsBuffer: jest.fn(),
     ifFileExists: jest.fn(),
   },
 };
