@@ -12,6 +12,10 @@ import SongComponent, {
   SongDialogProvider,
   SongsStatusProvider,
 } from '../components/Song';
+import {
+  ConfirmationDialog,
+  ConfirmationProvider,
+} from '../components/ConfirmationDialog';
 import * as SongDialogContext from '../components/Song/SongDialog.context';
 import SongList from '../components/SongList';
 import { songTestData, songListTestData } from '../__testsData__/testData';
@@ -248,6 +252,50 @@ describe('Song', () => {
       ).not.toBeInTheDocument()
     );
     expect(screen.getByText(songTestData[1].lyricsPath)).toBeInTheDocument();
+  });
+
+  test('click close button after making changes will show a confirmation dialog', () => {
+    jest
+      .spyOn(SongDialogContext, 'useSongDialog')
+      .mockReturnValue({ open: true, setOpen: jest.fn() });
+    render(
+      <ConfirmationProvider>
+        <SongDialogProvider>
+          <SongDialog song={songTestData[0]} setSong={jest.fn()} />
+        </SongDialogProvider>
+        <ConfirmationDialog />
+      </ConfirmationProvider>
+    );
+
+    const nameButton = screen.getByTestId('edit-name');
+    fireEvent.click(nameButton);
+    const nameInput = screen.getByRole('textbox');
+    fireEvent.change(nameInput, {
+      target: { value: songTestData[1].songName },
+    });
+    fireEvent.focusOut(nameInput);
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeButton);
+    expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
+  });
+
+  test('delete button will remove song from database', () => {
+    jest
+      .spyOn(SongDialogContext, 'useSongDialog')
+      .mockReturnValue({ open: true, setOpen: jest.fn() });
+    render(
+      <ConfirmationProvider>
+        <SongDialogProvider>
+          <SongDialog song={songTestData[0]} setSong={jest.fn()} />
+        </SongDialogProvider>
+        <ConfirmationDialog />
+      </ConfirmationProvider>
+    );
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    fireEvent.click(deleteButton);
+    const confirmButton = screen.getByRole('button', { name: /Confirm/i });
+    fireEvent.click(confirmButton);
+    expect(mockDelete).toBeCalledWith(songTestData[0].songId);
   });
 
   test('click save button will update the song in the database', () => {

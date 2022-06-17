@@ -323,11 +323,7 @@ export const AudioPlayer = () => {
   return (
     <Grid container direction="column">
       <Grid item container sx={{ justifyContent: 'center' }}>
-        <ProgressBar
-          duration={duration}
-          currentTime={currentTime}
-          setSkipToTime={setSkipToTime}
-        />
+        <ProgressBar />
         <IconButton
           sx={{ padding: 0 }}
           data-testid="end-song-button"

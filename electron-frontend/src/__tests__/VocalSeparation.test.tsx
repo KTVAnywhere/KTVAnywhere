@@ -1,8 +1,12 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import mockedElectron from '../__testsData__/mocks';
-import { SongsStatusProvider } from '../components/Song';
+import { SongDialogProvider, SongsStatusProvider } from '../components/Song';
 import * as SongsStatusContext from '../components/Song/SongsStatus.context';
+import {
+  ConfirmationDialog,
+  ConfirmationProvider,
+} from '../components/ConfirmationDialog';
 import SongList from '../components/SongList';
 import { songListTestData } from '../__testsData__/testData';
 
@@ -19,8 +23,6 @@ describe('Process song with spleeter', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
-    jest.resetAllMocks();
     jest.clearAllMocks();
   });
 
@@ -49,5 +51,37 @@ describe('Process song with spleeter', () => {
       ...mockSongsStatus,
       songListTestData[0].songId,
     ]);
+  });
+
+  test('click process button when song has been processed will show a confirmation dialog', () => {
+    jest.spyOn(SongsStatusContext, 'useSongsStatus').mockReturnValue({
+      songsStatus: mockSongsStatus,
+      setSongsStatus: mockSetSongsStatus,
+    });
+    render(
+      <ConfirmationProvider>
+        <SongDialogProvider>
+          <SongsStatusProvider>
+            <SongList
+              setOpenSong={mockSetOpenSong}
+              setNextSong={mockSetNextSong}
+            />
+            <ConfirmationDialog />
+          </SongsStatusProvider>
+        </SongDialogProvider>
+      </ConfirmationProvider>
+    );
+
+    const { getAllByRole } = within(
+      screen.getByRole('list', { name: /data/i })
+    );
+
+    const secondProcessButton = getAllByRole('button', {
+      name: /Process/i,
+    })[1];
+
+    expect(mockSetSongsStatus).not.toBeCalled();
+    fireEvent.click(secondProcessButton);
+    expect(mockSetSongsStatus).not.toBeCalled();
   });
 });

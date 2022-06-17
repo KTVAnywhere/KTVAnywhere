@@ -11,8 +11,9 @@ import {
   ListItemIcon,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Song, { SongProps } from '../Song';
+import Song, { SongProps, useSongsStatus } from '../Song';
 import { useSongStagingDialog } from './SongStagingDialog.context';
+import { useConfirmation } from '../ConfirmationDialog';
 
 interface SongUploadStagingDialogProps {
   uploadedSongs: SongProps[];
@@ -23,11 +24,56 @@ const SongStagingDialog = ({
   uploadedSongs,
   setUploadedSongs,
 }: SongUploadStagingDialogProps) => {
+  const { setSongsStatus } = useSongsStatus();
   const { open, setOpen } = useSongStagingDialog();
+  const {
+    setOpen: setOpenConfirmation,
+    setConfirmationMessage,
+    setActions,
+  } = useConfirmation();
 
   const uploadSongs = () => {
-    window.electron.store.songs.addSongs(uploadedSongs, true);
-    setOpen(false);
+    setConfirmationMessage({
+      heading: 'Upload songs',
+      message: 'Do you want to start processing the songs after upload?',
+    });
+    setActions([
+      {
+        label: 'No',
+        fn: () => {
+          setOpen(false);
+          window.electron.store.songs.addSongs(uploadedSongs, true);
+        },
+      },
+      {
+        label: 'Yes',
+        fn: () => {
+          setOpen(false);
+          window.electron.store.songs.addSongs(uploadedSongs, true);
+          const uploadSongIds = uploadedSongs.map((song) => song.songId);
+          setSongsStatus((previous) => [...previous, ...uploadSongIds]);
+        },
+      },
+    ]);
+    setOpenConfirmation(true);
+  };
+
+  const cancelUpload = () => {
+    setConfirmationMessage({
+      heading: 'Cancel upload',
+      message: `Are you sure you want to cancel uploading ${
+        uploadedSongs.length
+      } ${uploadSongs.length > 1 ? 'songs' : 'song'}?`,
+    });
+    setActions([
+      {
+        label: 'Confirm',
+        fn: () => {
+          setOpen(false);
+        },
+      },
+    ]);
+    setOpenConfirmation(true);
   };
 
   useEffect(() => {
@@ -52,7 +98,7 @@ const SongStagingDialog = ({
   };
 
   return (
-    <Dialog fullWidth scroll="paper" open={open}>
+    <Dialog fullWidth scroll="paper" open={open} onClose={cancelUpload}>
       <DialogTitle>Upload songs</DialogTitle>
       <DialogContent dividers>
         <List>
@@ -72,11 +118,11 @@ const SongStagingDialog = ({
         </List>
       </DialogContent>
       <DialogActions>
-        <Button aria-label="cancel" onClick={() => setOpen(false)}>
+        <Button aria-label="cancel" onClick={() => cancelUpload()}>
           Cancel
         </Button>
         <Button aria-label="upload" onClick={uploadSongs}>
-          Upload songs
+          Upload
         </Button>
       </DialogActions>
     </Dialog>

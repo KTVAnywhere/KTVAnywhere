@@ -270,7 +270,7 @@ app
     const saveSongIndex = () => {
       fs.promises.writeFile(
         indexPath,
-        JSON.stringify(songSearcher.getIndex().toJSON)
+        JSON.stringify(songSearcher.getIndex().toJSON())
       );
     };
     try {
