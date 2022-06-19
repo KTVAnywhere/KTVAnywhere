@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   CardActions,
@@ -18,6 +18,7 @@ import {
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
 import { SongProps } from '../Song';
+import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
 
 export interface QueueItemProps {
   song: SongProps;
@@ -28,12 +29,10 @@ const setQueue = (queueList: QueueItemProps[]) => {
   window.electron.store.queueItems.setAllQueueItems(queueList);
 };
 
-export const QueueList = ({
-  setNextSong,
-}: {
-  setNextSong: Dispatch<SetStateAction<SongProps | null>>;
-}) => {
+export const QueueList = () => {
   const [queueItems, setQueueItems] = useState<QueueItemProps[]>([]);
+  const { setNextSong } = useAudioStatus();
+
   useEffect(() => {
     setQueueItems(window.electron.store.queueItems.getAllQueueItems() ?? []);
     const queueItemsUnsubscribe = window.electron.store.queueItems.onChange(
@@ -250,7 +249,11 @@ export function EnqueueSong(song: SongProps): void {
 
 export function DequeueSong(): SongProps | null {
   const queue = window.electron.store.queueItems.getAllQueueItems();
-  const nextSong = queue.length > 0 ? queue[0].song : null;
+  const nextSongId = queue.length > 0 ? queue[0].song.songId : null;
+  const nextSong =
+    nextSongId === null
+      ? null
+      : window.electron.store.songs.getSong(nextSongId);
   if (queue.length > 0) {
     setQueue([...queue.slice(1)]);
   }

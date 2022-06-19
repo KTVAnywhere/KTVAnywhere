@@ -29,6 +29,7 @@ import {
   AlertMessageProvider,
   useAlertMessage,
 } from '../components/Alert.context';
+import { AudioStatusProvider } from '../components/AudioPlayer/AudioStatus.context';
 import AudioPlayer from '../components/AudioPlayer';
 import LyricsPlayer from '../components/LyricsPlayer';
 import './App.css';
@@ -53,10 +54,6 @@ const darkTheme = createTheme({
 
 const MainPage = () => {
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
-  const [nextSong, setNextSong] = useState<SongProps | null>(null);
-  const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(true);
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
@@ -160,7 +157,7 @@ const MainPage = () => {
             <SongDialogProvider>
               <LeftSidebar>
                 <SongUploadButton setUploadedSongs={setUploadedSongs} />
-                <SongList setOpenSong={setOpenSong} setNextSong={setNextSong} />
+                <SongList setOpenSong={setOpenSong} />
                 <SongDialog song={openSong} setSong={setOpenSong} />
                 <ConfirmationDialog />
                 <SongStagingDialog
@@ -183,15 +180,11 @@ const MainPage = () => {
               pb: '1%',
             }}
           >
-            <LyricsPlayer
-              currentSong={currentSong}
-              currentTime={currentTime}
-              lyricsEnabled={lyricsEnabled}
-            />
+            <LyricsPlayer />
           </Grid>
         </Grid>
         <RightSidebar>
-          <QueueList setNextSong={setNextSong} />
+          <QueueList />
         </RightSidebar>
       </Container>
       <Container
@@ -204,15 +197,7 @@ const MainPage = () => {
           bottom: 0,
         }}
       >
-        <AudioPlayer
-          currentTime={currentTime}
-          setCurrentTime={setCurrentTime}
-          currentSong={currentSong}
-          setCurrentSong={setCurrentSong}
-          nextSong={nextSong}
-          lyricsEnabled={lyricsEnabled}
-          setLyricsEnabled={setLyricsEnabled}
-        />
+        <AudioPlayer />
       </Container>
     </Container>
   );
@@ -228,7 +213,9 @@ export default function App() {
             <ThemeProvider theme={darkTheme}>
               <AlertMessageProvider>
                 <SongsStatusProvider>
-                  <MainPage />
+                  <AudioStatusProvider>
+                    <MainPage />
+                  </AudioStatusProvider>
                 </SongsStatusProvider>
               </AlertMessageProvider>
             </ThemeProvider>

@@ -38,6 +38,11 @@ ipcMain.handle('file:read', async (_, filePath: string) => {
   return data;
 });
 
+ipcMain.handle('file:readAsBuffer', async (_, filePath: string) => {
+  const data = await fs.promises.readFile(filePath, null);
+  return data;
+});
+
 ipcMain.on('file:ifFileExists', (event, filePath) => {
   event.returnValue = fs.existsSync(filePath);
 });
@@ -165,7 +170,6 @@ app
             ]);
 
         spleeterProcess?.stdout.on('data', (message: string) => {
-          console.log(`${message}`);
           if (`${message}` === `done splitting ${song.songId}`) {
             mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
               vocalsPath: path.join(songFolder, 'vocals.mp3'),

@@ -22,7 +22,6 @@ import mockedElectron from '../__testsData__/mocks';
 describe('QueueList component buttons tests', () => {
   const mockGetAllQueueItems = () => queueTestDataWithSongs012;
   const mockSetAllQueueItems = jest.fn();
-  const mockSetNextSong = jest.fn();
 
   beforeEach(() => {
     global.window.electron = {
@@ -45,7 +44,7 @@ describe('QueueList component buttons tests', () => {
   });
 
   test('clear queue button should empty the queue', () => {
-    render(<QueueList setNextSong={mockSetNextSong} />);
+    render(<QueueList />);
     const clearQueueButton = screen.getByTestId('clear-queue-button');
     fireEvent.click(clearQueueButton);
 
@@ -53,7 +52,7 @@ describe('QueueList component buttons tests', () => {
   });
 
   test('delete button should delete song from queue', () => {
-    render(<QueueList setNextSong={mockSetNextSong} />);
+    render(<QueueList />);
     const deleteSongInQueueButton = screen.getAllByTestId(
       'delete-song-from-queue-button'
     )[1];
@@ -63,7 +62,7 @@ describe('QueueList component buttons tests', () => {
   });
 
   test('up button should move song up in queue', () => {
-    render(<QueueList setNextSong={mockSetNextSong} />);
+    render(<QueueList />);
     const swapSongPositionInQueueButton = screen.getAllByTestId(
       'move-song-up-in-queue-button'
     )[1];
@@ -73,7 +72,7 @@ describe('QueueList component buttons tests', () => {
   });
 
   test('send to front of queue button should move song to first item in queue', () => {
-    render(<QueueList setNextSong={mockSetNextSong} />);
+    render(<QueueList />);
     const sendToFrontInQueueButton = screen.getAllByTestId(
       'send-to-front-of-queue-button'
     )[2];
@@ -86,7 +85,6 @@ describe('QueueList component buttons tests', () => {
 describe('Drag and Drop tests on QueueList component', () => {
   const mockGetAllQueueItems = () => queueTestDataWithSongs012;
   const mockSetAllQueueItems = jest.fn();
-  const mockSetNextSong = jest.fn();
 
   beforeEach(() => {
     global.window.electron = {
@@ -110,7 +108,7 @@ describe('Drag and Drop tests on QueueList component', () => {
   });
 
   test('drag and drop second song in queue to first', async () => {
-    const { container } = render(<QueueList setNextSong={mockSetNextSong} />);
+    const { container } = render(<QueueList />);
     mockDndSpacing(container);
 
     await makeDnd({
@@ -128,6 +126,9 @@ describe('Drag and Drop tests on QueueList component', () => {
 
 describe('Enqueue and Dequeue tests', () => {
   const mockGetAllQueueItems = () => queueTestDataWithSong0;
+  const mockGetSong = () => {
+    return songTestData[0];
+  };
   const mockSetAllQueueItems = jest.fn();
 
   beforeEach(() => {
@@ -135,6 +136,10 @@ describe('Enqueue and Dequeue tests', () => {
       ...mockedElectron,
       store: {
         ...mockedElectron.store,
+        songs: {
+          ...mockedElectron.store.songs,
+          getSong: mockGetSong,
+        },
         queueItems: {
           ...mockedElectron.store.queueItems,
           getAllQueueItems: mockGetAllQueueItems,

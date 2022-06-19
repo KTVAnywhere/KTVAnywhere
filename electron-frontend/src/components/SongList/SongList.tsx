@@ -18,19 +18,19 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { SongProps, useSongDialog, useSongsStatus } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
+import { useAudioStatus } from '../AudioPlayer';
 import { useConfirmation } from '../ConfirmationDialog';
 
 const SongCard = ({
   song,
   setOpenSong,
-  setNextSong,
 }: {
   song: SongProps;
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
-  setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
   const { setOpen: setOpenSongDialog } = useSongDialog();
   const { songsStatus, setSongsStatus } = useSongsStatus();
+  const { setNextSong } = useAudioStatus();
   const {
     setOpen: setOpenConfirmation,
     setConfirmationMessage,
@@ -128,16 +128,15 @@ const SongCard = ({
 
 const SongList = ({
   setOpenSong,
-  setNextSong,
 }: {
   setOpenSong: Dispatch<SetStateAction<SongProps>>;
-  setNextSong: Dispatch<SetStateAction<SongProps | null>>;
 }) => {
   const [songList, setSongList] = useState<SongProps[]>([]);
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SongProps[] | undefined>(
     []
   );
+
   useEffect(() => {
     setSongList(window.electron.store.songs.getAllSongs() ?? []);
     const songsUnsubscribe = window.electron.store.songs.onChange(
@@ -189,11 +188,7 @@ const SongList = ({
           ? 'Loading...'
           : searchResults.map((song) => (
               <ListItem key={song.songId} sx={{ px: 0 }}>
-                <SongCard
-                  song={song}
-                  setOpenSong={setOpenSong}
-                  setNextSong={setNextSong}
-                />
+                <SongCard song={song} setOpenSong={setOpenSong} />
               </ListItem>
             ))}
       </List>

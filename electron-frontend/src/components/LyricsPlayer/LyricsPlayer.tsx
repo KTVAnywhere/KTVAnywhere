@@ -1,22 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Grid, Typography } from '@mui/material';
 import { Lrc, Runner } from 'lrc-kit';
-import { SongProps } from '../Song';
+import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
 
-interface LyricsProps {
-  currentSong: SongProps | null;
-  currentTime: number;
-  lyricsEnabled: boolean;
-}
-
-const LyricsPlayer = ({
-  currentSong,
-  currentTime,
-  lyricsEnabled,
-}: LyricsProps) => {
+const LyricsPlayer = () => {
   const [lyrics, setLyrics] = useState('');
   const [nextLyrics, setNextLyrics] = useState('');
   const [runner, setRunner] = useState(new Runner(Lrc.parse(''), true));
+  const { currentSong, currentTime, lyricsEnabled } = useAudioStatus();
 
   useEffect(() => {
     if (currentSong === null) {
