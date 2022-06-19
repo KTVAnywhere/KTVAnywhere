@@ -1,4 +1,5 @@
 import { IpcRenderer } from 'electron';
+import { ConfigType } from 'main/schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
@@ -40,6 +41,10 @@ declare global {
           onChange(
             callback: (_event: IpcRenderer, results: QueueItemProps[]) => void
           ): () => void;
+        };
+        config: {
+          getPlayingSong(): ConfigType['playingSong'];
+          setPlayingSong(playingSong: ConfigType['playingSong']): void;
         };
       };
       preprocess: {

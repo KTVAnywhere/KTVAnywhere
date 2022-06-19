@@ -18,6 +18,17 @@ export interface QueueItemsType {
   queueItems: QueueItemProps[];
 }
 
+export interface ConfigType {
+  playingSong: {
+    songId: string;
+    songTime: number;
+    volume: number;
+    pitch: number;
+    vocalsEnabled: boolean;
+    lyricsEnabled: boolean;
+  };
+}
+
 const songSchema: Schema<Song> = {
   song: {
     type: 'object',
@@ -59,12 +70,28 @@ const queueItemsSchema: Schema<QueueItemsType> = {
   },
 };
 
+const configSchema: Schema<ConfigType> = {
+  playingSong: {
+    type: 'object',
+    properties: {
+      songId: { type: 'string' },
+      songTime: { type: 'number' },
+      volume: { type: 'number' },
+      pitch: { type: 'number' },
+      vocalsEnabled: { type: 'boolean' },
+      lyricsEnabled: { type: 'boolean' },
+    },
+  },
+};
+
 const schemas: {
   songsSchema: Schema<SongsType>;
   queueItemsSchema: Schema<QueueItemsType>;
+  configSchema: Schema<ConfigType>;
 } = {
   songsSchema,
   queueItemsSchema,
+  configSchema,
 };
 
 export default schemas;

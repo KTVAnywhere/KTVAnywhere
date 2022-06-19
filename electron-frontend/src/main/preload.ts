@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
+import { ConfigType } from './schema';
 
 contextBridge.exposeInMainWorld('electron', {
   dialog: {
@@ -83,6 +84,14 @@ contextBridge.exposeInMainWorld('electron', {
         ipcRenderer.on('store:onQueueItemsChange', callback);
         return () =>
           ipcRenderer.removeListener('store:onQueueItemsChange', callback);
+      },
+    },
+    config: {
+      getPlayingSong() {
+        return ipcRenderer.sendSync('store:getPlayingSong');
+      },
+      setSong(playingSong: ConfigType['playingSong']) {
+        ipcRenderer.send('store:setPlayingSong', playingSong);
       },
     },
   },

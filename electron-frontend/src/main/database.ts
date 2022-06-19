@@ -1,6 +1,6 @@
 import Store from 'electron-store';
 import Fuse from 'fuse.js';
-import schemas, { SongsType, QueueItemsType } from './schema';
+import schemas, { SongsType, QueueItemsType, ConfigType } from './schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
@@ -18,6 +18,21 @@ export const createQueueItemsStore = () =>
     schema: schemas.queueItemsSchema,
     watch: true,
     defaults: { queueItems: [] },
+  });
+
+export const createConfigStore = () =>
+  new Store<ConfigType>({
+    schema: schemas.configSchema,
+    defaults: {
+      playingSong: {
+        songId: '',
+        songTime: 0,
+        volume: 0.5,
+        pitch: 0,
+        vocalsEnabled: true,
+        lyricsEnabled: true,
+      },
+    },
   });
 
 export const songFunctions = {
@@ -111,4 +126,12 @@ export const queueItemFunctions = {
   ) => {
     store.set('queueItems', queueItems);
   },
+};
+
+export const configFunctions = {
+  getPlayingSong: (store: Store<ConfigType>) => store.get('playingSong'),
+  setPlayingSong: (
+    store: Store<ConfigType>,
+    playingSong: ConfigType['playingSong']
+  ) => store.set('playingSong', playingSong),
 };

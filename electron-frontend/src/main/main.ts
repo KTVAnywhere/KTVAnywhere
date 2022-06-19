@@ -26,6 +26,8 @@ import {
   createQueueItemsStore,
   songFunctions,
   queueItemFunctions,
+  createConfigStore,
+  configFunctions,
 } from './database';
 import { SongProps } from '../components/Song';
 
@@ -236,6 +238,7 @@ app
     // Database
     const songsStore = createSongsStore();
     const queueItemsStore = createQueueItemsStore();
+    const configStore = createConfigStore();
     const {
       getSong,
       setSong,
@@ -253,6 +256,7 @@ app
       getAllQueueItems,
       setAllQueueItems,
     } = queueItemFunctions;
+    const { getPlayingSong, setPlayingSong } = configFunctions;
     const fuseOptions = {
       keys: ['songName', 'artist'],
       findAllMatches: true,
@@ -337,5 +341,13 @@ app
     queueItemsStore.onDidChange('queueItems', (results) =>
       mainWindow?.webContents.send('store:onQueueItemsChange', results)
     );
+
+    ipcMain.on('store:getPlayingSong', (event) => {
+      event.returnValue = getPlayingSong(configStore);
+    });
+
+    ipcMain.on('store:setPlayingSong', (_, playingSong) => {
+      setPlayingSong(configStore, playingSong);
+    });
   })
   .catch(console.error);
