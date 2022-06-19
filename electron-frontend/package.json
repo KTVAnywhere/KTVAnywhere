@@ -139,6 +139,7 @@
     "@types/react-dom": "^18.0.4",
     "@types/react-edit-text": "^4.4.0",
     "@types/react-test-renderer": "^18.0.0",
+    "@types/sinon": "^10.0.11",
     "@types/terser-webpack-plugin": "^5.0.4",
     "@types/uniqid": "^5.3.2",
     "@types/webpack-bundle-analyzer": "^4.4.1",
