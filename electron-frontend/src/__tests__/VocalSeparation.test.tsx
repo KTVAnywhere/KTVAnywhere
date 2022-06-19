@@ -12,7 +12,6 @@ import { songListTestData } from '../__testsData__/testData';
 
 describe('Process song with spleeter', () => {
   const mockSetOpenSong = jest.fn();
-  const mockSetNextSong = jest.fn();
   const mockSongsStatus: string[] = [];
   const mockSetSongsStatus = jest.fn();
 
@@ -33,7 +32,7 @@ describe('Process song with spleeter', () => {
     });
     render(
       <SongsStatusProvider>
-        <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
+        <SongList setOpenSong={mockSetOpenSong} />
       </SongsStatusProvider>
     );
 
@@ -62,10 +61,7 @@ describe('Process song with spleeter', () => {
       <ConfirmationProvider>
         <SongDialogProvider>
           <SongsStatusProvider>
-            <SongList
-              setOpenSong={mockSetOpenSong}
-              setNextSong={mockSetNextSong}
-            />
+            <SongList setOpenSong={mockSetOpenSong} />
             <ConfirmationDialog />
           </SongsStatusProvider>
         </SongDialogProvider>

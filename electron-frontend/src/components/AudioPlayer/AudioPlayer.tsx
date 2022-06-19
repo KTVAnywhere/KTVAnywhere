@@ -373,6 +373,7 @@ export const AudioPlayer = () => {
             max={3.5}
             step={0.5}
             color="secondary"
+            data-testid="pitch-slider"
           />
           <Typography>Pitch: {pitch > 0 ? `+${pitch}` : pitch}</Typography>
         </Grid>

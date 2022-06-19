@@ -18,7 +18,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { SongProps, useSongDialog, useSongsStatus } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
-import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
+import { useAudioStatus } from '../AudioPlayer';
 import { useConfirmation } from '../ConfirmationDialog';
 
 const SongCard = ({

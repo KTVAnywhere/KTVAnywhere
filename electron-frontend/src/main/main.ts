@@ -168,7 +168,6 @@ app
             ]);
 
         spleeterProcess?.stdout.on('data', (message: string) => {
-          console.log(`${message}`);
           if (`${message}` === `done splitting ${song.songId}`) {
             mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
               vocalsPath: path.join(songFolder, 'vocals.mp3'),

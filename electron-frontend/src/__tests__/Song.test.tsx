@@ -6,12 +6,15 @@ import {
   within,
   waitFor,
 } from '@testing-library/react';
+import { AudioContext } from 'standardized-audio-context-mock';
 import * as Queue from '../components/SongsQueue';
 import SongComponent, {
   SongDialog,
   SongDialogProvider,
   SongsStatusProvider,
 } from '../components/Song';
+import { AudioStatusProvider } from '../components/AudioPlayer';
+import * as AudioStatusContext from '../components/AudioPlayer/AudioStatus.context';
 import {
   ConfirmationDialog,
   ConfirmationProvider,
@@ -19,16 +22,16 @@ import {
 import * as SongDialogContext from '../components/Song/SongDialog.context';
 import SongList from '../components/SongList';
 import { songTestData, songListTestData } from '../__testsData__/testData';
-import mockedElectron from '../__testsData__/mocks';
+import mockedElectron, { mockedAudioStatus } from '../__testsData__/mocks';
 
 describe('SongList', () => {
   const mockGetAll = () => songListTestData;
   const mockDelete = jest.fn();
   const mockSearch = jest.fn();
   const mockSetOpenSong = jest.fn();
-  const mockSetNextSong = jest.fn();
 
   beforeEach(() => {
+    global.AudioContext = AudioContext as any;
     global.window.electron = {
       ...mockedElectron,
       store: {
@@ -45,13 +48,17 @@ describe('SongList', () => {
   });
 
   afterEach(() => {
+    jest.restoreAllMocks();
     jest.resetAllMocks();
+    jest.clearAllMocks();
   });
   test('song library should display list of songs', async () => {
     render(
-      <SongsStatusProvider>
-        <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
-      </SongsStatusProvider>
+      <AudioStatusProvider>
+        <SongsStatusProvider>
+          <SongList setOpenSong={mockSetOpenSong} />
+        </SongsStatusProvider>
+      </AudioStatusProvider>
     );
     const { getAllByRole } = within(
       screen.getByRole('list', { name: /data/i })
@@ -61,10 +68,16 @@ describe('SongList', () => {
   });
 
   test('click play button should call setNextSong with the song clicked', async () => {
+    const mockSetNextSong = jest.fn();
+    jest
+      .spyOn(AudioStatusContext, 'useAudioStatus')
+      .mockReturnValue({ ...mockedAudioStatus, setNextSong: mockSetNextSong });
     render(
-      <SongsStatusProvider>
-        <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
-      </SongsStatusProvider>
+      <AudioStatusProvider>
+        <SongsStatusProvider>
+          <SongList setOpenSong={mockSetOpenSong} />
+        </SongsStatusProvider>
+      </AudioStatusProvider>
     );
     const { getAllByRole } = within(
       screen.getByRole('list', { name: /data/i })
@@ -80,9 +93,11 @@ describe('SongList', () => {
   test('click enqueue button should add song to queue', async () => {
     const enqueueSpy = jest.spyOn(Queue, 'EnqueueSong');
     render(
-      <SongsStatusProvider>
-        <SongList setOpenSong={mockSetOpenSong} setNextSong={mockSetNextSong} />
-      </SongsStatusProvider>
+      <AudioStatusProvider>
+        <SongsStatusProvider>
+          <SongList setOpenSong={mockSetOpenSong} />
+        </SongsStatusProvider>
+      </AudioStatusProvider>
     );
     const { getAllByRole } = within(
       screen.getByRole('list', { name: /data/i })
@@ -101,14 +116,13 @@ describe('SongList', () => {
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: true, setOpen: mockSetOpen });
     render(
-      <SongsStatusProvider>
-        <SongDialogProvider>
-          <SongList
-            setOpenSong={mockSetOpenSong}
-            setNextSong={mockSetNextSong}
-          />
-        </SongDialogProvider>
-      </SongsStatusProvider>
+      <AudioStatusProvider>
+        <SongsStatusProvider>
+          <SongDialogProvider>
+            <SongList setOpenSong={mockSetOpenSong} />
+          </SongDialogProvider>
+        </SongsStatusProvider>
+      </AudioStatusProvider>
     );
 
     const song1button = screen.getByRole('button', {
@@ -128,11 +142,13 @@ describe('SongList', () => {
       .spyOn(SongDialogContext, 'useSongDialog')
       .mockReturnValue({ open: false, setOpen: jest.fn() });
     render(
-      <SongDialogProvider>
-        <SongsStatusProvider>
-          <SongList setOpenSong={jest.fn()} setNextSong={jest.fn()} />
-        </SongsStatusProvider>
-      </SongDialogProvider>
+      <AudioStatusProvider>
+        <SongDialogProvider>
+          <SongsStatusProvider>
+            <SongList setOpenSong={jest.fn()} />
+          </SongsStatusProvider>
+        </SongDialogProvider>
+      </AudioStatusProvider>
     );
     const searchBox = screen.getByRole('textbox');
     fireEvent.change(searchBox, {
