@@ -93,7 +93,7 @@ contextBridge.exposeInMainWorld('electron', {
       getPlayingSong() {
         return ipcRenderer.sendSync('store:getPlayingSong');
       },
-      setSong(playingSong: ConfigType['playingSong']) {
+      setPlayingSong(playingSong: ConfigType['playingSong']) {
         ipcRenderer.send('store:setPlayingSong', playingSong);
       },
     },

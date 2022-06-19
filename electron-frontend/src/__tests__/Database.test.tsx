@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom';
 import Fuse from 'fuse.js';
-import { queueItemFunctions, songFunctions } from '../main/database';
+import {
+  configFunctions,
+  queueItemFunctions,
+  songFunctions,
+} from '../main/database';
+import { ConfigType } from '../main/schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 import {
@@ -195,5 +200,36 @@ describe('queueItems store', () => {
     const { setAllQueueItems } = queueItemFunctions;
     setAllQueueItems(queueItemsStore, queueTestDataWithSongs102);
     expect(mockSet).toBeCalledWith('queueItems', queueTestDataWithSongs102);
+  });
+});
+
+describe('config store', () => {
+  const mockGet = jest.fn();
+  const mockSet = jest.fn();
+
+  const configStore = {
+    ...new ActualStore({}),
+    get: mockGet,
+    set: mockSet,
+  };
+
+  test('get settings for playing song', () => {
+    const { getPlayingSong } = configFunctions;
+    getPlayingSong(configStore);
+    expect(mockGet).toBeCalled();
+  });
+
+  test('set settings for playing song', () => {
+    const { setPlayingSong } = configFunctions;
+    const playingSong: ConfigType['playingSong'] = {
+      songId: '1',
+      songTime: 5,
+      volume: 0.5,
+      pitch: 0,
+      vocalsEnabled: true,
+      lyricsEnabled: true,
+    };
+    setPlayingSong(configStore, playingSong);
+    expect(mockSet).toBeCalledWith('playingSong', playingSong);
   });
 });

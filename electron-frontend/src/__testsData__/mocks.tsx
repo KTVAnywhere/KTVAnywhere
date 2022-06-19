@@ -24,6 +24,10 @@ const mockedElectron = {
       setAllQueueItems: jest.fn(),
       onChange: jest.fn().mockReturnValue(jest.fn()),
     },
+    config: {
+      getPlayingSong: jest.fn(),
+      setPlayingSong: jest.fn(),
+    },
   },
   preprocess: {
     getSongDetails: jest.fn(),
