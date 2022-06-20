@@ -26,8 +26,9 @@ export const createConfigStore = () =>
     defaults: {
       playingSong: {
         songId: '',
-        songTime: 0,
-        volume: 0.5,
+        currentTime: 0,
+        duration: 0,
+        volume: 50,
         pitch: 0,
         vocalsEnabled: true,
         lyricsEnabled: true,

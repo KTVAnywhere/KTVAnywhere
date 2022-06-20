@@ -25,7 +25,17 @@ const mockedElectron = {
       onChange: jest.fn().mockReturnValue(jest.fn()),
     },
     config: {
-      getPlayingSong: jest.fn(),
+      getPlayingSong: () => {
+        return {
+          songId: '',
+          currentTime: 0,
+          duration: 0,
+          volume: 50,
+          pitch: 0,
+          vocalsEnabled: true,
+          lyricsEnabled: true,
+        };
+      },
       setPlayingSong: jest.fn(),
     },
   },
@@ -56,8 +66,6 @@ export const mockedAudioStatus = {
   setIsPlaying: jest.fn(),
   isPlayingVocals: true,
   setIsPlayingVocals: jest.fn(),
-  skipToTime: null,
-  setSkipToTime: jest.fn(),
   volume: 70,
   setVolume: jest.fn(),
   pitch: 0,

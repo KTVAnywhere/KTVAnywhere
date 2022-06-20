@@ -21,7 +21,8 @@ export interface QueueItemsType {
 export interface ConfigType {
   playingSong: {
     songId: string;
-    songTime: number;
+    currentTime: number;
+    duration: number;
     volume: number;
     pitch: number;
     vocalsEnabled: boolean;
@@ -75,7 +76,8 @@ const configSchema: Schema<ConfigType> = {
     type: 'object',
     properties: {
       songId: { type: 'string' },
-      songTime: { type: 'number' },
+      currentTime: { type: 'number' },
+      duration: { type: 'number' },
       volume: { type: 'number' },
       pitch: { type: 'number' },
       vocalsEnabled: { type: 'boolean' },

@@ -18,8 +18,6 @@ interface ContextState {
   setIsPlaying: Dispatch<SetStateAction<boolean>>;
   isPlayingVocals: boolean;
   setIsPlayingVocals: Dispatch<SetStateAction<boolean>>;
-  skipToTime: number | null;
-  setSkipToTime: Dispatch<SetStateAction<number | null>>;
   volume: number;
   setVolume: Dispatch<SetStateAction<number>>;
   pitch: number;
@@ -41,19 +39,32 @@ interface ContextState {
 const AudioStatusContext = createContext({} as ContextState);
 
 export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
-  const [duration, setDuration] = useState<number>(0);
+  const playingSong = window.electron.store.config.getPlayingSong();
+  const song =
+    playingSong.songId === ''
+      ? null
+      : window.electron.store.songs.getSong(playingSong.songId);
+  const timePlayed = playingSong.songId === '' ? 0 : playingSong.currentTime;
+  const songDuration = playingSong.songId === '' ? 0 : playingSong.duration;
+  const newAudioContext = new AudioContext();
+  const newGainNode = newAudioContext.createGain();
+  newGainNode.gain.value = playingSong.volume / 100;
+  const [duration, setDuration] = useState<number>(songDuration);
   const [songEnded, setSongEnded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isPlayingVocals, setIsPlayingVocals] = useState(true);
-  const [skipToTime, setSkipToTime] = useState<number | null>(null);
-  const [volume, setVolume] = useState<number>(70);
-  const [pitch, setPitch] = useState<number>(0);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [currentSong, setCurrentSong] = useState<SongProps | null>(null);
+  const [isPlayingVocals, setIsPlayingVocals] = useState(
+    playingSong.vocalsEnabled
+  );
+  const [volume, setVolume] = useState<number>(playingSong.volume);
+  const [pitch, setPitch] = useState<number>(playingSong.pitch);
+  const [currentTime, setCurrentTime] = useState<number>(timePlayed);
+  const [currentSong, setCurrentSong] = useState<SongProps | null>(song);
   const [nextSong, setNextSong] = useState<SongProps | null>(null);
-  const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(true);
-  const [audioContext] = useState<AudioContext>(new AudioContext());
-  const [gainNode] = useState<GainNode>(audioContext.createGain());
+  const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(
+    playingSong.lyricsEnabled
+  );
+  const [audioContext] = useState<AudioContext>(newAudioContext);
+  const [gainNode] = useState<GainNode>(newGainNode);
   const [source, setSource] = useState<typeof PitchShifter | null>();
 
   return (
@@ -67,8 +78,6 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
         setIsPlaying,
         isPlayingVocals,
         setIsPlayingVocals,
-        skipToTime,
-        setSkipToTime,
         volume,
         setVolume,
         pitch,

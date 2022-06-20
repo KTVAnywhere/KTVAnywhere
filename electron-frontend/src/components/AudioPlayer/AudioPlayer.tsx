@@ -10,13 +10,12 @@ import VolumeMuteIcon from '@mui/icons-material/VolumeMute';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import { useEffect } from 'react';
-import './AudioPlayer.css';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../Alert.context';
 import { useAudioStatus } from './AudioStatus.context';
 
 const ProgressBar = () => {
-  const { duration, currentTime, setSkipToTime } = useAudioStatus();
+  const { duration, currentTime, setCurrentTime, source } = useAudioStatus();
 
   function formatSecondsToMinutesAndSeconds(seconds: number) {
     return `${Math.floor(seconds / 60)}:${`0${Math.floor(seconds % 60)}`.slice(
@@ -24,52 +23,52 @@ const ProgressBar = () => {
     )}`;
   }
 
-  function getSkippedTime(
-    e: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent
-  ) {
-    const mousePositionWhenClicked = e.pageX;
-    const bar = document.querySelector('.bar-progress') as HTMLSpanElement;
-    const leftSideOfBar = bar.getBoundingClientRect().left + window.scrollX;
-    const barWidth = bar.offsetWidth;
-    const relativePositionInBar = mousePositionWhenClicked - leftSideOfBar;
-    const unitTime = duration / barWidth;
-    return unitTime * relativePositionInBar;
-  }
-
-  function songPlayBackTimeChange(
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) {
-    setSkipToTime(getSkippedTime(e));
-
-    function updateTimeOnMove(event: MouseEvent) {
-      setSkipToTime(getSkippedTime(event));
+  const timeChange = (_event: Event, newValue: number | number[]) => {
+    if (source && duration !== 0) {
+      source.percentagePlayed = (newValue as number) / duration;
+      setCurrentTime(newValue as number);
     }
-
-    document.addEventListener('mousemove', updateTimeOnMove);
-
-    document.addEventListener('mouseup', () => {
-      document.removeEventListener('mousemove', updateTimeOnMove);
-    });
-  }
-
-  const currentPercentage = duration === 0 ? 0 : (currentTime / duration) * 100;
+  };
 
   return (
-    <Grid container direction="row" alignItems="center" maxWidth="60%">
+    <Grid
+      container
+      direction="row"
+      alignItems="center"
+      justifyContent="center"
+      maxWidth="60%"
+    >
       <Grid item>
         <Typography>{formatSecondsToMinutesAndSeconds(currentTime)}</Typography>
       </Grid>
-      <div
-        className="bar-progress"
-        role="progressbar"
-        tabIndex={0}
-        aria-label="Progress bar of song"
-        data-testid="progress-bar"
-        style={{
-          background: `linear-gradient(to right, #7FB069 ${currentPercentage}%, white 0)`,
+      <Grid
+        item
+        sx={{
+          width: '87%',
+          paddingLeft: '1%',
+          paddingRight: '1%',
         }}
-        onMouseDown={(e) => songPlayBackTimeChange(e)}
-      />
+      >
+        <Slider
+          aria-label="SongProgress"
+          value={currentTime}
+          onChange={timeChange}
+          min={0}
+          max={duration}
+          sx={{
+            display: 'flex',
+            height: '10px',
+            '& .MuiSlider-thumb': {
+              width: 0,
+              height: 0,
+              boxShadow: 'none',
+              '&:hover, &.Mui-focusVisible, &.Mui-active': {
+                boxShadow: 'none',
+              },
+            },
+          }}
+        />
+      </Grid>
       <Grid item>
         <Typography>{formatSecondsToMinutesAndSeconds(duration)}</Typography>
       </Grid>
@@ -87,8 +86,6 @@ export const AudioPlayer = () => {
     setIsPlaying,
     isPlayingVocals,
     setIsPlayingVocals,
-    skipToTime,
-    setSkipToTime,
     volume,
     setVolume,
     pitch,
@@ -146,7 +143,11 @@ export const AudioPlayer = () => {
     return ab;
   };
 
-  const createSource = (audioBuffer: AudioBuffer, percentagePlayed: number) => {
+  const createSource = (
+    audioBuffer: AudioBuffer,
+    percentagePlayed: number,
+    playNow: boolean
+  ) => {
     setDuration(audioBuffer.duration);
     const newSource = new PitchShifter(audioContext, audioBuffer, 4096);
     newSource.on('play', onPlay);
@@ -154,17 +155,20 @@ export const AudioPlayer = () => {
     newSource.pitchSemitones = pitch;
     destroySource();
     newSource.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    if (playNow) {
+      gainNode.connect(audioContext.destination);
+    }
     setSource(newSource);
   };
 
   const loadSong = async (
     filePath: string,
-    vocalsToggle: boolean,
+    resumeTime: boolean,
+    playNow: boolean,
     callback?: () => void
   ) => {
     let percentagePlayed = 0;
-    if (vocalsToggle && duration !== 0) {
+    if (resumeTime && duration !== 0) {
       percentagePlayed = currentTime / duration;
     }
 
@@ -174,7 +178,7 @@ export const AudioPlayer = () => {
           await window.electron.file.readAsBuffer(filePath)
         );
         audioContext.decodeAudioData(arrayBuffer, (buffer: AudioBuffer) => {
-          createSource(buffer, percentagePlayed);
+          createSource(buffer, percentagePlayed, playNow);
         });
         if (callback) {
           callback();
@@ -226,7 +230,7 @@ export const AudioPlayer = () => {
     } else if (!currentSong && GetQueueLength() > 0) {
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, () => {
+        loadSong(song.songPath, false, true, () => {
           setCurrentSong(song);
           setIsPlaying(true);
         });
@@ -245,7 +249,9 @@ export const AudioPlayer = () => {
 
   const enableVocals = () => {
     if (currentSong) {
-      loadSong(currentSong.songPath, true, () => setIsPlayingVocals(true));
+      loadSong(currentSong.songPath, true, true, () =>
+        setIsPlayingVocals(true)
+      );
     }
   };
 
@@ -258,7 +264,7 @@ export const AudioPlayer = () => {
         });
         setShowAlertMessage(true);
       } else {
-        loadSong(currentSong.accompanimentPath, true, () =>
+        loadSong(currentSong.accompanimentPath, true, true, () =>
           setIsPlayingVocals(false)
         );
       }
@@ -269,7 +275,7 @@ export const AudioPlayer = () => {
     if (GetQueueLength() > 0) {
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, () => {
+        loadSong(song.songPath, false, true, () => {
           setCurrentSong(song);
           setIsPlaying(true);
           setIsPlayingVocals(true);
@@ -287,18 +293,25 @@ export const AudioPlayer = () => {
   };
 
   const backwardTenSeconds = () => {
-    setSkipToTime(() => (currentTime <= 10 ? 0.01 : currentTime - 10));
+    if (source && duration !== 0) {
+      const nextTime = currentTime <= 10 ? 0.01 : currentTime - 10;
+      source.percentagePlayed = nextTime / duration;
+      setCurrentTime(nextTime);
+    }
   };
 
   const forwardTenSeconds = () => {
-    setSkipToTime(() =>
-      currentTime + 10 >= duration ? duration : currentTime + 10
-    );
+    if (source && duration !== 0) {
+      const nextTime =
+        currentTime + 10 >= duration ? duration : currentTime + 10;
+      source.percentagePlayed = nextTime / duration;
+      setCurrentTime(nextTime);
+    }
   };
 
   useEffect(() => {
     if (nextSong === null) return;
-    loadSong(nextSong.songPath, false, () => {
+    loadSong(nextSong.songPath, false, true, () => {
       setCurrentSong(nextSong);
       setIsPlaying(true);
       setIsPlayingVocals(true);
@@ -307,18 +320,33 @@ export const AudioPlayer = () => {
   }, [nextSong]);
 
   useEffect(() => {
-    if (skipToTime && source && audioContext) {
-      source.percentagePlayed = skipToTime / duration;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [skipToTime]);
-
-  useEffect(() => {
     if (songEnded) {
       endSong();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [songEnded]);
+
+  useEffect(() => {
+    if (currentSong) {
+      loadSong(currentSong.songPath, true, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const saveConfig = () => {
+    window.removeEventListener('beforeunload', saveConfig);
+    window.electron.store.config.setPlayingSong({
+      songId: currentSong ? currentSong.songId : '',
+      currentTime,
+      duration,
+      volume,
+      pitch,
+      vocalsEnabled: isPlayingVocals,
+      lyricsEnabled,
+    });
+  };
+
+  window.addEventListener('beforeunload', saveConfig);
 
   return (
     <Grid container direction="column">

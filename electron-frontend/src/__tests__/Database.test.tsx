@@ -223,8 +223,9 @@ describe('config store', () => {
     const { setPlayingSong } = configFunctions;
     const playingSong: ConfigType['playingSong'] = {
       songId: '1',
-      songTime: 5,
-      volume: 0.5,
+      currentTime: 5,
+      duration: 10,
+      volume: 50,
       pitch: 0,
       vocalsEnabled: true,
       lyricsEnabled: true,

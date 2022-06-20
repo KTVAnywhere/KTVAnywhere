@@ -310,12 +310,12 @@ describe('Audio player component tests', () => {
     );
 
     const toggleVocalsSwitch = screen.getByTestId('toggle-vocals-switch');
-    expect(mockIfFileExists).not.toHaveBeenCalled();
-    expect(mockReadAsBuffer).not.toHaveBeenCalled();
+    expect(mockIfFileExists).toHaveBeenCalledTimes(1);
+    expect(mockReadAsBuffer).toHaveBeenCalledTimes(1);
     fireEvent.click(toggleVocalsSwitch);
     await waitFor(() => {
-      expect(mockIfFileExists).toHaveBeenCalled();
-      expect(mockReadAsBuffer).toHaveBeenCalled();
+      expect(mockIfFileExists).toHaveBeenCalledTimes(2);
+      expect(mockReadAsBuffer).toHaveBeenCalledTimes(2);
     });
   });
 
