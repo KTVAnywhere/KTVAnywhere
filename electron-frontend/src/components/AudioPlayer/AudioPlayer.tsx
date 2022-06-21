@@ -1,4 +1,11 @@
-import { Grid, IconButton, Slider, Switch, Typography } from '@mui/material';
+import {
+  Box,
+  Grid,
+  IconButton,
+  Slider,
+  Switch,
+  Typography,
+} from '@mui/material';
 import { PitchShifter } from 'soundtouchjs';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
@@ -13,6 +20,7 @@ import { useEffect } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../Alert.context';
 import { useAudioStatus } from './AudioStatus.context';
+import { LyricsAdjust } from '../LyricsPlayer';
 
 const ProgressBar = () => {
   const { duration, currentTime, setCurrentTime, source } = useAudioStatus();
@@ -245,7 +253,15 @@ export const AudioPlayer = () => {
   };
 
   const toggleLyrics = () => {
-    setLyricsEnabled((state) => !state);
+    if (!lyricsEnabled && !currentSong?.lyricsPath) {
+      setAlertMessage({
+        message: 'Lyrics file not found',
+        severity: 'info',
+      });
+      setShowAlertMessage(true);
+    } else {
+      setLyricsEnabled((state) => !state);
+    }
   };
 
   const enableVocals = () => {
@@ -316,6 +332,9 @@ export const AudioPlayer = () => {
       setIsPlaying(true);
       setIsPlayingVocals(true);
     });
+    if (!nextSong.lyricsPath) {
+      setLyricsEnabled(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nextSong]);
 
@@ -456,7 +475,12 @@ export const AudioPlayer = () => {
           <Typography>Volume: {volume}%</Typography>
         </Grid>
         <Grid item>
-          <Grid container direction="row" alignItems="center">
+          <Grid
+            container
+            direction="row"
+            alignItems="center"
+            position="relative"
+          >
             <LyricsIcon sx={{ fontSize: '30px' }} />
             <Switch
               checked={lyricsEnabled}
@@ -464,6 +488,9 @@ export const AudioPlayer = () => {
               onClick={toggleLyrics}
               color="secondary"
             />
+            <Box position="absolute" top="0" left="100px">
+              {lyricsEnabled && currentSong?.lyricsPath && <LyricsAdjust />}
+            </Box>
           </Grid>
           <Typography align="center">lyrics</Typography>
         </Grid>

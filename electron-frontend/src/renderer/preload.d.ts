@@ -14,6 +14,7 @@ declare global {
         read(filePath: string): Promise<string>;
         readAsBuffer(filePath: string): Promise<Buffer>;
         ifFileExists(filePath: string): boolean;
+        write(filePath: string, data: string): Promise<{ error?: Error }>;
       };
       music: {
         getLrc(song: SongProps): Promise<{ lyricsPath: string; error?: Error }>;

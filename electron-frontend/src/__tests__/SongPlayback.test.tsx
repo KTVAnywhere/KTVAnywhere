@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { Lrc, Runner } from 'lrc-kit';
 import { AudioContext, AudioBuffer } from 'standardized-audio-context-mock';
 import mockedElectron, { mockedAudioStatus } from '../__testsData__/mocks';
 import {
@@ -9,9 +10,13 @@ import {
   lineAt10s,
 } from '../__testsData__/testData';
 import { AlertMessageProvider } from '../components/Alert.context';
-import LyricsPlayer from '../components/LyricsPlayer';
+import LyricsPlayer, {
+  LyricsAdjust,
+  LyricsProvider,
+} from '../components/LyricsPlayer';
 import AudioPlayer, { AudioStatusProvider } from '../components/AudioPlayer';
 import * as AudioStatusContext from '../components/AudioPlayer/AudioStatus.context';
+import * as LyricsContext from '../components/LyricsPlayer/Lyrics.context';
 
 describe('Lyrics player', () => {
   let mockRead = jest.fn().mockResolvedValue(testLyrics);
@@ -21,6 +26,7 @@ describe('Lyrics player', () => {
     global.window.electron = {
       ...mockedElectron,
       file: {
+        ...mockedElectron.file,
         read: mockRead,
         readAsBuffer: jest.fn(),
         ifFileExists: jest.fn(),
@@ -40,7 +46,9 @@ describe('Lyrics player', () => {
       .mockReturnValue({ ...mockedAudioStatus, currentSong: songTestData[0] });
     render(
       <AudioStatusProvider>
-        <LyricsPlayer />
+        <LyricsProvider>
+          <LyricsPlayer />
+        </LyricsProvider>
       </AudioStatusProvider>
     );
     await waitFor(() =>
@@ -56,7 +64,9 @@ describe('Lyrics player', () => {
     });
     render(
       <AudioStatusProvider>
-        <LyricsPlayer />
+        <LyricsProvider>
+          <LyricsPlayer />
+        </LyricsProvider>
       </AudioStatusProvider>
     );
     const line = screen.getByTestId('lyrics');
@@ -74,13 +84,74 @@ describe('Lyrics player', () => {
     });
     render(
       <AudioStatusProvider>
-        <LyricsPlayer />
+        <LyricsProvider>
+          <LyricsPlayer />
+        </LyricsProvider>
       </AudioStatusProvider>
     );
     const line = screen.getByTestId('lyrics');
     const nextLine = screen.getByTestId('next-lyrics');
     await waitFor(() => expect(line).toHaveTextContent(''));
     await waitFor(() => expect(nextLine).toHaveTextContent(''));
+  });
+});
+
+describe('Lyrics adjust', () => {
+  afterAll(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+  test('click plus and minus button should change the offset by 0.2', () => {
+    const mockSet = jest.fn();
+    jest.spyOn(LyricsContext, 'useLyrics').mockReturnValue({
+      lyricsRunner: new Runner(Lrc.parse('')),
+      setLyricsRunner: mockSet,
+    });
+    render(
+      <LyricsProvider>
+        <LyricsAdjust />
+      </LyricsProvider>
+    );
+
+    const offsetField = screen.getByTestId('offset');
+    const minusButton = screen.getByRole('button', { name: /stepDown/i });
+    const plusButton = screen.getByRole('button', { name: /stepUp/i });
+
+    expect(offsetField).toHaveValue(0);
+    fireEvent.click(minusButton);
+    expect(offsetField).toHaveValue(-0.2);
+    fireEvent.click(plusButton);
+    expect(offsetField).toHaveValue(0);
+    expect(mockSet).toBeCalledTimes(2);
+  });
+
+  test('click tick button should update lyrics file', async () => {
+    const mockWrite = jest.fn().mockResolvedValue({});
+    global.window.electron = {
+      ...mockedElectron,
+      file: {
+        ...mockedElectron.file,
+        write: mockWrite,
+      },
+    };
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+    });
+
+    render(
+      <AlertMessageProvider>
+        <LyricsProvider>
+          <LyricsAdjust />
+        </LyricsProvider>
+      </AlertMessageProvider>
+    );
+
+    const tickButton = screen.getByRole('button', { name: /saveOffset/i });
+
+    fireEvent.click(tickButton);
+    await waitFor(() => expect(mockWrite).toBeCalled());
   });
 });
 
@@ -99,6 +170,7 @@ describe('Audio player component tests', () => {
         },
       },
       file: {
+        ...mockedElectron.file,
         read: jest.fn(),
         readAsBuffer: jest
           .fn()

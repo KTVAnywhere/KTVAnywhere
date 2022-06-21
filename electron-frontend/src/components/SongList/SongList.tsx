@@ -84,14 +84,10 @@ const SongCard = ({
             {song.artist}
           </Typography>
           <Stack direction="row" spacing={1} pt="10px">
-            {!isProcessed() ? (
-              <></>
-            ) : (
+            {isProcessed() && (
               <Chip label="Processed" color="success" size="small" />
             )}
-            {!song.lyricsPath ? (
-              <></>
-            ) : (
+            {song.lyricsPath && (
               <Chip label="Lyrics" color="success" size="small" />
             )}
           </Stack>
