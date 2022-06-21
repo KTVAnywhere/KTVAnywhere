@@ -18,6 +18,7 @@ import {
   resolveHtmlPath,
   openFiles,
   openFile,
+  writeFile,
   processSongDetails,
   getLrcFile,
 } from './util';
@@ -45,6 +46,11 @@ ipcMain.handle('file:readAsBuffer', async (_, filePath: string) => {
 
 ipcMain.on('file:ifFileExists', (event, filePath) => {
   event.returnValue = fs.existsSync(filePath);
+});
+
+ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
+  const result = await writeFile(filePath, data);
+  return result;
 });
 
 if (process.env.NODE_ENV === 'production') {

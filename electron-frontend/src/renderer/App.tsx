@@ -31,7 +31,7 @@ import {
 } from '../components/Alert.context';
 import { AudioStatusProvider } from '../components/AudioPlayer/AudioStatus.context';
 import AudioPlayer from '../components/AudioPlayer';
-import LyricsPlayer from '../components/LyricsPlayer';
+import LyricsPlayer, { LyricsProvider } from '../components/LyricsPlayer';
 import './App.css';
 import {
   ConfirmationDialog,
@@ -214,7 +214,9 @@ export default function App() {
               <AlertMessageProvider>
                 <SongsStatusProvider>
                   <AudioStatusProvider>
-                    <MainPage />
+                    <LyricsProvider>
+                      <MainPage />
+                    </LyricsProvider>
                   </AudioStatusProvider>
                 </SongsStatusProvider>
               </AlertMessageProvider>

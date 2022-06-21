@@ -2,51 +2,43 @@ import { useEffect, useState } from 'react';
 import { Grid, Typography } from '@mui/material';
 import { Lrc, Runner } from 'lrc-kit';
 import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
+import { useLyrics } from './Lyrics.context';
 
 const LyricsPlayer = () => {
   const [lyrics, setLyrics] = useState('');
   const [nextLyrics, setNextLyrics] = useState('');
-  const [runner, setRunner] = useState(new Runner(Lrc.parse(''), true));
   const { currentSong, currentTime, lyricsEnabled } = useAudioStatus();
+  const { lyricsRunner, setLyricsRunner } = useLyrics();
 
   useEffect(() => {
-    if (currentSong === null) {
-      setLyrics('file not loaded');
-      setRunner(new Runner(Lrc.parse('')));
+    if (!lyricsEnabled || currentSong == null) {
+      setLyricsRunner(new Runner(Lrc.parse(''), true));
     } else if (!currentSong.lyricsPath) {
       setLyrics('no lyrics file for song');
-      setRunner(new Runner(Lrc.parse('')));
+      setLyricsRunner(new Runner(Lrc.parse(''), true));
     } else {
       window.electron.file
         .read(currentSong.lyricsPath)
-        .then((lyricsData) => setRunner(new Runner(Lrc.parse(lyricsData))))
+        .then((lyricsData) =>
+          setLyricsRunner(new Runner(Lrc.parse(lyricsData), true))
+        )
         .catch((err) => console.log(err));
     }
-  }, [currentSong]);
+  }, [currentSong, lyricsEnabled, setLyricsRunner]);
 
   useEffect(() => {
-    if (lyricsEnabled) {
-      runner.timeUpdate(currentTime);
-      try {
-        setLyrics(runner.curLyric().content);
-      } catch {
-        setLyrics('');
-      }
-      try {
-        const currIndex = runner.curIndex();
-        setNextLyrics(runner.getLyric(currIndex + 1).content);
-      } catch {
-        setNextLyrics('');
-      }
-    }
-  }, [currentTime, lyricsEnabled, runner]);
-
-  useEffect(() => {
-    if (!lyricsEnabled) {
+    lyricsRunner.timeUpdate(currentTime);
+    const lyricsLength = lyricsRunner.getLyrics().length;
+    try {
+      setLyrics(lyricsRunner.curLyric().content);
+      const nextIndex = lyricsRunner.curIndex() + 1;
+      if (nextIndex < lyricsLength)
+        setNextLyrics(lyricsRunner.getLyric(nextIndex).content);
+    } catch {
       setLyrics('');
       setNextLyrics('');
     }
-  }, [lyricsEnabled]);
+  }, [currentTime, lyricsRunner]);
 
   return (
     <Grid container direction="column" alignItems="center" textAlign="center">

@@ -22,6 +22,9 @@ contextBridge.exposeInMainWorld('electron', {
     ifFileExists(filePath: string) {
       return ipcRenderer.sendSync('file:ifFileExists', filePath);
     },
+    write(filePath: string, data: string) {
+      return ipcRenderer.invoke('file:write', filePath, data);
+    },
   },
   music: {
     getLrc(song: SongProps) {

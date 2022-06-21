@@ -35,6 +35,19 @@ export const openFile = async (config: Electron.OpenDialogOptions) => {
   return filePaths[0];
 };
 
+export const writeFile = async (filePath: string, data: string) => {
+  try {
+    const pathDirectory = path.parse(filePath).dir;
+    if (!fs.existsSync(pathDirectory)) {
+      fs.mkdirSync(pathDirectory, { recursive: true });
+    }
+    await fs.promises.writeFile(filePath, data);
+    return {};
+  } catch (error) {
+    return { error: error as Error };
+  }
+};
+
 export const processSongDetails = async (songPaths: string[]) => {
   const items = await Promise.all(
     songPaths.map(async (songPath) => {
@@ -87,25 +100,25 @@ export const findLyric = async (
 export const getLrcFile = async (song: SongProps) => {
   const netease = new NeteaseMusic();
   try {
-    const lyricsPath = await findNeteaseSongId(
+    const { lyricsPath, error } = await findNeteaseSongId(
       netease,
       song.songName,
       song.artist
     )
       .then((neteaseSongId) => findLyric(netease, neteaseSongId))
-      .then((lyric) => {
-        const songFolder = path.join(
+      .then(async (lyric) => {
+        const lyricsFile = path.join(
           app.getPath('userData'),
           'songs',
-          song.songId
+          song.songId,
+          'lyrics.lrc'
         );
-        if (!fs.existsSync(songFolder)) {
-          fs.mkdirSync(songFolder, { recursive: true });
-        }
-        const lyricsFile = path.join(songFolder, 'lyrics.lrc');
-        fs.promises.writeFile(lyricsFile, lyric);
-        return lyricsFile;
+        const { error: writeError } = await writeFile(lyricsFile, lyric);
+        return { lyricsPath: lyricsFile, error: writeError };
       });
+    if (error) {
+      return { lyricsPath: '', error };
+    }
     return { lyricsPath };
   } catch (error) {
     return { lyricsPath: '', error: error as Error };
