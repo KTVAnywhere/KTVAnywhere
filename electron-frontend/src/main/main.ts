@@ -260,7 +260,8 @@ app
       getAllQueueItems,
       setAllQueueItems,
     } = queueItemFunctions;
-    const { getPlayingSong, setPlayingSong } = configFunctions;
+    const { getPlayingSong, setPlayingSong, getSettings, setSettings } =
+      configFunctions;
     const fuseOptions = {
       keys: ['songName', 'artist'],
       findAllMatches: true,
@@ -352,6 +353,14 @@ app
 
     ipcMain.on('store:setPlayingSong', (_, playingSong) => {
       setPlayingSong(configStore, playingSong);
+    });
+
+    ipcMain.on('store:getSettings', (event) => {
+      event.returnValue = getSettings(configStore);
+    });
+
+    ipcMain.on('store:setSettings', (_, settings) => {
+      setSettings(configStore, settings);
     });
   })
   .catch(console.error);

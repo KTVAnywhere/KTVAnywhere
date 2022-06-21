@@ -46,6 +46,8 @@ declare global {
         config: {
           getPlayingSong(): ConfigType['playingSong'];
           setPlayingSong(playingSong: ConfigType['playingSong']): void;
+          getSettings(): ConfigType['settings'];
+          setSettings(settings: ConfigType['settings']): void;
         };
       };
       preprocess: {

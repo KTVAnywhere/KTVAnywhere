@@ -128,6 +128,7 @@ export const AudioPlayer = () => {
 
   const destroySource = () => {
     if (source) {
+      source.off();
       source.disconnect();
       setSource(null);
     }
@@ -249,7 +250,7 @@ export const AudioPlayer = () => {
 
   const enableVocals = () => {
     if (currentSong) {
-      loadSong(currentSong.songPath, true, true, () =>
+      loadSong(currentSong.songPath, true, isPlaying, () =>
         setIsPlayingVocals(true)
       );
     }
@@ -264,7 +265,7 @@ export const AudioPlayer = () => {
         });
         setShowAlertMessage(true);
       } else {
-        loadSong(currentSong.accompanimentPath, true, true, () =>
+        loadSong(currentSong.accompanimentPath, true, isPlaying, () =>
           setIsPlayingVocals(false)
         );
       }
@@ -275,9 +276,8 @@ export const AudioPlayer = () => {
     if (GetQueueLength() > 0) {
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, true, () => {
+        loadSong(song.songPath, false, isPlaying, () => {
           setCurrentSong(song);
-          setIsPlaying(true);
           setIsPlayingVocals(true);
         });
       }

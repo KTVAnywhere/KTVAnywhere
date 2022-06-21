@@ -8,7 +8,9 @@ import {
   Container,
   CssBaseline,
   Snackbar,
+  IconButton,
 } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList from '../components/SongsQueue';
 import {
@@ -37,6 +39,7 @@ import {
   ConfirmationDialog,
   ConfirmationProvider,
 } from '../components/ConfirmationDialog';
+import SettingsMenu from '../components/Settings';
 
 const darkTheme = createTheme({
   palette: {
@@ -54,6 +57,7 @@ const darkTheme = createTheme({
 
 const MainPage = () => {
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
@@ -119,7 +123,9 @@ const MainPage = () => {
       <CssBaseline enableColorScheme />
       <Snackbar
         open={showAlertMessage}
-        autoHideDuration={5000}
+        autoHideDuration={
+          window.electron.store.config.getSettings().errorMessagesTimeout * 1000
+        }
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         onClose={(_event, reason) => {
           if (reason === 'clickaway') return;
@@ -199,6 +205,17 @@ const MainPage = () => {
       >
         <AudioPlayer />
       </Container>
+      <IconButton
+        sx={{ position: 'fixed', bottom: 20, right: 20, padding: 0 }}
+        data-testid="settings-button"
+        onClick={() => setShowSettings(true)}
+      >
+        <SettingsIcon sx={{ fontSize: '50px' }} />
+      </IconButton>
+      <SettingsMenu
+        showSettings={showSettings}
+        setShowSettings={setShowSettings}
+      />
     </Container>
   );
 };

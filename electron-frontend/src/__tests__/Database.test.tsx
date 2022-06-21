@@ -213,6 +213,11 @@ describe('config store', () => {
     set: mockSet,
   };
 
+  afterEach(() => {
+    mockGet.mockClear();
+    mockSet.mockClear();
+  });
+
   test('get settings for playing song', () => {
     const { getPlayingSong } = configFunctions;
     getPlayingSong(configStore);
@@ -232,5 +237,20 @@ describe('config store', () => {
     };
     setPlayingSong(configStore, playingSong);
     expect(mockSet).toBeCalledWith('playingSong', playingSong);
+  });
+
+  test('get settings', () => {
+    const { getSettings } = configFunctions;
+    getSettings(configStore);
+    expect(mockGet).toBeCalled();
+  });
+
+  test('set settings', () => {
+    const { setSettings } = configFunctions;
+    const updatedSettings: ConfigType['settings'] = {
+      errorMessagesTimeout: 5,
+    };
+    setSettings(configStore, updatedSettings);
+    expect(mockSet).toBeCalledWith('settings', updatedSettings);
   });
 });

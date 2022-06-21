@@ -33,6 +33,9 @@ export const createConfigStore = () =>
         vocalsEnabled: true,
         lyricsEnabled: true,
       },
+      settings: {
+        errorMessagesTimeout: 5,
+      },
     },
   });
 
@@ -135,4 +138,7 @@ export const configFunctions = {
     store: Store<ConfigType>,
     playingSong: ConfigType['playingSong']
   ) => store.set('playingSong', playingSong),
+  getSettings: (store: Store<ConfigType>) => store.get('settings'),
+  setSettings: (store: Store<ConfigType>, settings: ConfigType['settings']) =>
+    store.set('settings', settings),
 };

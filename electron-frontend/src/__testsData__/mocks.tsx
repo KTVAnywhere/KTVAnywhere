@@ -37,6 +37,12 @@ const mockedElectron = {
         };
       },
       setPlayingSong: jest.fn(),
+      getSettings: () => {
+        return {
+          errorMessagesTimeout: 5,
+        };
+      },
+      setSettings: jest.fn(),
     },
   },
   preprocess: {
@@ -55,6 +61,8 @@ class MockSource {
   connect = (_other: unknown) => {};
 
   disconnect = () => {};
+
+  off = () => {};
 }
 
 export const mockedAudioStatus = {

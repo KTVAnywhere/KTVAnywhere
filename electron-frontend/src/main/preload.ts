@@ -96,6 +96,12 @@ contextBridge.exposeInMainWorld('electron', {
       setPlayingSong(playingSong: ConfigType['playingSong']) {
         ipcRenderer.send('store:setPlayingSong', playingSong);
       },
+      getSettings() {
+        return ipcRenderer.sendSync('store:getSettings');
+      },
+      setSettings(settings: ConfigType['settings']) {
+        ipcRenderer.send('store:setSettings', settings);
+      },
     },
   },
   preprocess: {
