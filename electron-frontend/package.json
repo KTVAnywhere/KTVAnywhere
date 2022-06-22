@@ -247,7 +247,6 @@
     },
     "linux": {
       "target": [
-        "flatpak",
         "deb"
       ],
       "category": "Development"
