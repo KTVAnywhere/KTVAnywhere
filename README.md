@@ -72,7 +72,7 @@ Spotted a bug? Please create a post on the [issues page]
 
 >(Hennequin et al. 2020)<br><br>
 Hennequin, Romain, Anis Khlif, Felix Voituret, and Manuel Moussallam. 2020. “Spleeter: A Fast and Efficient Music Source Separation Tool with Pre-Trained Models.” Journal of Open Source Software 5 (50). The Open Journal: 2154. doi:10.21105/joss.02154.
-```
+
 
    [releases page]: <https://github.com/weiquany/KTVAnywhere/releases>
    [issues page]: <https://github.com/weiquany/KTVAnywhere/issues>
