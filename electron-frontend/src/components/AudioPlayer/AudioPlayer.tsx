@@ -4,6 +4,7 @@ import {
   IconButton,
   Slider,
   Switch,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { PitchShifter } from 'soundtouchjs';
@@ -158,7 +159,11 @@ export const AudioPlayer = () => {
     playNow: boolean
   ) => {
     setDuration(audioBuffer.duration);
-    const newSource = new PitchShifter(audioContext, audioBuffer, 4096);
+    const newSource = new PitchShifter(
+      audioContext,
+      audioBuffer,
+      window.electron.store.config.getSettings().audioBufferSize
+    );
     newSource.on('play', onPlay);
     newSource.percentagePlayed = percentagePlayed;
     newSource.pitchSemitones = pitch;
@@ -384,12 +389,22 @@ export const AudioPlayer = () => {
           item
           sx={{ position: 'absolute', left: '2%', right: '85%', top: 0 }}
         >
-          <Typography noWrap sx={{ fontSize: '32px' }}>
-            {currentSong?.songName}
-          </Typography>
-          <Typography noWrap sx={{ fontSize: '24px', opacity: '80%' }}>
-            {currentSong?.artist}
-          </Typography>
+          <Tooltip
+            title={currentSong ? currentSong.songName : ''}
+            placement="right"
+          >
+            <Typography noWrap sx={{ fontSize: '24px' }}>
+              {currentSong?.songName}
+            </Typography>
+          </Tooltip>
+          <Tooltip
+            title={currentSong ? currentSong.artist : ''}
+            placement="right"
+          >
+            <Typography noWrap sx={{ fontSize: '20px', opacity: '80%' }}>
+              {currentSong?.artist}
+            </Typography>
+          </Tooltip>
         </Grid>
         <Grid item>
           <Grid container direction="row" alignItems="center">

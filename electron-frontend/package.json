@@ -247,7 +247,8 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "flatpak",
+        "deb"
       ],
       "category": "Development"
     },

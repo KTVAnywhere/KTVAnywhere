@@ -35,6 +35,7 @@ export const createConfigStore = () =>
       },
       settings: {
         errorMessagesTimeout: 5,
+        audioBufferSize: 4096,
       },
     },
   });

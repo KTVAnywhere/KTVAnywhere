@@ -249,6 +249,7 @@ describe('config store', () => {
     const { setSettings } = configFunctions;
     const updatedSettings: ConfigType['settings'] = {
       errorMessagesTimeout: 5,
+      audioBufferSize: 8192,
     };
     setSettings(configStore, updatedSettings);
     expect(mockSet).toBeCalledWith('settings', updatedSettings);

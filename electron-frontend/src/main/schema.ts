@@ -30,6 +30,7 @@ export interface ConfigType {
   };
   settings: {
     errorMessagesTimeout: number;
+    audioBufferSize: number;
   };
 }
 
@@ -91,6 +92,7 @@ const configSchema: Schema<ConfigType> = {
     type: 'object',
     properties: {
       errorMessagesTimeout: { type: 'number' },
+      audioBufferSize: { type: 'number' },
     },
   },
 };
