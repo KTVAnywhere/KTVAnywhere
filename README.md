@@ -38,6 +38,7 @@ Download and install the latest release from the [releases page].
 * Under git master build, click on 'ffmpeg-git-essentials.7z'. The file should start downloading.
 ![chrome_z2Vsx5cGsd](https://user-images.githubusercontent.com/19296886/175204729-2524d4a9-ebaa-4cf4-a22e-9064e753504b.png)
 * After the zip file has finished downloading, unzip it and rename the folder to ffmpeg and move it to any directory *(eg. C:\Program Files)*
+
 ![explorer_YmGn5bEG1L](https://user-images.githubusercontent.com/19296886/175205601-f2fff3f5-9834-4f3c-8c3f-1eee3885a0e3.png)
 ![explorer_RVvjHlN5Xt](https://user-images.githubusercontent.com/19296886/175205609-9ee1575a-adfa-452f-8ece-da64032cbd14.png)
 ![explorer_wKmHGYCGmQ](https://user-images.githubusercontent.com/19296886/175205622-f0c6344e-2ab2-4467-99d4-a75beef4ec88.png)
