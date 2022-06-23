@@ -34,13 +34,22 @@ Download and install the latest release from the [releases page].
 
 1. **Download**
 * Goto their [website](https://ffmpeg.org/download.html#build-windows) and click on Windows builds from gyan.dev
+![chrome_KELTCMQdqz](https://user-images.githubusercontent.com/19296886/175204696-7343e1ae-adcb-41f9-b583-f21eb6965dc1.png)
 * Under git master build, click on 'ffmpeg-git-essentials.7z'. The file should start downloading.
-* After the zip file has finished downloading, unzip it to any directory *(eg. C:\Program Files)* 
+![chrome_z2Vsx5cGsd](https://user-images.githubusercontent.com/19296886/175204729-2524d4a9-ebaa-4cf4-a22e-9064e753504b.png)
+* After the zip file has finished downloading, unzip it and rename the folder to ffmpeg and move it to any directory *(eg. C:\Program Files)*
+![explorer_YmGn5bEG1L](https://user-images.githubusercontent.com/19296886/175205601-f2fff3f5-9834-4f3c-8c3f-1eee3885a0e3.png)
+![explorer_RVvjHlN5Xt](https://user-images.githubusercontent.com/19296886/175205609-9ee1575a-adfa-452f-8ece-da64032cbd14.png)
+![explorer_wKmHGYCGmQ](https://user-images.githubusercontent.com/19296886/175205622-f0c6344e-2ab2-4467-99d4-a75beef4ec88.png)
 2. **Add FFMPEG to path**
 * Click on the start icon and search for 'Edit the system environment variables'. Click on the result that matches.
-* Click on 'Edit Variables..'. A new window should pop up.
-* Under system variables , look for the 'Path' variable and click 'Edit...'. A new window should pop up.
-* Click on 'New' and add the path to ffmpeg\bin *(eg. C:\Program Files\ffmpeg\bin)*. 
+![NVIDIA_Share_VFaH1SbZ4o](https://user-images.githubusercontent.com/19296886/175205930-7a02edaf-f996-4c5a-bf74-cdb726535842.png)
+* Click on 'Edit Variables..'. A new window should pop up, then click on 'Environment Variables...'.
+![NVIDIA_Share_xkn7ySgk0J](https://user-images.githubusercontent.com/19296886/175206001-747c39e3-1426-4a0b-a267-44af2db191dd.png)
+* Under system variables , select the 'Path' variable and click 'Edit...'. A new window should pop up.
+![SystemPropertiesAdvanced_D5jNzwruu8](https://user-images.githubusercontent.com/19296886/175206235-06daf890-3b85-4f58-bf68-8ed61c0ed1ed.png)
+* Click on 'New' and add the path to ffmpeg\bin *(eg. C:\Program Files\ffmpeg\bin)*.
+![SystemPropertiesAdvanced_2CknDdW8me](https://user-images.githubusercontent.com/19296886/175206573-f25c28f1-2944-457a-9e3e-f2cae736c09b.png)
 * Click on 'OK' to close all the windows opened.
 
 
