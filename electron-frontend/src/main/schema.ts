@@ -31,6 +31,7 @@ export interface ConfigType {
   settings: {
     errorMessagesTimeout: number;
     audioBufferSize: number;
+    colorThemeId: number;
   };
 }
 

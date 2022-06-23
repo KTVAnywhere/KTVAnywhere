@@ -6,7 +6,6 @@ body {
   position: relative;
   color: white;
   height: 100vh;
-  background: linear-gradient(315deg, #004661 0%, black 74%);
 
   font-family: sans-serif;
   overflow-y: hidden;

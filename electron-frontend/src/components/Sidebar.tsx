@@ -1,13 +1,15 @@
 import { ReactNode } from 'react';
 import { Drawer } from '@mui/material';
+import { GetColorTheme } from './Settings';
 
 interface SidebarProps {
   children: ReactNode;
 }
 
-const backgroundColor = '#2C2F33';
 const drawerHeight = 'calc(100vh - 130px)';
 export const LeftSidebar = ({ children }: SidebarProps) => {
+  const backgroundColor = GetColorTheme().sidebarBackground;
+
   return (
     <Drawer
       sx={{
@@ -26,6 +28,7 @@ export const LeftSidebar = ({ children }: SidebarProps) => {
 };
 
 export const RightSidebar = ({ children }: SidebarProps) => {
+  const backgroundColor = GetColorTheme().sidebarBackground;
   return (
     <Drawer
       sx={{

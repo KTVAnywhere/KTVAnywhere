@@ -18,7 +18,13 @@ describe('Settings menu component test', () => {
 
   test('click close settings button should close settings menu', () => {
     const mockSetShowSettings = jest.fn();
-    render(<SettingsMenu showSettings setShowSettings={mockSetShowSettings} />);
+    render(
+      <SettingsMenu
+        showSettings
+        setShowSettings={mockSetShowSettings}
+        setCurrentTheme={jest.fn()}
+      />
+    );
     const closeSettingsButton = screen.getAllByRole('button', {
       name: /Close/i,
     })[0];
@@ -38,9 +44,15 @@ describe('Settings menu component test', () => {
         },
       },
     };
-    render(<SettingsMenu showSettings setShowSettings={jest.fn()} />);
+    render(
+      <SettingsMenu
+        showSettings
+        setShowSettings={jest.fn()}
+        setCurrentTheme={jest.fn()}
+      />
+    );
 
-    const errorMessagesTimeoutOptions = screen.getAllByRole('button')[0];
+    const errorMessagesTimeoutOptions = screen.getAllByRole('button')[1];
     fireEvent.mouseDown(errorMessagesTimeoutOptions);
 
     fireEvent.click(within(screen.getByRole('listbox')).getByText(/15s/));

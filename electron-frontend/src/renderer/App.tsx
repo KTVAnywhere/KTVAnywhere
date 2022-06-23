@@ -1,6 +1,6 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Button,
@@ -9,6 +9,7 @@ import {
   CssBaseline,
   Snackbar,
   IconButton,
+  PaletteMode,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
@@ -39,23 +40,16 @@ import {
   ConfirmationDialog,
   ConfirmationProvider,
 } from '../components/ConfirmationDialog';
-import SettingsMenu from '../components/Settings';
+import SettingsMenu, {
+  ColorThemeProps,
+  GetColorTheme,
+} from '../components/Settings';
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#00ADB5',
-    },
-  },
-  typography: {
-    button: {
-      textTransform: 'none',
-    },
-  },
-});
-
-const MainPage = () => {
+const MainPage = ({
+  setCurrentTheme,
+}: {
+  setCurrentTheme: Dispatch<SetStateAction<ColorThemeProps>>;
+}) => {
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
@@ -196,7 +190,7 @@ const MainPage = () => {
       <Container
         maxWidth={false}
         sx={{
-          bgcolor: '#222831',
+          bgcolor: GetColorTheme().audioPlayerBackground,
           height: '130px',
           position: 'fixed',
           left: 0,
@@ -215,24 +209,52 @@ const MainPage = () => {
       <SettingsMenu
         showSettings={showSettings}
         setShowSettings={setShowSettings}
+        setCurrentTheme={setCurrentTheme}
       />
     </Container>
   );
 };
 
 export default function App() {
+  const [currentTheme, setCurrentTheme] = useState(GetColorTheme());
+
+  const chosenTheme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: currentTheme.mode as PaletteMode,
+          primary: {
+            main: currentTheme.primary,
+          },
+          secondary: {
+            main: currentTheme.secondary,
+          },
+          background: {
+            default: currentTheme.mainPageBackground,
+            paper: currentTheme.paperBackground,
+          },
+        },
+        typography: {
+          button: {
+            textTransform: 'none',
+          },
+        },
+      }),
+    [currentTheme]
+  );
+
   return (
     <Router>
       <Routes>
         <Route
           path="/"
           element={
-            <ThemeProvider theme={darkTheme}>
+            <ThemeProvider theme={chosenTheme}>
               <AlertMessageProvider>
                 <SongsStatusProvider>
                   <AudioStatusProvider>
                     <LyricsProvider>
-                      <MainPage />
+                      <MainPage setCurrentTheme={setCurrentTheme} />
                     </LyricsProvider>
                   </AudioStatusProvider>
                 </SongsStatusProvider>

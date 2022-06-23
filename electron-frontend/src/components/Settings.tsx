@@ -13,12 +13,56 @@ import {
 } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
+export interface ColorThemeProps {
+  colorThemeId: number;
+  name: string;
+  mode: string;
+  primary: string;
+  secondary: string;
+  mainPageBackground: string;
+  paperBackground: string;
+  sidebarBackground: string;
+  audioPlayerBackground: string;
+}
+
+const ColorThemes: ColorThemeProps[] = [
+  {
+    colorThemeId: 0,
+    name: 'default',
+    mode: 'dark',
+    primary: '#86C232',
+    secondary: '#61892F',
+    mainPageBackground: '#6C6F6F',
+    paperBackground: '#222629',
+    sidebarBackground: '#474B4B',
+    audioPlayerBackground: '#222629',
+  },
+  {
+    colorThemeId: 1,
+    name: 'ocean',
+    mode: 'dark',
+    primary: '#8DA9C4',
+    secondary: '#EEF4ED',
+    mainPageBackground: '#0E3158',
+    paperBackground: '#0D2444',
+    sidebarBackground: '#134074',
+    audioPlayerBackground: '#0D2444',
+  },
+];
+
+export const GetColorTheme = () => {
+  const currentId = window.electron.store.config.getSettings().colorThemeId;
+  return ColorThemes[currentId + 1 > ColorThemes.length ? 0 : currentId];
+};
+
 const SettingsMenu = ({
   showSettings,
   setShowSettings,
+  setCurrentTheme,
 }: {
   showSettings: boolean;
   setShowSettings: Dispatch<SetStateAction<boolean>>;
+  setCurrentTheme: Dispatch<SetStateAction<ColorThemeProps>>;
 }) => {
   const getCurrentSettings = () => window.electron.store.config.getSettings();
   const [errorMessagesTimeout, setErrorMessagesTimeout] = useState<number>(
@@ -27,30 +71,76 @@ const SettingsMenu = ({
   const [audioBufferSize, setAudioBufferSize] = useState<number>(
     getCurrentSettings().audioBufferSize
   );
+  const [colorThemeId, setColorThemeId] = useState(
+    getCurrentSettings().colorThemeId
+  );
 
   useEffect(() => {
     window.electron.store.config.setSettings({
       errorMessagesTimeout,
       audioBufferSize,
+      colorThemeId,
     });
-  }, [audioBufferSize, errorMessagesTimeout]);
+  }, [errorMessagesTimeout, audioBufferSize, colorThemeId]);
 
-  const handleErrorTimeoutChange = (event: SelectChangeEvent<number>) => {
+  const errorTimeoutChange = (event: SelectChangeEvent<number>) => {
     setErrorMessagesTimeout(event.target.value as number);
   };
 
-  const handleAudioBufferSizeChange = (event: SelectChangeEvent<number>) => {
+  const audioBufferSizeChange = (event: SelectChangeEvent<number>) => {
     setAudioBufferSize(event.target.value as number);
   };
 
+  const colorThemeChange = (event: SelectChangeEvent<number>) => {
+    setColorThemeId(event.target.value as number);
+  };
+
+  const closeDialog = () => {
+    setShowSettings(false);
+    setCurrentTheme(GetColorTheme());
+  };
+
   return (
-    <Dialog
-      fullWidth
-      maxWidth="sm"
-      open={showSettings}
-      onClose={() => setShowSettings(false)}
-    >
+    <Dialog fullWidth maxWidth="sm" open={showSettings} onClose={closeDialog}>
       <DialogTitle>Settings</DialogTitle>
+      <DialogContent>
+        <Grid container>
+          <Grid
+            item
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+          >
+            <Typography sx={{ opacity: '90%' }}>Color theme</Typography>
+          </Grid>
+          <Grid
+            item
+            sx={{ marginLeft: 'auto' }}
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+          >
+            <FormControl sx={{ minWidth: 100 }}>
+              <Select
+                value={colorThemeId}
+                onChange={colorThemeChange}
+                renderValue={() => ColorThemes[colorThemeId].name}
+              >
+                {ColorThemes.map((_idx, index) => {
+                  return (
+                    <MenuItem
+                      key={ColorThemes[index].colorThemeId}
+                      value={index}
+                    >
+                      {ColorThemes[index].name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </DialogContent>
       <DialogContent>
         <Grid container>
           <Grid
@@ -73,7 +163,7 @@ const SettingsMenu = ({
             <FormControl sx={{ minWidth: 100 }}>
               <Select
                 value={errorMessagesTimeout}
-                onChange={handleErrorTimeoutChange}
+                onChange={errorTimeoutChange}
               >
                 <MenuItem value={5}>5s</MenuItem>
                 <MenuItem value={10}>10s</MenuItem>
@@ -107,10 +197,7 @@ const SettingsMenu = ({
             justifyContent="center"
           >
             <FormControl sx={{ minWidth: 100 }}>
-              <Select
-                value={audioBufferSize}
-                onChange={handleAudioBufferSizeChange}
-              >
+              <Select value={audioBufferSize} onChange={audioBufferSizeChange}>
                 <MenuItem value={4096}>4096</MenuItem>
                 <MenuItem value={8192}>8192</MenuItem>
                 <MenuItem value={16384}>16384</MenuItem>
@@ -120,7 +207,7 @@ const SettingsMenu = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setShowSettings(false)}>Close</Button>
+        <Button onClick={closeDialog}>Close</Button>
       </DialogActions>
     </Dialog>
   );

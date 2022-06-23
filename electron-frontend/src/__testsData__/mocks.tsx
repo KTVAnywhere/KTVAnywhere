@@ -41,6 +41,7 @@ const mockedElectron = {
         return {
           errorMessagesTimeout: 5,
           audioBufferSize: 4096,
+          colorThemeId: 0,
         };
       },
       setSettings: jest.fn(),
