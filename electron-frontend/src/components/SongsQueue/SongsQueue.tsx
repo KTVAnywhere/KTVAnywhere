@@ -111,15 +111,17 @@ export const QueueList = () => {
       >
         Songs Queue
       </Typography>
-      <Button
-        size="small"
-        variant="contained"
-        data-testid="clear-queue-button"
-        onClick={() => clearQueue()}
-        color="error"
-      >
-        Clear queue
-      </Button>
+      {queueItems.length > 0 && (
+        <Button
+          size="small"
+          variant="contained"
+          data-testid="clear-queue-button"
+          onClick={() => clearQueue()}
+          color="error"
+        >
+          Clear queue
+        </Button>
+      )}
       {queueItems.length > 0 ? (
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="songsQueue">
@@ -231,6 +233,7 @@ export const QueueList = () => {
         </DragDropContext>
       ) : (
         <Typography
+          textAlign="center"
           sx={{
             paddingTop: '5%',
           }}

@@ -51,7 +51,8 @@ const ColorThemes: ColorThemeProps[] = [
 ];
 
 export const GetColorTheme = () => {
-  const currentId = window.electron.store.config.getSettings().colorThemeId;
+  const currentId =
+    window.electron.store.config.getSettings().colorThemeId ?? 0;
   return ColorThemes[currentId + 1 > ColorThemes.length ? 0 : currentId];
 };
 
@@ -72,7 +73,7 @@ const SettingsMenu = ({
     getCurrentSettings().audioBufferSize
   );
   const [colorThemeId, setColorThemeId] = useState(
-    getCurrentSettings().colorThemeId
+    getCurrentSettings().colorThemeId ?? 0
   );
 
   useEffect(() => {
@@ -184,9 +185,13 @@ const SettingsMenu = ({
             justifyContent="center"
           >
             <Typography sx={{ opacity: '90%' }}>Audio buffer size</Typography>
-            <Typography maxWidth={425} sx={{ opacity: '70%' }}>
-              note: set higher if audio has static noise, but audio controls
-              responsiveness may decrease
+            <Typography
+              variant="subtitle2"
+              maxWidth={400}
+              sx={{ opacity: '70%' }}
+            >
+              Increase if audio has static noise / crackles, but audio controls
+              responsiveness may decrease. Requires restart.
             </Typography>
           </Grid>
           <Grid
@@ -197,10 +202,13 @@ const SettingsMenu = ({
             justifyContent="center"
           >
             <FormControl sx={{ minWidth: 100 }}>
-              <Select value={audioBufferSize} onChange={audioBufferSizeChange}>
-                <MenuItem value={4096}>4096</MenuItem>
-                <MenuItem value={8192}>8192</MenuItem>
-                <MenuItem value={16384}>16384</MenuItem>
+              <Select
+                value={audioBufferSize || 4096}
+                onChange={audioBufferSizeChange}
+              >
+                <MenuItem value={4096}>4 Kb</MenuItem>
+                <MenuItem value={8192}>8 Kb</MenuItem>
+                <MenuItem value={16384}>16 Kb</MenuItem>
               </Select>
             </FormControl>
           </Grid>

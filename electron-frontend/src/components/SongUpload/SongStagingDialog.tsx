@@ -9,6 +9,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
+  Tooltip,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Song, { SongProps, useSongsStatus } from '../Song';
@@ -98,20 +99,26 @@ const SongStagingDialog = ({
   };
 
   return (
-    <Dialog fullWidth scroll="paper" open={open} onClose={cancelUpload}>
+    <Dialog scroll="paper" open={open} onClose={cancelUpload} maxWidth="md">
       <DialogTitle>Upload songs</DialogTitle>
       <DialogContent dividers>
         <List>
           {uploadedSongs.map((song, index) => (
-            <ListItem divider key={song.songId}>
+            <ListItem
+              divider
+              key={song.songId}
+              sx={{ display: 'flex', flexDirection: 'row' }}
+            >
               <Song song={song} setSong={updateSong(index)} />
               <ListItemIcon>
-                <IconButton
-                  aria-label="delete"
-                  onClick={() => deleteSong(index)}
-                >
-                  <DeleteIcon color="error" />
-                </IconButton>
+                <Tooltip title="Remove">
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => deleteSong(index)}
+                  >
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                </Tooltip>
               </ListItemIcon>
             </ListItem>
           ))}

@@ -198,10 +198,6 @@ export default class MenuBuilder {
         label: '&File',
         submenu: [
           {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
-          },
-          {
             label: '&Close',
             accelerator: 'Ctrl+W',
             click: () => {
@@ -256,29 +252,17 @@ export default class MenuBuilder {
         label: 'Help',
         submenu: [
           {
-            label: 'Learn More',
+            label: 'Homepage',
             click() {
-              shell.openExternal('https://electronjs.org');
+              shell.openExternal('https://github.com/weiquany/ktvanywhere/');
             },
           },
           {
-            label: 'Documentation',
+            label: 'Report Bugs',
             click() {
               shell.openExternal(
-                'https://github.com/electron/electron/tree/main/docs#readme'
+                'https://github.com/weiquany/ktvanywhere/issues'
               );
-            },
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
             },
           },
         ],

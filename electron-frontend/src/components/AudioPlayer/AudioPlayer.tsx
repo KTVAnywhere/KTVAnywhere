@@ -26,11 +26,8 @@ import { LyricsAdjust } from '../LyricsPlayer';
 const ProgressBar = () => {
   const { duration, currentTime, setCurrentTime, source } = useAudioStatus();
 
-  function formatSecondsToMinutesAndSeconds(seconds: number) {
-    return `${Math.floor(seconds / 60)}:${`0${Math.floor(seconds % 60)}`.slice(
-      -2
-    )}`;
-  }
+  const formatSecondsToMinutesAndSeconds = (seconds: number) =>
+    `${Math.floor(seconds / 60)}:${`0${Math.floor(seconds % 60)}`.slice(-2)}`;
 
   const timeChange = (_event: Event, newValue: number | number[]) => {
     if (source && duration !== 0) {
@@ -386,22 +383,24 @@ export const AudioPlayer = () => {
     <Grid container direction="column">
       <Grid item container sx={{ justifyContent: 'center' }}>
         <ProgressBar />
-        <IconButton
-          sx={{ padding: 0 }}
-          data-testid="end-song-button"
-          onClick={endSong}
-        >
-          <SkipNextIcon sx={{ fontSize: '35px' }} />
-        </IconButton>
+        <Tooltip title="End song" placement="right">
+          <IconButton
+            sx={{ padding: 0 }}
+            data-testid="end-song-button"
+            onClick={endSong}
+          >
+            <SkipNextIcon sx={{ fontSize: '35px' }} />
+          </IconButton>
+        </Tooltip>
       </Grid>
       <Grid item container direction="row" sx={{ justifyContent: 'center' }}>
         <Grid
           item
-          sx={{ position: 'absolute', left: '2%', right: '85%', top: 0 }}
+          sx={{ position: 'absolute', left: '2%', right: '85%', top: '15px' }}
         >
           <Tooltip
             title={currentSong ? currentSong.songName : ''}
-            placement="right"
+            placement="top-start"
           >
             <Typography noWrap sx={{ fontSize: '24px' }}>
               {currentSong?.songName}
@@ -409,7 +408,7 @@ export const AudioPlayer = () => {
           </Tooltip>
           <Tooltip
             title={currentSong ? currentSong.artist : ''}
-            placement="right"
+            placement="top-start"
           >
             <Typography noWrap sx={{ fontSize: '20px', opacity: '80%' }}>
               {currentSong?.artist}

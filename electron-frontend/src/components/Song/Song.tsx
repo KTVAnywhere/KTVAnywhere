@@ -100,7 +100,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
   };
 
   return (
-    <Container sx={{ paddingTop: '5%' }}>
+    <Container sx={{ paddingTop: '5%', width: 1 }}>
       <Container disableGutters>
         <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText

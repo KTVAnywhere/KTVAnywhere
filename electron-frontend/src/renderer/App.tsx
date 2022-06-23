@@ -10,6 +10,8 @@ import {
   Snackbar,
   IconButton,
   PaletteMode,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
@@ -156,6 +158,9 @@ const MainPage = ({
           <SongStagingDialogProvider>
             <SongDialogProvider>
               <LeftSidebar>
+                <Typography variant="h5" align="center" paddingTop="15px">
+                  Songs Library
+                </Typography>
                 <SongUploadButton setUploadedSongs={setUploadedSongs} />
                 <SongList setOpenSong={setOpenSong} />
                 <SongDialog song={openSong} setSong={setOpenSong} />
@@ -199,13 +204,15 @@ const MainPage = ({
       >
         <AudioPlayer />
       </Container>
-      <IconButton
-        sx={{ position: 'fixed', bottom: 20, right: 20, padding: 0 }}
-        data-testid="settings-button"
-        onClick={() => setShowSettings(true)}
-      >
-        <SettingsIcon sx={{ fontSize: '50px' }} />
-      </IconButton>
+      <Tooltip title="Settings">
+        <IconButton
+          sx={{ position: 'fixed', bottom: 20, right: 20, padding: 0 }}
+          data-testid="settings-button"
+          onClick={() => setShowSettings(true)}
+        >
+          <SettingsIcon fontSize="medium" />
+        </IconButton>
+      </Tooltip>
       <SettingsMenu
         showSettings={showSettings}
         setShowSettings={setShowSettings}

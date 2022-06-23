@@ -97,6 +97,7 @@ const createWindow = async () => {
     height: 728,
     minWidth: 1024,
     minHeight: 728,
+    autoHideMenuBar: true,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged

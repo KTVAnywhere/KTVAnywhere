@@ -1,4 +1,10 @@
-import { IconButton, Stack, TextField, Typography } from '@mui/material';
+import {
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
@@ -77,13 +83,15 @@ const LyricsAdjust = () => {
           alignItems="center"
           justifyItems="center"
         >
-          <IconButton
-            aria-label="stepDown"
-            size="small"
-            onClick={() => step(-0.2)}
-          >
-            <RemoveIcon fontSize="small" color="secondary" />
-          </IconButton>
+          <Tooltip title="Lyrics appearing too late" placement="top">
+            <IconButton
+              aria-label="stepDown"
+              size="small"
+              onClick={() => step(-0.2)}
+            >
+              <RemoveIcon fontSize="small" color="secondary" />
+            </IconButton>
+          </Tooltip>
           <TextField
             type="number"
             size="small"
@@ -104,13 +112,15 @@ const LyricsAdjust = () => {
             value={currentOffset}
             onChange={(event) => changeLyricsOffset(event.target.value)}
           />
-          <IconButton
-            aria-label="stepUp"
-            size="small"
-            onClick={() => step(0.2)}
-          >
-            <AddIcon fontSize="small" color="secondary" />
-          </IconButton>
+          <Tooltip title="Lyrics appearing too early" placement="top">
+            <IconButton
+              aria-label="stepUp"
+              size="small"
+              onClick={() => step(0.2)}
+            >
+              <AddIcon fontSize="small" color="secondary" />
+            </IconButton>
+          </Tooltip>
         </Stack>
         <Stack
           direction="row"
@@ -118,14 +128,16 @@ const LyricsAdjust = () => {
           sx={{ position: 'relative' }}
         >
           <Typography>offset</Typography>
-          <IconButton
-            aria-label="saveOffset"
-            onClick={saveOffset}
-            size="small"
-            sx={{ position: 'absolute', top: '0', left: '50px', padding: 0 }}
-          >
-            <CheckOutlinedIcon fontSize="small" color="success" />
-          </IconButton>
+          <Tooltip title="Save changes" placement="right">
+            <IconButton
+              aria-label="saveOffset"
+              onClick={saveOffset}
+              size="small"
+              sx={{ position: 'absolute', top: '0', left: '50px', padding: 0 }}
+            >
+              <CheckOutlinedIcon fontSize="small" color="success" />
+            </IconButton>
+          </Tooltip>
         </Stack>
       </Stack>
     </>

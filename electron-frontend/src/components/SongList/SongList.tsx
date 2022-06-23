@@ -11,6 +11,7 @@ import {
   Chip,
   Stack,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import QueuePlayNext from '@mui/icons-material/QueuePlayNext';
@@ -103,12 +104,16 @@ const SongCard = ({
             alignItems: 'center',
           }}
         >
-          <IconButton aria-label="play" onClick={() => setNextSong(song)}>
-            <PlayArrowIcon fontSize="medium" />
-          </IconButton>
-          <IconButton aria-label="enqueue" onClick={() => EnqueueSong(song)}>
-            <QueuePlayNext />
-          </IconButton>
+          <Tooltip title="Play song" placement="right">
+            <IconButton aria-label="play" onClick={() => setNextSong(song)}>
+              <PlayArrowIcon fontSize="medium" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Enqueue song" placement="right">
+            <IconButton aria-label="enqueue" onClick={() => EnqueueSong(song)}>
+              <QueuePlayNext />
+            </IconButton>
+          </Tooltip>
           <LoadingButton
             size="small"
             loading={songsStatus.indexOf(song.songId) !== -1}
@@ -161,9 +166,6 @@ const SongList = ({
   };
   return (
     <Container>
-      <Typography variant="h5" align="center" gutterBottom>
-        Songs Library
-      </Typography>
       <TextField
         aria-label="searchbox"
         size="small"
@@ -187,6 +189,16 @@ const SongList = ({
                 <SongCard song={song} setOpenSong={setOpenSong} />
               </ListItem>
             ))}
+        {searchResults && searchResults.length === 0 && (
+          <Typography
+            textAlign="center"
+            sx={{
+              paddingTop: '5%',
+            }}
+          >
+            No songs found
+          </Typography>
+        )}
       </List>
     </Container>
   );
