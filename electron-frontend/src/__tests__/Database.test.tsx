@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom';
-import { queueItemFunctions, songFunctions } from '../main/database';
+import Fuse from 'fuse.js';
+import {
+  configFunctions,
+  queueItemFunctions,
+  songFunctions,
+} from '../main/database';
+import { ConfigType } from '../main/schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 import {
@@ -9,6 +15,7 @@ import {
 } from '../__testsData__/testData';
 
 const ActualStore = jest.requireActual('electron-store');
+const ActualFuse = jest.requireActual('fuse.js');
 
 describe('songs store', () => {
   let data: SongProps[] = [];
@@ -16,10 +23,22 @@ describe('songs store', () => {
   const mockSet = jest.fn((_, songs: SongProps[]) => {
     data = songs;
   });
+
   const songsStore = {
     ...new ActualStore({}),
     get: mockGet,
     set: mockSet,
+  };
+
+  const mockIndexAdd = jest.fn();
+  const mockIndexRemove = jest.fn();
+  const mockIndexSet = jest.fn();
+  const songSearcher = {
+    ...new ActualFuse([]),
+    add: mockIndexAdd,
+    remove: mockIndexRemove,
+    setCollection: mockIndexSet,
+    getIndex: () => ({} as Fuse.FuseIndex<SongProps>),
   };
 
   beforeEach(() => {
@@ -28,6 +47,8 @@ describe('songs store', () => {
   afterEach(() => {
     mockGet.mockClear();
     mockSet.mockClear();
+    mockIndexAdd.mockClear();
+    mockIndexRemove.mockClear();
   });
   test('get song based on songId', () => {
     const { getSong } = songFunctions;
@@ -44,8 +65,9 @@ describe('songs store', () => {
       accompanimentPath: '',
     };
     const { addSong } = songFunctions;
-    addSong(songsStore, toAdd);
+    addSong(songsStore, songSearcher, toAdd);
     expect(mockSet).toBeCalledWith('songs', [...songListTestData, toAdd]);
+    expect(mockIndexAdd).toBeCalledWith(toAdd);
   });
   test('change song in list', () => {
     const newTestSong: SongProps = {
@@ -53,16 +75,19 @@ describe('songs store', () => {
       songName: 'new test song',
     };
     const { setSong } = songFunctions;
-    setSong(songsStore, newTestSong);
+    setSong(songsStore, songSearcher, newTestSong);
     expect(mockSet).toBeCalledWith('songs', [
       ...songListTestData.slice(0, 1),
       newTestSong,
     ]);
+    expect(mockIndexRemove.mock.calls[0][0](newTestSong)).toEqual(true);
+    expect(mockIndexAdd).toBeCalledWith(newTestSong);
   });
   test('delete song', () => {
     const { deleteSong } = songFunctions;
-    deleteSong(songsStore, '0');
+    deleteSong(songsStore, songSearcher, '0');
     expect(mockSet).toBeCalledWith('songs', [...songListTestData.slice(1)]);
+    expect(mockIndexRemove.mock.calls[0][0](songListTestData[0])).toEqual(true);
   });
   test('get all songs', () => {
     const { getAllSongs } = songFunctions;
@@ -90,8 +115,9 @@ describe('songs store', () => {
       },
     ];
     const { setAllSongs } = songFunctions;
-    setAllSongs(songsStore, newsongListTestData);
+    setAllSongs(songsStore, songSearcher, newsongListTestData);
     expect(mockSet).toBeCalledWith('songs', newsongListTestData);
+    expect(mockIndexSet).toBeCalledWith(newsongListTestData);
   });
 });
 
@@ -174,5 +200,59 @@ describe('queueItems store', () => {
     const { setAllQueueItems } = queueItemFunctions;
     setAllQueueItems(queueItemsStore, queueTestDataWithSongs102);
     expect(mockSet).toBeCalledWith('queueItems', queueTestDataWithSongs102);
+  });
+});
+
+describe('config store', () => {
+  const mockGet = jest.fn();
+  const mockSet = jest.fn();
+
+  const configStore = {
+    ...new ActualStore({}),
+    get: mockGet,
+    set: mockSet,
+  };
+
+  afterEach(() => {
+    mockGet.mockClear();
+    mockSet.mockClear();
+  });
+
+  test('get settings for playing song', () => {
+    const { getPlayingSong } = configFunctions;
+    getPlayingSong(configStore);
+    expect(mockGet).toBeCalled();
+  });
+
+  test('set settings for playing song', () => {
+    const { setPlayingSong } = configFunctions;
+    const playingSong: ConfigType['playingSong'] = {
+      songId: '1',
+      currentTime: 5,
+      duration: 10,
+      volume: 50,
+      pitch: 0,
+      vocalsEnabled: true,
+      lyricsEnabled: true,
+    };
+    setPlayingSong(configStore, playingSong);
+    expect(mockSet).toBeCalledWith('playingSong', playingSong);
+  });
+
+  test('get settings', () => {
+    const { getSettings } = configFunctions;
+    getSettings(configStore);
+    expect(mockGet).toBeCalled();
+  });
+
+  test('set settings', () => {
+    const { setSettings } = configFunctions;
+    const updatedSettings: ConfigType['settings'] = {
+      errorMessagesTimeout: 5,
+      audioBufferSize: 8192,
+      colorThemeId: 0,
+    };
+    setSettings(configStore, updatedSettings);
+    expect(mockSet).toBeCalledWith('settings', updatedSettings);
   });
 });

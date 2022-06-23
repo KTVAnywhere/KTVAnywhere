@@ -1,4 +1,5 @@
 import { IpcRenderer } from 'electron';
+import { ConfigType } from 'main/schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
@@ -11,7 +12,9 @@ declare global {
       };
       file: {
         read(filePath: string): Promise<string>;
+        readAsBuffer(filePath: string): Promise<Buffer>;
         ifFileExists(filePath: string): boolean;
+        write(filePath: string, data: string): Promise<{ error?: Error }>;
       };
       music: {
         getLrc(song: SongProps): Promise<{ lyricsPath: string; error?: Error }>;
@@ -28,6 +31,7 @@ declare global {
           onChange(
             callback: (_event: IpcRenderer, results: SongProps[]) => void
           ): () => void;
+          search(query: string): Promise<SongProps[]>;
         };
         queueItems: {
           getQueueItem(queueItemId: string): QueueItemProps;
@@ -39,6 +43,12 @@ declare global {
           onChange(
             callback: (_event: IpcRenderer, results: QueueItemProps[]) => void
           ): () => void;
+        };
+        config: {
+          getPlayingSong(): ConfigType['playingSong'];
+          setPlayingSong(playingSong: ConfigType['playingSong']): void;
+          getSettings(): ConfigType['settings'];
+          setSettings(settings: ConfigType['settings']): void;
         };
       };
       preprocess: {

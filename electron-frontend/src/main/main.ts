@@ -10,6 +10,7 @@
  */
 import path from 'path';
 import fs from 'fs-extra';
+import Fuse from 'fuse.js';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import { spawn } from 'child_process';
 import MenuBuilder from './menu';
@@ -17,6 +18,7 @@ import {
   resolveHtmlPath,
   openFiles,
   openFile,
+  writeFile,
   processSongDetails,
   getLrcFile,
 } from './util';
@@ -25,7 +27,10 @@ import {
   createQueueItemsStore,
   songFunctions,
   queueItemFunctions,
+  createConfigStore,
+  configFunctions,
 } from './database';
+import { SongProps } from '../components/Song';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -34,8 +39,18 @@ ipcMain.handle('file:read', async (_, filePath: string) => {
   return data;
 });
 
+ipcMain.handle('file:readAsBuffer', async (_, filePath: string) => {
+  const data = await fs.promises.readFile(filePath, null);
+  return data;
+});
+
 ipcMain.on('file:ifFileExists', (event, filePath) => {
   event.returnValue = fs.existsSync(filePath);
+});
+
+ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
+  const result = await writeFile(filePath, data);
+  return result;
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -82,6 +97,7 @@ const createWindow = async () => {
     height: 728,
     minWidth: 1024,
     minHeight: 728,
+    autoHideMenuBar: true,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -161,7 +177,6 @@ app
             ]);
 
         spleeterProcess?.stdout.on('data', (message: string) => {
-          console.log(`${message}`);
           if (`${message}` === `done splitting ${song.songId}`) {
             mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
               vocalsPath: path.join(songFolder, 'vocals.mp3'),
@@ -234,6 +249,7 @@ app
     // Database
     const songsStore = createSongsStore();
     const queueItemsStore = createQueueItemsStore();
+    const configStore = createConfigStore();
     const {
       getSong,
       setSong,
@@ -251,31 +267,66 @@ app
       getAllQueueItems,
       setAllQueueItems,
     } = queueItemFunctions;
+    const { getPlayingSong, setPlayingSong, getSettings, setSettings } =
+      configFunctions;
+    const fuseOptions = {
+      keys: ['songName', 'artist'],
+      findAllMatches: true,
+      shouldSort: true,
+      threshold: 0.4,
+      ignoreLocation: true,
+    };
+    const indexPath = path.join(app.getPath('userData'), 'songIndex.json');
+    let songSearcher: Fuse<SongProps>;
+    const saveSongIndex = () => {
+      fs.promises.writeFile(
+        indexPath,
+        JSON.stringify(songSearcher.getIndex().toJSON())
+      );
+    };
+    try {
+      const songs = getAllSongs(songsStore);
+      const index = fs.readFileSync(indexPath);
+      const songsIndex = Fuse.parseIndex<SongProps>(index);
+      songSearcher = new Fuse(songs, fuseOptions, songsIndex);
+    } catch {
+      const songs = getAllSongs(songsStore);
+      songSearcher = new Fuse(songs, fuseOptions);
+    }
 
     ipcMain.on('store:getSong', async (event, songId) => {
       event.returnValue = getSong(songsStore, songId);
     });
     ipcMain.on('store:addSong', async (_, song) => {
-      addSong(songsStore, song);
+      addSong(songsStore, songSearcher, song);
+      saveSongIndex();
     });
     ipcMain.on('store:addSongs', async (_, songs, prepend) => {
-      addSongs(songsStore, songs, prepend);
+      addSongs(songsStore, songs, songSearcher, prepend);
+      saveSongIndex();
     });
     ipcMain.on('store:setSong', async (_, song) => {
-      setSong(songsStore, song);
+      setSong(songsStore, songSearcher, song);
+      saveSongIndex();
     });
     ipcMain.on('store:deleteSong', async (_, songId) => {
-      deleteSong(songsStore, songId);
+      deleteSong(songsStore, songSearcher, songId);
+      saveSongIndex();
     });
     ipcMain.on('store:getAllSongs', async (event) => {
       event.returnValue = getAllSongs(songsStore);
     });
     ipcMain.on('store:setAllSongs', async (_, songs) => {
-      setAllSongs(songsStore, songs);
+      setAllSongs(songsStore, songSearcher, songs);
+      saveSongIndex();
     });
 
     songsStore.onDidChange('songs', (results) =>
       mainWindow?.webContents.send('store:onSongsChange', results)
+    );
+
+    ipcMain.handle('store:searchSongs', (_, query) =>
+      songSearcher.search(query).map((result) => result.item)
     );
 
     ipcMain.on('store:getQueueItem', async (event, queueItemId) => {
@@ -302,5 +353,21 @@ app
     queueItemsStore.onDidChange('queueItems', (results) =>
       mainWindow?.webContents.send('store:onQueueItemsChange', results)
     );
+
+    ipcMain.on('store:getPlayingSong', (event) => {
+      event.returnValue = getPlayingSong(configStore);
+    });
+
+    ipcMain.on('store:setPlayingSong', (_, playingSong) => {
+      setPlayingSong(configStore, playingSong);
+    });
+
+    ipcMain.on('store:getSettings', (event) => {
+      event.returnValue = getSettings(configStore);
+    });
+
+    ipcMain.on('store:setSettings', (_, settings) => {
+      setSettings(configStore, settings);
+    });
   })
   .catch(console.error);

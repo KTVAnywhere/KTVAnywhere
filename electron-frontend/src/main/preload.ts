@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
+import { ConfigType } from './schema';
 
 contextBridge.exposeInMainWorld('electron', {
   dialog: {
@@ -15,8 +16,14 @@ contextBridge.exposeInMainWorld('electron', {
     read(filePath: string) {
       return ipcRenderer.invoke('file:read', filePath);
     },
+    readAsBuffer(filePath: string) {
+      return ipcRenderer.invoke('file:readAsBuffer', filePath);
+    },
     ifFileExists(filePath: string) {
       return ipcRenderer.sendSync('file:ifFileExists', filePath);
+    },
+    write(filePath: string, data: string) {
+      return ipcRenderer.invoke('file:write', filePath, data);
     },
   },
   music: {
@@ -54,6 +61,9 @@ contextBridge.exposeInMainWorld('electron', {
         return () =>
           ipcRenderer.removeListener('store:onSongsChange', callback);
       },
+      search(query: string) {
+        return ipcRenderer.invoke('store:searchSongs', query);
+      },
     },
     queueItems: {
       getQueueItem(key: string) {
@@ -80,6 +90,20 @@ contextBridge.exposeInMainWorld('electron', {
         ipcRenderer.on('store:onQueueItemsChange', callback);
         return () =>
           ipcRenderer.removeListener('store:onQueueItemsChange', callback);
+      },
+    },
+    config: {
+      getPlayingSong() {
+        return ipcRenderer.sendSync('store:getPlayingSong');
+      },
+      setPlayingSong(playingSong: ConfigType['playingSong']) {
+        ipcRenderer.send('store:setPlayingSong', playingSong);
+      },
+      getSettings() {
+        return ipcRenderer.sendSync('store:getSettings');
+      },
+      setSettings(settings: ConfigType['settings']) {
+        ipcRenderer.send('store:setSettings', settings);
       },
     },
   },

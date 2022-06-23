@@ -2,17 +2,18 @@
 # KTV Anywhere
 #### A karaoke song system for everyone
 [![Electron](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml/badge.svg)](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml)
+
+Available for Windows OS
 ## Aim
 While karaoke has been around for many years, casual singers usually go to karaoke joints instead of having a home karaoke system due to the high set-up cost and subscription service. Therefore, we hope to make a self-hosted karaoke song system that is easy to deploy for personal use. It would only require a working computer and songs the users already have. We hope to make it seamless and provide a fun and interactive karaoke experience for all ages.
 ### Implemented Features
-- A basic CRUD to upload, delete and modify songs
-- A queue system to manage songs you want to play
-- Audio and lyrics player 
+- A queue system to manage songs
+- Vocal separation from user-provided tracks
+- Lyrics retrieval from NetEase Cloud Music
+- Audio player with key shifting functionality
+- Lyrics player with basic adjustments with offset
 
 ### Proposed features
-- Removing vocals from user-provided tracks
-- Fetching lyrics of song
-- Key shifter 
 - Pitch graph and scoring
 
 ## Technologies
@@ -21,18 +22,28 @@ KTV Anywhere uses the following technlogies:
 
 - [Electron] - Cross-platform desktop deployment
 - [ReactJS] - For the application's frontend
+- [spleeter] - For the vocal separation feature
+- [SoundTouchJS] - For the pitch shifting functionality
 
 
 ## Installation
 Download and install the latest release from the [releases page].
-> Note: Mac versions might not run as the application is not signed
+> Note: The vocal separation feature requires FFMPEG to be installed and added to path. You can skip this step if you already have FFMPEG or do not intend to use the vocal separation feature
+
+#### FFMPEG installation instructions (Windows)
+[wiki page: ffmpeg installation instructions]
+
 ## Installation for development
+This project requires:
+* [NodeJS]
+* [Python] > 3.8
 
 Setup
 ```sh
 git clone https://github.com/weiquany/KTVAnywhere.git
 cd ./KTVAnywhere/electron-frontend
-npm install
+npm install                                     # node modules
+python -m pip install -r 'requirements.txt'     # python libraries
 ```
 Starting the application
 ```sh
@@ -40,13 +51,25 @@ npm start
 ```
 Packaging for current environment
 ```sh
-npm package 
+npm run package:spleeter    # package python script with pyinstaller
+npm run package             # package electron app with electron-builder
 ```
 ### Bugs
 Spotted a bug? Please create a post on the [issues page]
 
+### Acknowledgement
+
+>(Hennequin et al. 2020)<br><br>
+Hennequin, Romain, Anis Khlif, Felix Voituret, and Manuel Moussallam. 2020. “Spleeter: A Fast and Efficient Music Source Separation Tool with Pre-Trained Models.” Journal of Open Source Software 5 (50). The Open Journal: 2154. doi:10.21105/joss.02154.
+
+
    [releases page]: <https://github.com/weiquany/KTVAnywhere/releases>
    [issues page]: <https://github.com/weiquany/KTVAnywhere/issues>
+   [wiki page: ffmpeg installation instructions]: <https://github.com/weiquany/KTVAnywhere/wiki/FFMPEG-Installation-instructions-for-Windows>
    [Electron]: <https://www.electronjs.org/>
    [ReactJS]: <https://reactjs.org/>
+   [spleeter]: <https://github.com/deezer/spleeter>
+   [SoundTouchJS]: <https://github.com/cutterbl/SoundTouchJS>
+   [NodeJS]: <https://nodejs.org/en/>
+   [python]: <https://www.python.org/>
 

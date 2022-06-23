@@ -21,7 +21,7 @@
     "url": "git+https://github.com/weiquany/KTVAnywhere.git"
   },
   "license": "ISC",
-  "author": "Tan Ming Wei & Yew Wei Quan",
+  "author": "Tan Ming Wei & Yew Wei Quan <finealps@gmail.com>",
   "main": "./src/main/main.ts",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -97,6 +97,9 @@
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!soundtouchjs)"
+    ],
     "resetMocks": false
   },
   "dependencies": {
@@ -110,6 +113,7 @@
     "electron-log": "^4.4.7",
     "electron-store": "^8.0.1",
     "electron-updater": "^5.0.1",
+    "fuse.js": "^6.6.2",
     "lodash.uniq": "^4.5.0",
     "lrc-kit": "^1.1.1",
     "music-metadata": "^7.12.3",
@@ -119,6 +123,7 @@
     "react-edit-text": "^4.4.0",
     "react-router-dom": "^6.3.0",
     "simple-netease-cloud-music": "^0.5.2",
+    "soundtouchjs": "^0.1.30",
     "uniqid": "^5.4.0"
   },
   "devDependencies": {
@@ -134,6 +139,7 @@
     "@types/react-dom": "^18.0.4",
     "@types/react-edit-text": "^4.4.0",
     "@types/react-test-renderer": "^18.0.0",
+    "@types/sinon": "^10.0.11",
     "@types/terser-webpack-plugin": "^5.0.4",
     "@types/uniqid": "^5.3.2",
     "@types/webpack-bundle-analyzer": "^4.4.1",
@@ -180,6 +186,7 @@
     "rimraf": "^3.0.2",
     "sass": "^1.51.0",
     "sass-loader": "^12.6.0",
+    "standardized-audio-context-mock": "^9.5.4",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "ts-jest": "^28.0.2",
@@ -240,7 +247,7 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "deb"
       ],
       "category": "Development"
     },

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   CardActions,
@@ -18,6 +18,7 @@ import {
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
 import { SongProps } from '../Song';
+import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
 
 export interface QueueItemProps {
   song: SongProps;
@@ -28,15 +29,26 @@ const setQueue = (queueList: QueueItemProps[]) => {
   window.electron.store.queueItems.setAllQueueItems(queueList);
 };
 
-export const QueueList = ({
-  setNextSong,
-}: {
-  setNextSong: Dispatch<SetStateAction<SongProps | null>>;
-}) => {
-  const queue = window.electron.store.queueItems.getAllQueueItems();
+export const QueueList = () => {
+  const [queueItems, setQueueItems] = useState<QueueItemProps[]>([]);
+  const { setNextSong } = useAudioStatus();
+
+  useEffect(() => {
+    setQueueItems(window.electron.store.queueItems.getAllQueueItems() ?? []);
+    const queueItemsUnsubscribe = window.electron.store.queueItems.onChange(
+      (_, results) => setQueueItems(results)
+    );
+
+    return () => {
+      queueItemsUnsubscribe();
+    };
+  }, []);
 
   const deleteSongFromQueue = (index: number): void => {
-    const newQueue = [...queue.slice(0, index), ...queue.slice(index + 1)];
+    const newQueue = [
+      ...queueItems.slice(0, index),
+      ...queueItems.slice(index + 1),
+    ];
     setQueue(newQueue);
   };
 
@@ -45,45 +57,45 @@ export const QueueList = ({
   };
 
   const shiftSongUp = (index: number): void => {
-    if (queue.length === 0 || queue.length === 1 || index === 0) {
+    if (queueItems.length === 0 || queueItems.length === 1 || index === 0) {
       return;
     }
     if (index === 1) {
-      const newQueue = [queue[1], queue[0], ...queue.slice(2)];
+      const newQueue = [queueItems[1], queueItems[0], ...queueItems.slice(2)];
       setQueue(newQueue);
       return;
     }
     const newQueue = [
-      ...queue.slice(0, index - 1),
-      queue[index],
-      queue[index - 1],
-      ...queue.slice(index + 1),
+      ...queueItems.slice(0, index - 1),
+      queueItems[index],
+      queueItems[index - 1],
+      ...queueItems.slice(index + 1),
     ];
     setQueue(newQueue);
   };
 
   const sendSongToFrontOfQueue = (index: number): void => {
-    if (queue.length === 0 || queue.length === 1 || index === 0) {
+    if (queueItems.length === 0 || queueItems.length === 1 || index === 0) {
       return;
     }
     const newQueue = [
-      queue[index],
-      ...queue.slice(0, index),
-      ...queue.slice(index + 1),
+      queueItems[index],
+      ...queueItems.slice(0, index),
+      ...queueItems.slice(index + 1),
     ];
     setQueue(newQueue);
   };
 
   const onDragEnd = (result: DropResult): void => {
     if (!result.destination) return;
-    const items = Array.from(queue);
+    const items = Array.from(queueItems);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     setQueue(items);
   };
 
   const playSong = (index: number): void => {
-    setNextSong(queue[index].song);
+    setNextSong(queueItems[index].song);
     deleteSongFromQueue(index);
   };
 
@@ -99,16 +111,18 @@ export const QueueList = ({
       >
         Songs Queue
       </Typography>
-      <Button
-        size="small"
-        variant="contained"
-        data-testid="clear-queue-button"
-        onClick={() => clearQueue()}
-        color="error"
-      >
-        Clear queue
-      </Button>
-      {queue.length > 0 ? (
+      {queueItems.length > 0 && (
+        <Button
+          size="small"
+          variant="contained"
+          data-testid="clear-queue-button"
+          onClick={() => clearQueue()}
+          color="error"
+        >
+          Clear queue
+        </Button>
+      )}
+      {queueItems.length > 0 ? (
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="songsQueue">
             {(provided) => (
@@ -124,7 +138,7 @@ export const QueueList = ({
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {queue.map((queueItem, index) => {
+                {queueItems.map((queueItem, index) => {
                   return (
                     <Draggable
                       key={queueItem.queueItemId}
@@ -219,6 +233,7 @@ export const QueueList = ({
         </DragDropContext>
       ) : (
         <Typography
+          textAlign="center"
           sx={{
             paddingTop: '5%',
           }}
@@ -237,7 +252,11 @@ export function EnqueueSong(song: SongProps): void {
 
 export function DequeueSong(): SongProps | null {
   const queue = window.electron.store.queueItems.getAllQueueItems();
-  const nextSong = queue.length > 0 ? queue[0].song : null;
+  const nextSongId = queue.length > 0 ? queue[0].song.songId : null;
+  const nextSong =
+    nextSongId === null
+      ? null
+      : window.electron.store.songs.getSong(nextSongId);
   if (queue.length > 0) {
     setQueue([...queue.slice(1)]);
   }

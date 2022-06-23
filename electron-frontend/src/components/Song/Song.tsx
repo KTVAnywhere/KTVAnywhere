@@ -100,7 +100,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
   };
 
   return (
-    <Container sx={{ paddingTop: '5%' }}>
+    <Container sx={{ paddingTop: '5%', width: 1 }}>
       <Container disableGutters>
         <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText
@@ -176,7 +176,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
             )
           }
         >
-          change file
+          Change file
         </Button>
       </Container>
       <Container disableGutters>
@@ -187,6 +187,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
         <Button
           data-testid="lyrics-picker-button"
           variant="outlined"
+          sx={{ mr: '5px' }}
           onClick={() =>
             chooseFile(
               {
@@ -200,7 +201,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
             )
           }
         >
-          {currSong.lyricsPath ? 'change file' : 'upload file'}
+          {currSong.lyricsPath ? 'Change file' : 'Upload file'}
         </Button>
         <LoadingButton
           data-testid="fetch-lyrics"
@@ -208,7 +209,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
           variant="outlined"
           onClick={() => getLyrics()}
         >
-          fetch lyrics
+          Fetch lyrics
         </LoadingButton>
       </Container>
     </Container>
