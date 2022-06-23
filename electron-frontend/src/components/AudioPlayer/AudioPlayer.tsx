@@ -93,6 +93,8 @@ export const AudioPlayer = () => {
     setSongEnded,
     isPlaying,
     setIsPlaying,
+    isLoading,
+    setIsLoading,
     isPlayingVocals,
     setIsPlayingVocals,
     volume,
@@ -104,6 +106,7 @@ export const AudioPlayer = () => {
     currentSong,
     setCurrentSong,
     nextSong,
+    setNextSong,
     lyricsEnabled,
     setLyricsEnabled,
     audioContext,
@@ -181,6 +184,8 @@ export const AudioPlayer = () => {
     playNow: boolean,
     callback?: () => void
   ) => {
+    if (isLoading) return;
+    setIsLoading(true);
     let percentagePlayed = 0;
     if (resumeTime && duration !== 0) {
       percentagePlayed = currentTime / duration;
@@ -193,6 +198,7 @@ export const AudioPlayer = () => {
         );
         audioContext.decodeAudioData(arrayBuffer, (buffer: AudioBuffer) => {
           createSource(buffer, percentagePlayed, playNow);
+          setIsLoading(false);
         });
         if (callback) {
           callback();
@@ -203,6 +209,7 @@ export const AudioPlayer = () => {
           severity: 'error',
         });
         setShowAlertMessage(true);
+        setIsLoading(false);
       }
     } catch (error) {
       setAlertMessage({
@@ -210,6 +217,7 @@ export const AudioPlayer = () => {
         severity: 'error',
       });
       setShowAlertMessage(true);
+      setIsLoading(false);
     }
   };
 
@@ -336,10 +344,11 @@ export const AudioPlayer = () => {
       setCurrentSong(nextSong);
       setIsPlaying(true);
       setIsPlayingVocals(true);
+      if (!nextSong.lyricsPath) {
+        setLyricsEnabled(false);
+      }
     });
-    if (!nextSong.lyricsPath) {
-      setLyricsEnabled(false);
-    }
+    setNextSong(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nextSong]);
 
@@ -359,6 +368,7 @@ export const AudioPlayer = () => {
 
   const saveConfig = () => {
     window.removeEventListener('beforeunload', saveConfig);
+    destroySource();
     window.electron.store.config.setPlayingSong({
       songId: currentSong ? currentSong.songId : '',
       currentTime,

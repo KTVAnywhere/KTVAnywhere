@@ -16,6 +16,8 @@ interface ContextState {
   setSongEnded: Dispatch<SetStateAction<boolean>>;
   isPlaying: boolean;
   setIsPlaying: Dispatch<SetStateAction<boolean>>;
+  isLoading: boolean;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
   isPlayingVocals: boolean;
   setIsPlayingVocals: Dispatch<SetStateAction<boolean>>;
   volume: number;
@@ -52,6 +54,7 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const [duration, setDuration] = useState<number>(songDuration);
   const [songEnded, setSongEnded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isPlayingVocals, setIsPlayingVocals] = useState(
     playingSong.vocalsEnabled
   );
@@ -76,6 +79,8 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
         setSongEnded,
         isPlaying,
         setIsPlaying,
+        isLoading,
+        setIsLoading,
         isPlayingVocals,
         setIsPlayingVocals,
         volume,

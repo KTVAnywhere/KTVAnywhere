@@ -74,6 +74,8 @@ export const mockedAudioStatus = {
   setSongEnded: jest.fn(),
   isPlaying: false,
   setIsPlaying: jest.fn(),
+  isLoading: false,
+  setIsLoading: jest.fn(),
   isPlayingVocals: true,
   setIsPlayingVocals: jest.fn(),
   volume: 70,

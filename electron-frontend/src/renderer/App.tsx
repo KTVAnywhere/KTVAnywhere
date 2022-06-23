@@ -45,7 +45,7 @@ const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#ABFF95',
+      main: '#00ADB5',
     },
   },
   typography: {
@@ -196,7 +196,7 @@ const MainPage = () => {
       <Container
         maxWidth={false}
         sx={{
-          bgcolor: '#1f2232',
+          bgcolor: '#222831',
           height: '130px',
           position: 'fixed',
           left: 0,
