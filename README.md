@@ -31,18 +31,7 @@ Download and install the latest release from the [releases page].
 > Note: The vocal separation feature requires FFMPEG to be installed and added to path. You can skip this step if you already have FFMPEG or do not intend to use the vocal separation feature
 
 #### FFMPEG installation instructions (Windows)
-
-1. **Download**
-* Goto their [website](https://ffmpeg.org/download.html#build-windows) and click on Windows builds from gyan.dev
-* Under git master build, click on 'ffmpeg-git-essentials.7z'. The file should start downloading.
-* After the zip file has finished downloading, unzip it to any directory *(eg. C:\Program Files)* 
-2. **Add FFMPEG to path**
-* Click on the start icon and search for 'Edit the system environment variables'. Click on the result that matches.
-* Click on 'Edit Variables..'. A new window should pop up.
-* Under system variables , look for the 'Path' variable and click 'Edit...'. A new window should pop up.
-* Click on 'New' and add the path to ffmpeg\bin *(eg. C:\Program Files\ffmpeg\bin)*. 
-* Click on 'OK' to close all the windows opened.
-
+[wiki page: ffmpeg installation instructions]
 
 ## Installation for development
 This project requires:
@@ -76,6 +65,7 @@ Hennequin, Romain, Anis Khlif, Felix Voituret, and Manuel Moussallam. 2020. “S
 
    [releases page]: <https://github.com/weiquany/KTVAnywhere/releases>
    [issues page]: <https://github.com/weiquany/KTVAnywhere/issues>
+   [wiki page: ffmpeg installation instructions]: <https://github.com/weiquany/KTVAnywhere/wiki/FFMPEG-Installation-instructions-for-Windows>
    [Electron]: <https://www.electronjs.org/>
    [ReactJS]: <https://reactjs.org/>
    [spleeter]: <https://github.com/deezer/spleeter>
