@@ -21,7 +21,7 @@
     "url": "git+https://github.com/weiquany/KTVAnywhere.git"
   },
   "license": "ISC",
-  "author": "Tan Ming Wei & Yew Wei Quan",
+  "author": "Tan Ming Wei & Yew Wei Quan <finealps@gmail.com>",
   "main": "./src/main/main.ts",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
