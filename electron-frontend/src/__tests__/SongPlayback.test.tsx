@@ -9,7 +9,7 @@ import {
   lineAt5s,
   lineAt10s,
 } from '../__testsData__/testData';
-import { AlertMessageProvider } from '../components/Alert.context';
+import { AlertMessageProvider } from '../components/AlertMessage';
 import LyricsPlayer, {
   LyricsAdjust,
   LyricsProvider,
@@ -29,12 +29,12 @@ describe('Lyrics player', () => {
         ...mockedElectron.file,
         read: mockRead,
         readAsBuffer: jest.fn(),
-        ifFileExists: jest.fn(),
+        ifFileExists: jest.fn().mockReturnValue(true),
       },
     };
   });
 
-  afterEach(() => {
+  afterAll(() => {
     jest.restoreAllMocks();
     jest.resetAllMocks();
     jest.clearAllMocks();
@@ -371,7 +371,7 @@ describe('Audio player component tests', () => {
     window.electron.file.readAsBuffer = mockReadAsBuffer;
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
       ...mockedAudioStatus,
-      currentSong: songTestData[1],
+      currentSong: songTestData[2],
     });
     render(
       <AudioStatusProvider>

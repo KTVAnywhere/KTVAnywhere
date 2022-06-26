@@ -11,6 +11,7 @@ import {
   SelectChangeEvent,
   Typography,
 } from '@mui/material';
+import { cyan } from '@mui/material/colors';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 export interface ColorThemeProps {
@@ -23,6 +24,10 @@ export interface ColorThemeProps {
   paperBackground: string;
   sidebarBackground: string;
   audioPlayerBackground: string;
+  scrollbarTrack: string;
+  scrollbarThumb: string;
+  scrollbarHover: string;
+  scrollbarActive: string;
 }
 
 const ColorThemes: ColorThemeProps[] = [
@@ -36,6 +41,10 @@ const ColorThemes: ColorThemeProps[] = [
     paperBackground: '#222629',
     sidebarBackground: '#474B4B',
     audioPlayerBackground: '#222629',
+    scrollbarTrack: '#313535',
+    scrollbarThumb: '#46513E',
+    scrollbarHover: '#505C47',
+    scrollbarActive: '#5A6850',
   },
   {
     colorThemeId: 1,
@@ -47,6 +56,55 @@ const ColorThemes: ColorThemeProps[] = [
     paperBackground: '#0D2444',
     sidebarBackground: '#134074',
     audioPlayerBackground: '#0D2444',
+    scrollbarTrack: '#0E3158',
+    scrollbarThumb: cyan[800],
+    scrollbarHover: cyan[700],
+    scrollbarActive: cyan[600],
+  },
+  {
+    colorThemeId: 2,
+    name: 'sunset',
+    mode: 'dark',
+    primary: '#F1C75B',
+    secondary: '#F5DA8E',
+    mainPageBackground: '#FF6D56',
+    paperBackground: '#B34C3D',
+    sidebarBackground: '#A6703A',
+    audioPlayerBackground: '#B34C3D',
+    scrollbarTrack: '#6C520E',
+    scrollbarThumb: '#F18D7E',
+    scrollbarHover: '#F39E91',
+    scrollbarActive: '#F5AEA3',
+  },
+  {
+    colorThemeId: 3,
+    name: 'pastel',
+    mode: 'light',
+    primary: '#DD5BEC',
+    secondary: '#47404F',
+    mainPageBackground: '#D1ADFF',
+    paperBackground: '#D1ADFF',
+    sidebarBackground: '#F6D0FF',
+    audioPlayerBackground: '#F4C2FF',
+    scrollbarTrack: '#ABA5B6',
+    scrollbarThumb: '#F4C2FF',
+    scrollbarHover: '#F8D6FF',
+    scrollbarActive: '#FCEBFF',
+  },
+  {
+    colorThemeId: 4,
+    name: 'berry',
+    mode: 'dark',
+    primary: '#9AFEC0',
+    secondary: '#E6EFE6',
+    mainPageBackground: '#FFB8BC',
+    paperBackground: '#B36B6E',
+    sidebarBackground: '#724B4C',
+    audioPlayerBackground: '#B36B6E',
+    scrollbarTrack: '#634042',
+    scrollbarThumb: '#FFADB1',
+    scrollbarHover: '#FFC2C5',
+    scrollbarActive: '#FFD6D8',
   },
 ];
 

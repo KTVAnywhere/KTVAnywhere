@@ -12,7 +12,7 @@ import { Runner } from 'lrc-kit';
 import { useEffect, useState } from 'react';
 import { useLyrics } from './Lyrics.context';
 import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
-import { useAlertMessage } from '../Alert.context';
+import { useAlertMessage } from '../AlertMessage';
 
 const LyricsAdjust = () => {
   const { lyricsRunner, setLyricsRunner } = useLyrics();
@@ -127,13 +127,13 @@ const LyricsAdjust = () => {
           justifyItems="center"
           sx={{ position: 'relative' }}
         >
-          <Typography>offset</Typography>
+          <Typography>offset (s)</Typography>
           <Tooltip title="Save changes" placement="right">
             <IconButton
               aria-label="saveOffset"
               onClick={saveOffset}
               size="small"
-              sx={{ position: 'absolute', top: '0', left: '50px', padding: 0 }}
+              sx={{ position: 'absolute', top: '0', left: '68px', padding: 0 }}
             >
               <CheckOutlinedIcon fontSize="small" color="success" />
             </IconButton>

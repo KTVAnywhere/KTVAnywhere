@@ -61,6 +61,12 @@ const mockedElectron = {
 };
 
 class MockSource {
+  _node = { onaudioprocess: null };
+
+  _soundtouch = null;
+
+  _filter = { sourceSound: { buffer: null } };
+
   connect = (_other: unknown) => {};
 
   disconnect = () => {};

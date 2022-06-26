@@ -7,7 +7,8 @@ import { useLyrics } from './Lyrics.context';
 const LyricsPlayer = () => {
   const [lyrics, setLyrics] = useState('');
   const [nextLyrics, setNextLyrics] = useState('');
-  const { currentSong, currentTime, lyricsEnabled } = useAudioStatus();
+  const { currentSong, currentTime, lyricsEnabled, setLyricsEnabled } =
+    useAudioStatus();
   const { lyricsRunner, setLyricsRunner } = useLyrics();
 
   useEffect(() => {
@@ -16,15 +17,17 @@ const LyricsPlayer = () => {
     } else if (!currentSong.lyricsPath) {
       setLyrics('no lyrics file for song');
       setLyricsRunner(new Runner(Lrc.parse(''), true));
-    } else {
+    } else if (window.electron.file.ifFileExists(currentSong.lyricsPath)) {
       window.electron.file
         .read(currentSong.lyricsPath)
         .then((lyricsData) =>
           setLyricsRunner(new Runner(Lrc.parse(lyricsData), true))
         )
         .catch((err) => console.log(err));
+    } else {
+      setLyricsEnabled(false);
     }
-  }, [currentSong, lyricsEnabled, setLyricsRunner]);
+  }, [currentSong, lyricsEnabled, setLyricsRunner, setLyricsEnabled]);
 
   useEffect(() => {
     lyricsRunner.timeUpdate(currentTime);
