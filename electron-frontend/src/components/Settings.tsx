@@ -209,7 +209,7 @@ const SettingsMenu = ({
             justifyContent="center"
           >
             <Typography sx={{ opacity: '90%' }}>
-              Timeout for success/error messages
+              Timeout for alert/error messages
             </Typography>
           </Grid>
           <Grid

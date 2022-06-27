@@ -168,8 +168,7 @@ export const AudioPlayer = () => {
     const newSource = new PitchShifter(
       audioContext,
       audioBuffer,
-      window.electron.store.config.getSettings().audioBufferSize,
-      destroySource
+      window.electron.store.config.getSettings().audioBufferSize
     );
     newSource.on('play', onPlay);
     newSource.percentagePlayed = percentagePlayed;
