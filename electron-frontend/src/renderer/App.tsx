@@ -2,12 +2,9 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
-  Button,
   Grid,
   Container,
   CssBaseline,
-  Snackbar,
   IconButton,
   PaletteMode,
   Tooltip,
@@ -33,7 +30,8 @@ import {
 import {
   AlertMessageProvider,
   useAlertMessage,
-} from '../components/Alert.context';
+  AlertMessage,
+} from '../components/AlertMessage';
 import { AudioStatusProvider } from '../components/AudioPlayer/AudioStatus.context';
 import AudioPlayer from '../components/AudioPlayer';
 import LyricsPlayer, { LyricsProvider } from '../components/LyricsPlayer';
@@ -57,12 +55,7 @@ const MainPage = ({
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
-  const {
-    alertMessage,
-    setAlertMessage,
-    showAlertMessage,
-    setShowAlertMessage,
-  } = useAlertMessage();
+  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
 
   useEffect(() => {
     const spleeterProcessSongUnsubscribe =
@@ -117,34 +110,6 @@ const MainPage = ({
   return (
     <Container>
       <CssBaseline enableColorScheme />
-      <Snackbar
-        open={showAlertMessage}
-        autoHideDuration={
-          window.electron.store.config.getSettings().errorMessagesTimeout * 1000
-        }
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        onClose={(_event, reason) => {
-          if (reason === 'clickaway') return;
-          setShowAlertMessage(false);
-        }}
-      >
-        <Alert
-          variant="filled"
-          severity={alertMessage.severity}
-          action={
-            <Button
-              variant="outlined"
-              color="inherit"
-              size="small"
-              onClick={() => setShowAlertMessage(false)}
-            >
-              Close
-            </Button>
-          }
-        >
-          {alertMessage.message}
-        </Alert>
-      </Snackbar>
       <Container
         maxWidth={false}
         sx={{
@@ -154,21 +119,22 @@ const MainPage = ({
           bottom: '130px',
         }}
       >
+        <AlertMessage />
         <ConfirmationProvider>
           <SongStagingDialogProvider>
             <SongDialogProvider>
+              <SongDialog song={openSong} setSong={setOpenSong} />
+              <SongStagingDialog
+                uploadedSongs={uploadedSongs}
+                setUploadedSongs={setUploadedSongs}
+              />
+              <ConfirmationDialog />
               <LeftSidebar>
                 <Typography variant="h5" align="center" paddingTop="15px">
                   Songs Library
                 </Typography>
                 <SongUploadButton setUploadedSongs={setUploadedSongs} />
                 <SongList setOpenSong={setOpenSong} />
-                <SongDialog song={openSong} setSong={setOpenSong} />
-                <ConfirmationDialog />
-                <SongStagingDialog
-                  uploadedSongs={uploadedSongs}
-                  setUploadedSongs={setUploadedSongs}
-                />
               </LeftSidebar>
             </SongDialogProvider>
           </SongStagingDialogProvider>
@@ -244,6 +210,34 @@ export default function App() {
         typography: {
           button: {
             textTransform: 'none',
+          },
+        },
+        components: {
+          MuiCssBaseline: {
+            styleOverrides: {
+              body: {
+                scrollbarColor: `${currentTheme.scrollbarThumb} ${currentTheme.scrollbarTrack}`,
+                '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
+                  backgroundColor: currentTheme.scrollbarTrack,
+                },
+                '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
+                  backgroundColor: currentTheme.scrollbarThumb,
+                  border: `2px solid ${currentTheme.scrollbarTrack}`,
+                },
+                '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
+                  {
+                    backgroundColor: currentTheme.scrollbarHover,
+                  },
+                '&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus':
+                  {
+                    backgroundColor: currentTheme.scrollbarHover,
+                  },
+                '&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active':
+                  {
+                    backgroundColor: currentTheme.scrollbarActive,
+                  },
+              },
+            },
           },
         },
       }),

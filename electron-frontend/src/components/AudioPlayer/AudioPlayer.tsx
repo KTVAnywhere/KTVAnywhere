@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import {
   Box,
   Grid,
@@ -19,7 +20,7 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import { useEffect } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
-import { useAlertMessage } from '../Alert.context';
+import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from './AudioStatus.context';
 import { LyricsAdjust } from '../LyricsPlayer';
 
@@ -137,8 +138,14 @@ export const AudioPlayer = () => {
 
   const destroySource = () => {
     if (source) {
-      source.off();
       source.disconnect();
+      source.off();
+      source._node.onaudioprocess = null;
+      source._node = null;
+      source._soundtouch = null;
+      source._filter.sourceSound.buffer = null;
+      source._filter.sourceSound = null;
+      source._filter = null;
       setSource(null);
     }
   };
@@ -146,8 +153,7 @@ export const AudioPlayer = () => {
   const toArrayBuffer = (buffer: Buffer) => {
     const ab = new ArrayBuffer(buffer.length);
     const view = new Uint8Array(ab);
-    let i;
-    for (i = 0; i < buffer.length; i += 1) {
+    for (let i = 0; i < buffer.length; i += 1) {
       view[i] = buffer[i];
     }
     return ab;
@@ -170,6 +176,7 @@ export const AudioPlayer = () => {
     destroySource();
     newSource.connect(gainNode);
     if (playNow) {
+      gainNode.disconnect();
       gainNode.connect(audioContext.destination);
     }
     setSource(newSource);
@@ -193,10 +200,20 @@ export const AudioPlayer = () => {
         const arrayBuffer = toArrayBuffer(
           await window.electron.file.readAsBuffer(filePath)
         );
-        audioContext.decodeAudioData(arrayBuffer, (buffer: AudioBuffer) => {
-          createSource(buffer, percentagePlayed, playNow);
-          setIsLoading(false);
-        });
+        audioContext
+          .decodeAudioData(arrayBuffer)
+          .then((buffer: AudioBuffer) => {
+            createSource(buffer, percentagePlayed, playNow);
+            return setIsLoading(false);
+          })
+          .catch((error) => {
+            setAlertMessage({
+              message: `${error}`,
+              severity: 'error',
+            });
+            setShowAlertMessage(true);
+            setIsLoading(false);
+          });
         if (callback) {
           callback();
         }
@@ -263,7 +280,13 @@ export const AudioPlayer = () => {
   };
 
   const toggleLyrics = () => {
-    if (!lyricsEnabled && !currentSong?.lyricsPath) {
+    if (
+      !lyricsEnabled &&
+      !(
+        currentSong?.lyricsPath &&
+        window.electron.file.ifFileExists(currentSong?.lyricsPath)
+      )
+    ) {
       setAlertMessage({
         message: 'Lyrics file not found',
         severity: 'info',
@@ -365,7 +388,6 @@ export const AudioPlayer = () => {
 
   const saveConfig = () => {
     window.removeEventListener('beforeunload', saveConfig);
-    destroySource();
     window.electron.store.config.setPlayingSong({
       songId: currentSong ? currentSong.songId : '',
       currentTime,
@@ -375,6 +397,7 @@ export const AudioPlayer = () => {
       vocalsEnabled: isPlayingVocals,
       lyricsEnabled,
     });
+    destroySource();
   };
 
   window.addEventListener('beforeunload', saveConfig);
@@ -449,13 +472,15 @@ export const AudioPlayer = () => {
           <Typography>Pitch: {pitch > 0 ? `+${pitch}` : pitch}</Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '3%', marginRight: '3%' }}>
-          <IconButton
-            sx={{ padding: 0 }}
-            data-testid="backward-10-button"
-            onClick={backwardTenSeconds}
-          >
-            <FastRewindIcon sx={{ fontSize: '35px' }} />
-          </IconButton>
+          <Tooltip title="Backward 10s" placement="top">
+            <IconButton
+              sx={{ padding: 0 }}
+              data-testid="backward-10-button"
+              onClick={backwardTenSeconds}
+            >
+              <FastRewindIcon sx={{ fontSize: '35px' }} />
+            </IconButton>
+          </Tooltip>
           {isPlaying ? (
             <IconButton
               sx={{ padding: 0 }}
@@ -473,13 +498,15 @@ export const AudioPlayer = () => {
               <PlayCircleIcon sx={{ fontSize: '64px' }} />
             </IconButton>
           )}
-          <IconButton
-            sx={{ padding: 0 }}
-            data-testid="forward-10-button"
-            onClick={forwardTenSeconds}
-          >
-            <FastForwardIcon sx={{ fontSize: '35px' }} />
-          </IconButton>
+          <Tooltip title="Forward 10s" placement="top">
+            <IconButton
+              sx={{ padding: 0 }}
+              data-testid="forward-10-button"
+              onClick={forwardTenSeconds}
+            >
+              <FastForwardIcon sx={{ fontSize: '35px' }} />
+            </IconButton>
+          </Tooltip>
         </Grid>
         <Grid item sx={{ marginRight: '1%' }}>
           <IconButton sx={{ padding: 0 }} onClick={() => volumeZero()}>
@@ -513,7 +540,11 @@ export const AudioPlayer = () => {
               color="secondary"
             />
             <Box position="absolute" top="0" left="100px">
-              {lyricsEnabled && currentSong?.lyricsPath && <LyricsAdjust />}
+              {lyricsEnabled &&
+                currentSong?.lyricsPath &&
+                window.electron.file.ifFileExists(currentSong?.lyricsPath) && (
+                  <LyricsAdjust />
+                )}
             </Box>
           </Grid>
           <Typography align="center">lyrics</Typography>

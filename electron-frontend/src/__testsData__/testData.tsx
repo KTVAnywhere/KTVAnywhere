@@ -24,7 +24,7 @@ export const songTestData = [
     songName: 'bensound-betterdays',
     artist: 'bensound',
     songPath: 'C:\\dir\\bensound-betterdays.mp3',
-    lyricsPath: 'C:\\dir\\bensound-betterdays.lrc',
+    lyricsPath: '',
     vocalsPath: 'C:\\dir\\bensound-betterdays\\vocals.mp3',
     accompanimentPath: 'C:\\dir\\bensound-betterdays\\accompaniment.mp3',
   },
