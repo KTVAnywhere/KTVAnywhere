@@ -388,7 +388,6 @@ export const AudioPlayer = () => {
 
   const saveConfig = () => {
     window.removeEventListener('beforeunload', saveConfig);
-    destroySource();
     window.electron.store.config.setPlayingSong({
       songId: currentSong ? currentSong.songId : '',
       currentTime,
@@ -398,6 +397,7 @@ export const AudioPlayer = () => {
       vocalsEnabled: isPlayingVocals,
       lyricsEnabled,
     });
+    destroySource();
   };
 
   window.addEventListener('beforeunload', saveConfig);
