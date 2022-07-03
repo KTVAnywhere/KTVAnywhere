@@ -1,5 +1,6 @@
 import { AudioPlayer } from './AudioPlayer';
+import Microphone from './Microphone';
 import { AudioStatusProvider, useAudioStatus } from './AudioStatus.context';
 
 export default AudioPlayer;
-export { AudioStatusProvider, useAudioStatus };
+export { Microphone, AudioStatusProvider, useAudioStatus };

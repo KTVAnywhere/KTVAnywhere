@@ -189,10 +189,17 @@ const SettingsMenu = ({
   }, []);
 
   return (
-    <Dialog fullWidth maxWidth="sm" open={showSettings} onClose={closeDialog}>
+    <Dialog
+      scroll="paper"
+      fullWidth
+      maxWidth="sm"
+      open={showSettings}
+      onClose={closeDialog}
+      sx={{ top: '15%', maxHeight: '600px' }}
+    >
       <DialogTitle>Settings</DialogTitle>
       <DialogContent>
-        <Grid container>
+        <Grid container paddingBottom={2}>
           <Grid
             item
             display="flex"
@@ -226,9 +233,7 @@ const SettingsMenu = ({
             </FormControl>
           </Grid>
         </Grid>
-      </DialogContent>
-      <DialogContent>
-        <Grid container>
+        <Grid container paddingBottom={2}>
           <Grid
             item
             display="flex"
@@ -262,9 +267,7 @@ const SettingsMenu = ({
             </FormControl>
           </Grid>
         </Grid>
-      </DialogContent>
-      <DialogContent>
-        <Grid container>
+        <Grid container paddingBottom={2}>
           <Grid
             item
             display="flex"
@@ -300,9 +303,7 @@ const SettingsMenu = ({
             </FormControl>
           </Grid>
         </Grid>
-      </DialogContent>
-      <DialogContent>
-        <Grid container>
+        <Grid container paddingBottom={2}>
           <Grid
             item
             display="flex"
@@ -334,9 +335,7 @@ const SettingsMenu = ({
             </FormControl>
           </Grid>
         </Grid>
-      </DialogContent>
-      <DialogContent>
-        <Grid container>
+        <Grid container paddingBottom={2}>
           <Grid
             item
             display="flex"

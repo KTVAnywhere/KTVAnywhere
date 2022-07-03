@@ -14,12 +14,14 @@ import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from './AudioStatus.context';
 
 const MicrophoneMenu = ({
+  micNo,
   open,
   anchorEl,
   microphoneGainNode,
   microphoneVolume,
   setMicrophoneVolume,
 }: {
+  micNo: number;
   open: boolean;
   anchorEl: HTMLElement | null;
   microphoneGainNode: GainNode;
@@ -39,6 +41,9 @@ const MicrophoneMenu = ({
         }}
       >
         <Stack direction="column" alignItems="center" justifyContent="center">
+          <Typography gutterBottom variant="h6">
+            mic {micNo} settings
+          </Typography>
           <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
             <Typography sx={{ width: '230px' }}>
               Volume: {microphoneVolume}%
@@ -50,6 +55,7 @@ const MicrophoneMenu = ({
               min={0}
               max={100}
               color="secondary"
+              data-testid={`microphone-${micNo}-volume-slider`}
             />
           </Stack>
         </Stack>
@@ -166,11 +172,16 @@ const Microphone = () => {
             }
             placement="bottom"
           >
-            <IconButton onClick={clickOpenMenu1} sx={{ padding: 0 }}>
+            <IconButton
+              onClick={clickOpenMenu1}
+              sx={{ padding: 0 }}
+              data-testid="toggle-mic-1-settings-menu"
+            >
               <MicIcon sx={{ fontSize: '30px' }} />
             </IconButton>
           </Tooltip>
           <MicrophoneMenu
+            micNo={1}
             open={openMicrophone1Menu}
             anchorEl={anchorEl1}
             microphoneGainNode={microphone1GainNode}
@@ -196,11 +207,16 @@ const Microphone = () => {
             }
             placement="bottom"
           >
-            <IconButton onClick={clickOpenMenu2} sx={{ padding: 0 }}>
+            <IconButton
+              onClick={clickOpenMenu2}
+              sx={{ padding: 0 }}
+              data-testid="toggle-mic-2-settings-menu"
+            >
               <MicIcon sx={{ fontSize: '30px' }} />
             </IconButton>
           </Tooltip>
           <MicrophoneMenu
+            micNo={2}
             open={openMicrophone2Menu}
             anchorEl={anchorEl2}
             microphoneGainNode={microphone2GainNode}
