@@ -23,6 +23,7 @@ import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from './AudioStatus.context';
 import { LyricsAdjust } from '../LyricsPlayer';
+import Microphone from './Microphone';
 
 const ProgressBar = () => {
   const { duration, currentTime, setCurrentTime, source } = useAudioStatus();
@@ -439,7 +440,19 @@ export const AudioPlayer = () => {
           </Tooltip>
         </Grid>
         <Grid item>
-          <Grid container direction="row" alignItems="center">
+          <Grid
+            container
+            direction="row"
+            alignItems="center"
+            position="relative"
+          >
+            <Box position="absolute" top="0" right="100px">
+              {lyricsEnabled &&
+                currentSong?.lyricsPath &&
+                window.electron.file.ifFileExists(currentSong?.lyricsPath) && (
+                  <LyricsAdjust />
+                )}
+            </Box>
             <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
             <Switch
               checked={isPlayingVocals}
@@ -539,12 +552,8 @@ export const AudioPlayer = () => {
               onClick={toggleLyrics}
               color="secondary"
             />
-            <Box position="absolute" top="0" left="100px">
-              {lyricsEnabled &&
-                currentSong?.lyricsPath &&
-                window.electron.file.ifFileExists(currentSong?.lyricsPath) && (
-                  <LyricsAdjust />
-                )}
+            <Box position="absolute" left="100px" top="0">
+              <Microphone />
             </Box>
           </Grid>
           <Typography align="center">lyrics</Typography>

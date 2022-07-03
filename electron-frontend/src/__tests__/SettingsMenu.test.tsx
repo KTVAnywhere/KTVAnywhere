@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 import { AudioContext } from 'standardized-audio-context-mock';
 import mockedElectron from '../__testsData__/mocks';
 import App from '../renderer/App';
@@ -8,15 +9,31 @@ import SettingsMenu from '../components/Settings';
 describe('Settings menu component test', () => {
   global.window.electron = mockedElectron;
   global.AudioContext = AudioContext as any;
+  const mediaDevicesPromise = Promise.resolve([]);
 
-  test('click settings button should show settings menu', () => {
+  beforeEach(() => {
+    const mockEnumerateDevices = jest.fn(() => mediaDevicesPromise);
+
+    Object.defineProperty(global.navigator, 'mediaDevices', {
+      writable: true,
+      value: {
+        enumerateDevices: mockEnumerateDevices,
+      },
+    });
+  });
+
+  test('click settings button should show settings menu', async () => {
     render(<App />);
     const settingsButton = screen.getByTestId('settings-button');
     fireEvent.click(settingsButton);
     expect(screen.getByText('Settings')).toBeInTheDocument();
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
   });
 
-  test('click close settings button should close settings menu', () => {
+  test('click close settings button should close settings menu', async () => {
     const mockSetShowSettings = jest.fn();
     render(
       <SettingsMenu
@@ -25,14 +42,16 @@ describe('Settings menu component test', () => {
         setCurrentTheme={jest.fn()}
       />
     );
-    const closeSettingsButton = screen.getAllByRole('button', {
-      name: /Close/i,
-    })[0];
+    const closeSettingsButton = screen.getByTestId('close-settings-button');
     fireEvent.click(closeSettingsButton);
     expect(mockSetShowSettings).toBeCalledWith(false);
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
   });
 
-  test('change errorMessagesTimeout', () => {
+  test('change errorMessagesTimeout', async () => {
     const mockSetSettings = jest.fn();
     global.window.electron = {
       ...mockedElectron,
@@ -52,7 +71,7 @@ describe('Settings menu component test', () => {
       />
     );
 
-    const errorMessagesTimeoutOptions = screen.getAllByRole('button')[1];
+    const errorMessagesTimeoutOptions = screen.getAllByRole('button')[3];
     fireEvent.mouseDown(errorMessagesTimeoutOptions);
 
     fireEvent.click(within(screen.getByRole('listbox')).getByText(/15s/));
@@ -60,6 +79,10 @@ describe('Settings menu component test', () => {
     expect(mockSetSettings).toBeCalledWith({
       ...mockedElectron.store.config.getSettings(),
       errorMessagesTimeout: 15,
+    });
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
     });
   });
 });

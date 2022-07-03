@@ -36,6 +36,28 @@ interface ContextState {
   gainNode: GainNode;
   source: typeof PitchShifter | null;
   setSource: Dispatch<SetStateAction<typeof PitchShifter | null>>;
+  microphone1Enabled: boolean;
+  setMicrophone1Enabled: Dispatch<SetStateAction<boolean>>;
+  microphone2Enabled: boolean;
+  setMicrophone2Enabled: Dispatch<SetStateAction<boolean>>;
+  microphone1Media: MediaStreamAudioSourceNode | null | undefined;
+  setMicrophone1Media: Dispatch<
+    SetStateAction<MediaStreamAudioSourceNode | null | undefined>
+  >;
+  microphone2Media: MediaStreamAudioSourceNode | null | undefined;
+  setMicrophone2Media: Dispatch<
+    SetStateAction<MediaStreamAudioSourceNode | null | undefined>
+  >;
+  audioInput1Id: string;
+  setAudioInput1Id: Dispatch<SetStateAction<string>>;
+  audioInput2Id: string;
+  setAudioInput2Id: Dispatch<SetStateAction<string>>;
+  microphone1GainNode: GainNode;
+  microphone2GainNode: GainNode;
+  microphone1Volume: number;
+  setMicrophone1Volume: Dispatch<SetStateAction<number>>;
+  microphone2Volume: number;
+  setMicrophone2Volume: Dispatch<SetStateAction<number>>;
 }
 
 const AudioStatusContext = createContext({} as ContextState);
@@ -51,6 +73,10 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const newAudioContext = new AudioContext();
   const newGainNode = newAudioContext.createGain();
   newGainNode.gain.value = playingSong.volume / 100;
+  const newMicrophone1GainNode = newAudioContext.createGain();
+  newMicrophone1GainNode.gain.value = playingSong.volume / 100;
+  const newMicrophone2GainNode = newAudioContext.createGain();
+  newMicrophone2GainNode.gain.value = playingSong.volume / 100;
   const [duration, setDuration] = useState<number>(songDuration);
   const [songEnded, setSongEnded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -69,6 +95,22 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const [audioContext] = useState<AudioContext>(newAudioContext);
   const [gainNode] = useState<GainNode>(newGainNode);
   const [source, setSource] = useState<typeof PitchShifter | null>();
+  const [microphone1Enabled, setMicrophone1Enabled] = useState<boolean>(false);
+  const [microphone2Enabled, setMicrophone2Enabled] = useState<boolean>(false);
+  const [microphone1Media, setMicrophone1Media] =
+    useState<MediaStreamAudioSourceNode | null>();
+  const [microphone2Media, setMicrophone2Media] =
+    useState<MediaStreamAudioSourceNode | null>();
+  const [audioInput1Id, setAudioInput1Id] = useState<string>('');
+  const [audioInput2Id, setAudioInput2Id] = useState<string>('');
+  const [microphone1GainNode] = useState<GainNode>(newMicrophone1GainNode);
+  const [microphone2GainNode] = useState<GainNode>(newMicrophone2GainNode);
+  const [microphone1Volume, setMicrophone1Volume] = useState<number>(
+    playingSong.volume
+  );
+  const [microphone2Volume, setMicrophone2Volume] = useState<number>(
+    playingSong.volume
+  );
 
   return (
     <AudioStatusContext.Provider
@@ -99,6 +141,24 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
         gainNode,
         source,
         setSource,
+        microphone1Enabled,
+        setMicrophone1Enabled,
+        microphone2Enabled,
+        setMicrophone2Enabled,
+        microphone1Media,
+        setMicrophone1Media,
+        microphone2Media,
+        setMicrophone2Media,
+        audioInput1Id,
+        setAudioInput1Id,
+        audioInput2Id,
+        setAudioInput2Id,
+        microphone1GainNode,
+        microphone2GainNode,
+        microphone1Volume,
+        setMicrophone1Volume,
+        microphone2Volume,
+        setMicrophone2Volume,
       }}
     >
       {children}
