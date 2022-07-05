@@ -42,7 +42,7 @@ const SongCard = ({
     return !!song.accompanimentPath;
   };
 
-  const spleeterSeparateVocalsAndMusic = () => {
+  const processSong = () => {
     if (isProcessed()) {
       setConfirmationMessage({
         heading: 'Process song',
@@ -117,7 +117,7 @@ const SongCard = ({
           <LoadingButton
             size="small"
             loading={songsStatus.indexOf(song.songId) !== -1}
-            onClick={spleeterSeparateVocalsAndMusic}
+            onClick={processSong}
           >
             Process
           </LoadingButton>

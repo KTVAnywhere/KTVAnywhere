@@ -1,3 +1,4 @@
+import { NoteEventTime } from '@spotify/basic-pitch/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
@@ -111,25 +112,58 @@ contextBridge.exposeInMainWorld('electron', {
     getSongDetails(songPaths: string[]) {
       return ipcRenderer.invoke('preprocess:getSongDetails', songPaths);
     },
-    spleeterProcessSong(song: SongProps) {
-      ipcRenderer.send('preprocess:spleeterProcessSong', song);
+    processSong(song: SongProps) {
+      ipcRenderer.send('preprocess:processSong', song);
     },
-    spleeterProcessResult(
+    processResult(
       callback: (results: {
         vocalsPath: string;
         accompanimentPath: string;
+        graphPath: string;
         songId: string;
         error?: Error;
       }) => void
     ) {
-      ipcRenderer.on('preprocess:spleeterProcessResult', (_event, data) =>
+      ipcRenderer.on('preprocess:processResult', (_event, data) =>
         callback(data)
       );
       return () =>
-        ipcRenderer.removeListener(
-          'preprocess:spleeterProcessResult',
-          (_event, data) => callback(data)
+        ipcRenderer.removeListener('preprocess:processResult', (_event, data) =>
+          callback(data)
         );
+    },
+    basicPitchProcessSong(
+      callback: (
+        song: SongProps,
+        vocalsPath: string,
+        accompanimentPath: string
+      ) => void
+    ) {
+      ipcRenderer.on(
+        'preprocess:basicPitchProcessSong',
+        (_event, song, vocalsPath, accompanimentPath) =>
+          callback(song, vocalsPath, accompanimentPath)
+      );
+      return () =>
+        ipcRenderer.removeListener(
+          'preprocess:basicPitchProcessSong',
+          (_event, song, vocalsPath, accompanimentPath) =>
+            callback(song, vocalsPath, accompanimentPath)
+        );
+    },
+    basicPitchProcessResult(
+      song: SongProps,
+      vocalsPath: string,
+      accompanimentPath: string,
+      result: { noteEvents: NoteEventTime[]; error?: Error }
+    ) {
+      ipcRenderer.send(
+        'preprocess:basicPitchProcessResult',
+        song,
+        vocalsPath,
+        accompanimentPath,
+        result
+      );
     },
   },
 });

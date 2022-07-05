@@ -1,3 +1,4 @@
+import { NoteEventTime } from '@spotify/basic-pitch/types';
 import { IpcRenderer } from 'electron';
 import { ConfigType } from 'main/schema';
 import { SongProps } from '../components/Song';
@@ -55,15 +56,29 @@ declare global {
         getSongDetails(
           songPaths: string[]
         ): Promise<{ songName: string; artist: string; songPath: string }[]>;
-        spleeterProcessSong(song: SongProps): void;
-        spleeterProcessResult(
+        processSong(song: SongProps): void;
+        processResult(
           callback: (results: {
             vocalsPath: string;
             accompanimentPath: string;
+            graphPath: string;
             songId: string;
             error?: Error;
           }) => void
         ): () => void;
+        basicPitchProcessSong(
+          callback: (
+            song: SongProps,
+            vocalsPath: string,
+            accompanimentPath: string
+          ) => void
+        ): () => void;
+        basicPitchProcessResult(
+          song: SongProps,
+          vocalsPath: string,
+          accompanimentPath: string,
+          result: { noteEvents: NoteEventTime[]; error?: Error }
+        ): void;
       };
     };
   }

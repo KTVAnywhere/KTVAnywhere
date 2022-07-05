@@ -44,6 +44,7 @@ import SettingsMenu, {
   ColorThemeProps,
   GetColorTheme,
 } from '../components/Settings';
+import PitchGraph from '../components/PitchGraph';
 
 const MainPage = ({
   setCurrentTheme,
@@ -58,37 +59,36 @@ const MainPage = ({
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
 
   useEffect(() => {
-    const spleeterProcessSongUnsubscribe =
-      window.electron.preprocess.spleeterProcessResult(
-        ({ vocalsPath, accompanimentPath, songId, error }) => {
-          if (!error) {
-            const songProcessedSuccessfully =
-              window.electron.store.songs.getSong(songId);
-            const changedSong = {
-              ...songProcessedSuccessfully,
-              vocalsPath,
-              accompanimentPath,
-            };
-            window.electron.store.songs.setSong(changedSong);
-            setAlertMessage({
-              message: `Vocals separated successfully for ${songProcessedSuccessfully.songName}`,
-              severity: 'success',
-            });
-            setShowAlertMessage(true);
-          } else {
-            console.error(error);
-            setAlertMessage({
-              message: error.message,
-              severity: 'error',
-            });
-            setShowAlertMessage(true);
-          }
-          setSongsStatus((state) => state.slice(1));
+    const processSongUnsubscribe = window.electron.preprocess.processResult(
+      ({ vocalsPath, accompanimentPath, graphPath, songId, error }) => {
+        if (!error) {
+          const songProcessedSuccessfully =
+            window.electron.store.songs.getSong(songId);
+          const changedSong = {
+            ...songProcessedSuccessfully,
+            vocalsPath,
+            accompanimentPath,
+            graphPath,
+          };
+          window.electron.store.songs.setSong(changedSong);
+          setAlertMessage({
+            message: `Vocals separated successfully for ${songProcessedSuccessfully.songName}`,
+            severity: 'success',
+          });
+          setShowAlertMessage(true);
+        } else {
+          setAlertMessage({
+            message: error.message,
+            severity: 'error',
+          });
+          setShowAlertMessage(true);
         }
-      );
+        setSongsStatus((state) => state.slice(1));
+      }
+    );
 
     return () => {
-      spleeterProcessSongUnsubscribe();
+      processSongUnsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -103,7 +103,7 @@ const MainPage = ({
       const nextSongId = songsStatus[0];
       const toProcess = window.electron.store.songs.getSong(nextSongId);
       setSongInSpleeter(nextSongId);
-      window.electron.preprocess.spleeterProcessSong(toProcess);
+      window.electron.preprocess.processSong(toProcess);
     }
   }, [songInSpleeter, songsStatus]);
 
@@ -151,6 +151,7 @@ const MainPage = ({
               pb: '1%',
             }}
           >
+            <PitchGraph />
             <LyricsPlayer />
           </Grid>
         </Grid>

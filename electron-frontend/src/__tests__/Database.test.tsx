@@ -63,6 +63,7 @@ describe('songs store', () => {
       lyricsPath: 'C:\\dir\\lyrics2.lrc',
       vocalsPath: '',
       accompanimentPath: '',
+      graphPath: '',
     };
     const { addSong } = songFunctions;
     addSong(songsStore, songSearcher, toAdd);
@@ -103,6 +104,7 @@ describe('songs store', () => {
         lyricsPath: 'C:\\dir\\lyrics2.lrc',
         vocalsPath: '',
         accompanimentPath: '',
+        graphPath: '',
       },
       {
         songId: '3',
@@ -112,6 +114,7 @@ describe('songs store', () => {
         lyricsPath: 'C:\\dir\\lyrics3.lrc',
         vocalsPath: '',
         accompanimentPath: '',
+        graphPath: '',
       },
     ];
     const { setAllSongs } = songFunctions;
@@ -157,6 +160,7 @@ describe('queueItems store', () => {
         lyricsPath: 'C:\\dir\\lyrics3.lrc',
         vocalsPath: '',
         accompanimentPath: '',
+        graphPath: '',
       },
       queueItemId: '3',
     };

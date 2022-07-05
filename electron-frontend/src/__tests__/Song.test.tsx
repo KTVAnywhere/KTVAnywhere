@@ -244,6 +244,7 @@ describe('Song', () => {
         ...songTestData[1],
         vocalsPath: expect.any(String),
         accompanimentPath: expect.any(String),
+        graphPath: expect.any(String),
       })
     );
   });

@@ -11,6 +11,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import Fuse from 'fuse.js';
+import { NoteEventTime } from '@spotify/basic-pitch';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import { spawn } from 'child_process';
 import MenuBuilder from './menu';
@@ -33,6 +34,7 @@ import {
 import { SongProps } from '../components/Song';
 
 let mainWindow: BrowserWindow | null = null;
+let workerWindow: BrowserWindow | null = null;
 
 ipcMain.handle('file:read', async (_, filePath: string) => {
   const data = await fs.promises.readFile(filePath, 'utf-8');
@@ -108,6 +110,20 @@ const createWindow = async () => {
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
+  if (workerWindow === null) {
+    workerWindow = new BrowserWindow({
+      show: false,
+      icon: getAssetPath('icon.png'),
+      webPreferences: {
+        backgroundThrottling: false,
+        preload: app.isPackaged
+          ? path.join(__dirname, 'preload.js')
+          : path.join(__dirname, '../../.erb/dll/preload.js'),
+      },
+    });
+    workerWindow.loadURL(resolveHtmlPath('worker.html'));
+  }
+
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
@@ -121,6 +137,7 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+    workerWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
@@ -153,7 +170,7 @@ app
     ipcMain.handle('preprocess:getSongDetails', async (_, songPaths) =>
       processSongDetails(songPaths)
     );
-    ipcMain.on('preprocess:spleeterProcessSong', async (event, song) => {
+    ipcMain.on('preprocess:processSong', async (event, song) => {
       try {
         const songFolder = path.join(
           app.getPath('userData'),
@@ -178,33 +195,37 @@ app
 
         spleeterProcess?.stdout.on('data', (message: string) => {
           if (`${message}` === `done splitting ${song.songId}`) {
-            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
-              vocalsPath: path.join(songFolder, 'vocals.mp3'),
-              accompanimentPath: path.join(songFolder, 'accompaniment.mp3'),
-              songId: song.songId,
-            });
+            workerWindow?.webContents.send(
+              'preprocess:basicPitchProcessSong',
+              song,
+              path.join(songFolder, 'vocals.mp3'),
+              path.join(songFolder, 'accompaniment.mp3')
+            );
           } else if (`${message}` === 'ffmpeg binary not found') {
-            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+            mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
+              graphPath: '',
               songId: song.songId,
               error: new Error(
                 'Failed to run spleeter: ffmpeg binary not found'
               ),
             });
           } else if (`${message}` === 'input file does not exist') {
-            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+            mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
+              graphPath: '',
               songId: song.songId,
               error: new Error(
                 `Failed to run spleeter: ${song.songPath} does not exist`
               ),
             });
           } else if (`${message}` === 'generic error message') {
-            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+            mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
+              graphPath: '',
               songId: song.songId,
               error: new Error('Failed to run spleeter'),
             });
@@ -215,31 +236,74 @@ app
           spleeterProcess.removeAllListeners();
         });
       } catch (error) {
-        event.reply('preprocess:spleeterProcessResult', {
+        event.reply('preprocess:processResult', {
           vocalsPath: '',
           accompanimentPath: '',
+          graphPath: '',
+          songId: song.songId,
           error: error as Error,
         });
       }
     });
+    ipcMain.on(
+      'preprocess:basicPitchProcessResult',
+      async (
+        _,
+        song,
+        vocalsPath,
+        accompanimentPath,
+        result: { noteEvents: NoteEventTime[]; error: Error }
+      ) => {
+        const { noteEvents, error } = result;
+        if (!error) {
+          const graphPath = path.join(vocalsPath, '..', 'graph.json');
+          const { error: writeError } = await writeFile(
+            graphPath,
+            JSON.stringify(noteEvents)
+          );
+          if (writeError) {
+            mainWindow?.webContents.send('preprocess:processResult', {
+              vocalsPath: '',
+              accompanimentPath: '',
+              graphPath: '',
+              songId: song.songId,
+              error: writeError,
+            });
+          } else {
+            mainWindow?.webContents.send('preprocess:processResult', {
+              vocalsPath,
+              accompanimentPath,
+              graphPath,
+              songId: song.songId,
+            });
+          }
+        } else {
+          mainWindow?.webContents.send('preprocess:processResult', {
+            vocalsPath: '',
+            accompanimentPath: '',
+            graphPath: '',
+            songId: song.songId,
+            error,
+          });
+        }
+      }
+    );
 
+    // custom protocol for reading local files
+    protocol.registerFileProtocol('atom', (request, callback) => {
+      const url = request.url.substring(7);
+      try {
+        return callback({ path: decodeURI(path.normalize(url)) });
+      } catch (error) {
+        console.error('Failed to register protocol');
+      }
+      return false;
+    });
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
-    });
-    // custom protocol for reading local files
-    protocol.registerFileProtocol('atom', (request, callback) => {
-      const url = request.url.substring(8);
-      if (fs.existsSync(decodeURI(path.normalize(url)))) {
-        try {
-          return callback(decodeURI(path.normalize(url)));
-        } catch (error) {
-          console.error('Failed to register protocol');
-        }
-      }
-      return false;
     });
   })
   .then(() => {

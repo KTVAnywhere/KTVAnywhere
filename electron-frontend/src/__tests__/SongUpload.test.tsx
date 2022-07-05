@@ -43,9 +43,8 @@ describe('SongUploadButton', () => {
         },
       },
       preprocess: {
+        ...mockedElectron.preprocess,
         getSongDetails: mockGetSongDetails,
-        spleeterProcessSong: jest.fn(),
-        spleeterProcessResult: jest.fn(),
       },
     };
   });
@@ -92,6 +91,7 @@ describe('SongUploadButton', () => {
       lyricsPath: expect.any(String),
       vocalsPath: expect.any(String),
       accompanimentPath: expect.any(String),
+      graphPath: expect.any(String),
     }));
 
     await waitFor(() => expect(mockGetSongDetails).toBeCalled());

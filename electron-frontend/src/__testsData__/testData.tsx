@@ -1,6 +1,6 @@
 import { SongProps } from '../components/Song';
 
-export const songTestData = [
+export const songTestData: SongProps[] = [
   {
     songId: expect.any(String),
     songName: 'bensound-energy',
@@ -9,6 +9,7 @@ export const songTestData = [
     lyricsPath: 'C:\\dir\\bensound-energy.lrc',
     vocalsPath: '',
     accompanimentPath: '',
+    graphPath: '',
   },
   {
     songId: expect.any(String),
@@ -18,6 +19,7 @@ export const songTestData = [
     lyricsPath: 'C:\\dir\\bensound-sunny.lrc',
     vocalsPath: 'C:\\dir\\bensound-sunny\\vocals.mp3',
     accompanimentPath: 'C:\\dir\\bensound-sunny\\accompaniment.mp3',
+    graphPath: 'C:\\dir\\bensound-sunny\\graph.json',
   },
   {
     songId: expect.any(String),
@@ -27,6 +29,7 @@ export const songTestData = [
     lyricsPath: '',
     vocalsPath: 'C:\\dir\\bensound-betterdays\\vocals.mp3',
     accompanimentPath: 'C:\\dir\\bensound-betterdays\\accompaniment.mp3',
+    graphPath: 'C:\\dir\\bensound-betterdays\\graph.json',
   },
 ];
 

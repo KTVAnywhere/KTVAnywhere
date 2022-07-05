@@ -46,6 +46,7 @@ const songSchema: Schema<Song> = {
       lyricsPath: { type: 'string' },
       vocalsPath: { type: 'string' },
       accompanimentPath: { type: 'string' },
+      graphPath: { type: 'string' },
     },
     required: ['songId', 'songName', 'songPath'],
   },
