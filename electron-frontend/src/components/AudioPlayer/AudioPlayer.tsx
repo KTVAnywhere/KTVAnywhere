@@ -446,12 +446,8 @@ export const AudioPlayer = () => {
             alignItems="center"
             position="relative"
           >
-            <Box position="absolute" top="0" right="100px">
-              {lyricsEnabled &&
-                currentSong?.lyricsPath &&
-                window.electron.file.ifFileExists(currentSong?.lyricsPath) && (
-                  <LyricsAdjust />
-                )}
+            <Box position="absolute" right="100px" top="0">
+              <Microphone />
             </Box>
             <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
             <Switch
@@ -553,7 +549,11 @@ export const AudioPlayer = () => {
               color="secondary"
             />
             <Box position="absolute" left="100px" top="0">
-              <Microphone />
+              {lyricsEnabled &&
+                currentSong?.lyricsPath &&
+                window.electron.file.ifFileExists(currentSong?.lyricsPath) && (
+                  <LyricsAdjust />
+                )}
             </Box>
           </Grid>
           <Typography align="center">lyrics</Typography>

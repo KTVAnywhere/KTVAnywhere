@@ -59,6 +59,7 @@ const mockedElectron = {
     readAsBuffer: jest.fn(),
     ifFileExists: jest.fn(),
     write: jest.fn(),
+    getWavFileForReverbPath: jest.fn().mockResolvedValue(''),
   },
 };
 
@@ -121,6 +122,24 @@ export const mockedAudioStatus = {
   setMicrophone1Volume: jest.fn(),
   microphone2Volume: 70,
   setMicrophone2Volume: jest.fn(),
+  reverb1Enabled: false,
+  setReverb1Enabled: jest.fn(),
+  reverb2Enabled: false,
+  setReverb2Enabled: jest.fn(),
+  reverb1Media: null,
+  setReverb1Media: jest.fn(),
+  reverb2Media: null,
+  setReverb2Media: jest.fn(),
+  reverb1Node: undefined,
+  setReverb1Node: jest.fn(),
+  reverb2Node: undefined,
+  setReverb2Node: jest.fn(),
+  reverb1GainNode: new AudioContext().createGain() as any,
+  reverb2GainNode: new AudioContext().createGain() as any,
+  reverb1Volume: 70,
+  setReverb1Volume: jest.fn(),
+  reverb2Volume: 70,
+  setReverb2Volume: jest.fn(),
 };
 
 export default mockedElectron;
