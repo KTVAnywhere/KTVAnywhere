@@ -21,9 +21,39 @@ describe('Microphone component test', () => {
       </AudioStatusProvider>
     );
 
-    const mic1SettingsButton = screen.getByTestId('toggle-mic-1-settings-menu');
-    fireEvent.click(mic1SettingsButton);
-    expect(screen.getByText('mic 1 settings')).toBeInTheDocument();
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+    expect(screen.getByText('mic 1')).toBeInTheDocument();
+    expect(screen.getByText('mic 2')).toBeInTheDocument();
+  });
+
+  test('toggle microphone switch off (initially on) should disable microphone', async () => {
+    const mockSetMicrophone1Enabled = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      microphone1Enabled: true,
+      setMicrophone1Enabled: mockSetMicrophone1Enabled,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+
+    // switch off
+    const microphone1ToggleSwitch = screen.getByTestId(
+      'toggle-microphone-1-switch'
+    );
+    fireEvent.click(microphone1ToggleSwitch);
+
+    expect(mockSetMicrophone1Enabled).toHaveBeenCalledWith(false);
   });
 
   test('microphone volume slider should change microphone volume', async () => {
@@ -45,9 +75,10 @@ describe('Microphone component test', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-    // open microphone 1 settings menu
-    const mic1SettingsButton = screen.getByTestId('toggle-mic-1-settings-menu');
-    fireEvent.click(mic1SettingsButton);
+
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
 
     // get microphone 1 volume slider
     const sliderInput = screen.getByTestId('microphone-1-volume-slider');

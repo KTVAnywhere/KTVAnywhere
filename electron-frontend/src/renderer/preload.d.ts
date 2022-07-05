@@ -1,5 +1,5 @@
 import { IpcRenderer } from 'electron';
-import { ConfigType } from 'main/schema';
+import { ConfigType } from '../main/schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
@@ -15,6 +15,7 @@ declare global {
         readAsBuffer(filePath: string): Promise<Buffer>;
         ifFileExists(filePath: string): boolean;
         write(filePath: string, data: string): Promise<{ error?: Error }>;
+        getWavFileForReverbPath(): string;
       };
       music: {
         getLrc(song: SongProps): Promise<{ lyricsPath: string; error?: Error }>;

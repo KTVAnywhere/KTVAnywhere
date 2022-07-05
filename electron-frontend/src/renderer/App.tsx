@@ -206,6 +206,7 @@ export default function App() {
             default: currentTheme.mainPageBackground,
             paper: currentTheme.paperBackground,
           },
+          divider: currentTheme.secondary,
         },
         typography: {
           button: {

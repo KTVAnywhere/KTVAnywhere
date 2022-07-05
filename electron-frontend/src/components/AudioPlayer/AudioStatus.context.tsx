@@ -58,6 +58,28 @@ interface ContextState {
   setMicrophone1Volume: Dispatch<SetStateAction<number>>;
   microphone2Volume: number;
   setMicrophone2Volume: Dispatch<SetStateAction<number>>;
+  reverb1Enabled: boolean;
+  setReverb1Enabled: Dispatch<SetStateAction<boolean>>;
+  reverb2Enabled: boolean;
+  setReverb2Enabled: Dispatch<SetStateAction<boolean>>;
+  reverb1Media: MediaStreamAudioSourceNode | null | undefined;
+  setReverb1Media: Dispatch<
+    SetStateAction<MediaStreamAudioSourceNode | null | undefined>
+  >;
+  reverb2Media: MediaStreamAudioSourceNode | null | undefined;
+  setReverb2Media: Dispatch<
+    SetStateAction<MediaStreamAudioSourceNode | null | undefined>
+  >;
+  reverb1Node: ConvolverNode | undefined;
+  setReverb1Node: Dispatch<SetStateAction<ConvolverNode | undefined>>;
+  reverb2Node: ConvolverNode | undefined;
+  setReverb2Node: Dispatch<SetStateAction<ConvolverNode | undefined>>;
+  reverb1GainNode: GainNode;
+  reverb2GainNode: GainNode;
+  reverb1Volume: number;
+  setReverb1Volume: Dispatch<SetStateAction<number>>;
+  reverb2Volume: number;
+  setReverb2Volume: Dispatch<SetStateAction<number>>;
 }
 
 const AudioStatusContext = createContext({} as ContextState);
@@ -71,12 +93,18 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const timePlayed = playingSong.songId === '' ? 0 : playingSong.currentTime;
   const songDuration = playingSong.songId === '' ? 0 : playingSong.duration;
   const newAudioContext = new AudioContext();
+
   const newGainNode = newAudioContext.createGain();
-  newGainNode.gain.value = playingSong.volume / 100;
   const newMicrophone1GainNode = newAudioContext.createGain();
-  newMicrophone1GainNode.gain.value = playingSong.volume / 100;
   const newMicrophone2GainNode = newAudioContext.createGain();
+  const newReverb1GainNode = newAudioContext.createGain();
+  const newReverb2GainNode = newAudioContext.createGain();
+  newGainNode.gain.value = playingSong.volume / 100;
+  newMicrophone1GainNode.gain.value = playingSong.volume / 100;
   newMicrophone2GainNode.gain.value = playingSong.volume / 100;
+  newReverb1GainNode.gain.value = playingSong.volume / 100;
+  newReverb2GainNode.gain.value = playingSong.volume / 100;
+
   const [duration, setDuration] = useState<number>(songDuration);
   const [songEnded, setSongEnded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -109,6 +137,22 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
     playingSong.volume
   );
   const [microphone2Volume, setMicrophone2Volume] = useState<number>(
+    playingSong.volume
+  );
+  const [reverb1Enabled, setReverb1Enabled] = useState<boolean>(false);
+  const [reverb2Enabled, setReverb2Enabled] = useState<boolean>(false);
+  const [reverb1Media, setReverb1Media] =
+    useState<MediaStreamAudioSourceNode | null>();
+  const [reverb2Media, setReverb2Media] =
+    useState<MediaStreamAudioSourceNode | null>();
+  const [reverb1Node, setReverb1Node] = useState<ConvolverNode>();
+  const [reverb2Node, setReverb2Node] = useState<ConvolverNode>();
+  const [reverb1GainNode] = useState<GainNode>(newReverb1GainNode);
+  const [reverb2GainNode] = useState<GainNode>(newReverb2GainNode);
+  const [reverb1Volume, setReverb1Volume] = useState<number>(
+    playingSong.volume
+  );
+  const [reverb2Volume, setReverb2Volume] = useState<number>(
     playingSong.volume
   );
 
@@ -159,6 +203,24 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
         setMicrophone1Volume,
         microphone2Volume,
         setMicrophone2Volume,
+        reverb1Enabled,
+        setReverb1Enabled,
+        reverb2Enabled,
+        setReverb2Enabled,
+        reverb1Media,
+        setReverb1Media,
+        reverb2Media,
+        setReverb2Media,
+        reverb1Node,
+        setReverb1Node,
+        reverb2Node,
+        setReverb2Node,
+        reverb1GainNode,
+        reverb2GainNode,
+        reverb1Volume,
+        setReverb1Volume,
+        reverb2Volume,
+        setReverb2Volume,
       }}
     >
       {children}

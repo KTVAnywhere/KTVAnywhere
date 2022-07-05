@@ -53,6 +53,17 @@ ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
   return result;
 });
 
+ipcMain.handle('file:getWavFileForReverbPath', async () => {
+  const RESOURCES_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets');
+
+  const getAssetPath = (...paths: string[]): string => {
+    return path.join(RESOURCES_PATH, ...paths);
+  };
+  return getAssetPath('impulses_impulse_rev.wav');
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
