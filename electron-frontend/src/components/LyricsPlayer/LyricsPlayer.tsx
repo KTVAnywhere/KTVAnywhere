@@ -12,7 +12,7 @@ const LyricsPlayer = () => {
   const { lyricsRunner, setLyricsRunner } = useLyrics();
 
   useEffect(() => {
-    if (!lyricsEnabled || currentSong == null) {
+    if (!lyricsEnabled || currentSong === null) {
       setLyricsRunner(new Runner(Lrc.parse(''), true));
     } else if (!currentSong.lyricsPath) {
       setLyrics('no lyrics file for song');

@@ -72,7 +72,7 @@ const MainPage = ({
           };
           window.electron.store.songs.setSong(changedSong);
           setAlertMessage({
-            message: `Vocals separated successfully for ${songProcessedSuccessfully.songName}`,
+            message: `${songProcessedSuccessfully.songName} successfully processed`,
             severity: 'success',
           });
           setShowAlertMessage(true);
@@ -173,7 +173,7 @@ const MainPage = ({
       </Container>
       <Tooltip title="Settings">
         <IconButton
-          sx={{ position: 'fixed', bottom: 20, right: 20, padding: 0 }}
+          sx={{ position: 'fixed', bottom: 10, left: '2%', padding: 0 }}
           data-testid="settings-button"
           onClick={() => setShowSettings(true)}
         >

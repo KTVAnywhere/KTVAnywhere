@@ -88,7 +88,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
         newReverbNode = audioContext.createConvolver();
         const arrayBuffer = toArrayBuffer(
           await window.electron.file.readAsBuffer(
-            await window.electron.file.getWavFileForReverbPath()
+            window.electron.file.getWavFileForReverbPath()
           )
         );
         newReverbNode.buffer = await audioContext.decodeAudioData(arrayBuffer);

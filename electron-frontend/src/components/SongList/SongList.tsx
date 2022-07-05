@@ -39,7 +39,7 @@ const SongCard = ({
   } = useConfirmation();
 
   const isProcessed = () => {
-    return !!song.accompanimentPath;
+    return !!(song.accompanimentPath && song.graphPath);
   };
 
   const processSong = () => {

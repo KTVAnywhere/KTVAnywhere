@@ -34,6 +34,7 @@ const mockedElectron = {
           pitch: 0,
           vocalsEnabled: true,
           lyricsEnabled: true,
+          graphEnabled: true,
         };
       },
       setPlayingSong: jest.fn(),
@@ -100,6 +101,8 @@ export const mockedAudioStatus = {
   setNextSong: jest.fn(),
   lyricsEnabled: true,
   setLyricsEnabled: jest.fn(),
+  graphEnabled: true,
+  setGraphEnabled: jest.fn(),
   audioContext: new AudioContext() as any,
   gainNode: new AudioContext().createGain() as any,
   source: new MockSource(),

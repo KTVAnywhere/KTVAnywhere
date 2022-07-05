@@ -31,7 +31,8 @@ export const createConfigStore = () =>
         volume: 50,
         pitch: 0,
         vocalsEnabled: true,
-        lyricsEnabled: true,
+        lyricsEnabled: false,
+        graphEnabled: false,
       },
       settings: {
         errorMessagesTimeout: 5,

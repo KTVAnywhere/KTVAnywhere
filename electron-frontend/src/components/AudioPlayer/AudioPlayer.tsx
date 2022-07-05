@@ -18,6 +18,7 @@ import LyricsIcon from '@mui/icons-material/Lyrics';
 import VolumeMuteIcon from '@mui/icons-material/VolumeMute';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import { useEffect } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
@@ -108,6 +109,8 @@ export const AudioPlayer = () => {
     setNextSong,
     lyricsEnabled,
     setLyricsEnabled,
+    graphEnabled,
+    setGraphEnabled,
     audioContext,
     gainNode,
     source,
@@ -298,6 +301,24 @@ export const AudioPlayer = () => {
     }
   };
 
+  const toggleGraph = () => {
+    if (
+      !graphEnabled &&
+      !(
+        currentSong?.lyricsPath &&
+        window.electron.file.ifFileExists(currentSong?.graphPath)
+      )
+    ) {
+      setAlertMessage({
+        message: 'Graph file not found',
+        severity: 'info',
+      });
+      setShowAlertMessage(true);
+    } else {
+      setGraphEnabled((state) => !state);
+    }
+  };
+
   const enableVocals = () => {
     if (currentSong) {
       loadSong(currentSong.songPath, true, isPlaying, () =>
@@ -397,6 +418,7 @@ export const AudioPlayer = () => {
       pitch,
       vocalsEnabled: isPlayingVocals,
       lyricsEnabled,
+      graphEnabled,
     });
     destroySource();
   };
@@ -439,16 +461,11 @@ export const AudioPlayer = () => {
             </Typography>
           </Tooltip>
         </Grid>
+        <Grid item sx={{ mx: '1%' }}>
+          <Microphone />
+        </Grid>
         <Grid item>
-          <Grid
-            container
-            direction="row"
-            alignItems="center"
-            position="relative"
-          >
-            <Box position="absolute" right="100px" top="0">
-              <Microphone />
-            </Box>
+          <Grid container direction="row" alignItems="center">
             <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
             <Switch
               checked={isPlayingVocals}
@@ -461,7 +478,7 @@ export const AudioPlayer = () => {
           </Grid>
           <Typography align="center">vocals</Typography>
         </Grid>
-        <Grid item sx={{ marginLeft: '2%' }}>
+        <Grid item sx={{ marginLeft: '1%' }}>
           <IconButton sx={{ padding: 0 }} onClick={pitchZero}>
             <GraphicEqIcon sx={{ fontSize: '35px' }} />
           </IconButton>
@@ -480,7 +497,7 @@ export const AudioPlayer = () => {
           />
           <Typography>Pitch: {pitch > 0 ? `+${pitch}` : pitch}</Typography>
         </Grid>
-        <Grid item sx={{ marginLeft: '3%', marginRight: '3%' }}>
+        <Grid item sx={{ marginLeft: '1%', marginRight: '1%' }}>
           <Tooltip title="Backward 10s" placement="top">
             <IconButton
               sx={{ padding: 0 }}
@@ -522,7 +539,7 @@ export const AudioPlayer = () => {
             <VolumeMuteIcon sx={{ fontSize: '35px' }} />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginRight: '2%', width: '8%' }}>
+        <Grid item sx={{ marginRight: '1%', width: '8%' }}>
           <Slider
             aria-label="Volume"
             value={volume}
@@ -533,6 +550,18 @@ export const AudioPlayer = () => {
             data-testid="volume-slider"
           />
           <Typography>Volume: {volume}%</Typography>
+        </Grid>
+        <Grid item sx={{ marginRight: '1%' }}>
+          <Grid container direction="row" alignItems="center">
+            <AutoGraphIcon sx={{ fontSize: '30px' }} />
+            <Switch
+              checked={graphEnabled}
+              data-testid="toggle-graph-button"
+              onClick={toggleGraph}
+              color="secondary"
+            />
+          </Grid>
+          <Typography align="center">graph</Typography>
         </Grid>
         <Grid item>
           <Grid
@@ -548,7 +577,7 @@ export const AudioPlayer = () => {
               onClick={toggleLyrics}
               color="secondary"
             />
-            <Box position="absolute" left="100px" top="0">
+            <Box position="absolute" left="80px" top="0">
               {lyricsEnabled &&
                 currentSong?.lyricsPath &&
                 window.electron.file.ifFileExists(currentSong?.lyricsPath) && (

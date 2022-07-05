@@ -49,18 +49,20 @@ const readGraphData = async (filePath: string) => {
 const PitchGraph = () => {
   const BEFORE = 1;
   const STEP = 200;
-  const [frequencyArray, setFrequencyArray] = useState<NoteEventTime[]>([]);
-  const { currentSong, currentTime } = useAudioStatus();
+  const [pitchArray, setPitchArray] = useState<NoteEventTime[]>([]);
+  const { currentSong, currentTime, graphEnabled } = useAudioStatus();
   useEffect(() => {
-    if (
-      currentSong &&
-      window.electron.file.ifFileExists(currentSong.graphPath)
-    ) {
+    if (!graphEnabled || currentSong === null) {
+      setPitchArray([]);
+    } else if (!currentSong.graphPath) {
+      setPitchArray([]);
+    } else if (window.electron.file.ifFileExists(currentSong.graphPath)) {
       readGraphData(currentSong.graphPath)
-        .then((data) => setFrequencyArray(data))
+        .then((data) => setPitchArray(data))
         .catch(console.error);
     }
-  }, [currentSong]);
+  }, [currentSong, graphEnabled]);
+
   return (
     <Container sx={{ position: 'relative' }}>
       <Divider
@@ -76,7 +78,7 @@ const PitchGraph = () => {
           transition: 'transform 0.3s ease-out',
         }}
       >
-        {frequencyArray.map(
+        {pitchArray.map(
           ({ startTimeSeconds, durationSeconds, pitchMidi }) =>
             currentTime + 5 >= startTimeSeconds &&
             currentTime - 5 <= startTimeSeconds + durationSeconds && (

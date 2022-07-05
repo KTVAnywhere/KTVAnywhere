@@ -27,6 +27,7 @@ export interface ConfigType {
     pitch: number;
     vocalsEnabled: boolean;
     lyricsEnabled: boolean;
+    graphEnabled: boolean;
   };
   settings: {
     errorMessagesTimeout: number;
@@ -88,6 +89,7 @@ const configSchema: Schema<ConfigType> = {
       pitch: { type: 'number' },
       vocalsEnabled: { type: 'boolean' },
       lyricsEnabled: { type: 'boolean' },
+      graphEnabled: { type: 'boolean' },
     },
   },
   settings: {

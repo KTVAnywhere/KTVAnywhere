@@ -238,6 +238,7 @@ describe('config store', () => {
       pitch: 0,
       vocalsEnabled: true,
       lyricsEnabled: true,
+      graphEnabled: true,
     };
     setPlayingSong(configStore, playingSong);
     expect(mockSet).toBeCalledWith('playingSong', playingSong);

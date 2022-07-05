@@ -32,6 +32,8 @@ interface ContextState {
   setNextSong: Dispatch<SetStateAction<SongProps | null>>;
   lyricsEnabled: boolean;
   setLyricsEnabled: Dispatch<SetStateAction<boolean>>;
+  graphEnabled: boolean;
+  setGraphEnabled: Dispatch<SetStateAction<boolean>>;
   audioContext: AudioContext;
   gainNode: GainNode;
   source: typeof PitchShifter | null;
@@ -120,6 +122,9 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(
     playingSong.lyricsEnabled
   );
+  const [graphEnabled, setGraphEnabled] = useState<boolean>(
+    playingSong.graphEnabled
+  );
   const [audioContext] = useState<AudioContext>(newAudioContext);
   const [gainNode] = useState<GainNode>(newGainNode);
   const [source, setSource] = useState<typeof PitchShifter | null>();
@@ -181,6 +186,8 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
         setNextSong,
         lyricsEnabled,
         setLyricsEnabled,
+        graphEnabled,
+        setGraphEnabled,
         audioContext,
         gainNode,
         source,

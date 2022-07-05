@@ -55,7 +55,7 @@ ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
   return result;
 });
 
-ipcMain.handle('file:getWavFileForReverbPath', async () => {
+ipcMain.on('file:getWavFileForReverbPath', async (event) => {
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
@@ -63,7 +63,7 @@ ipcMain.handle('file:getWavFileForReverbPath', async () => {
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
   };
-  return getAssetPath('impulses_impulse_rev.wav');
+  event.returnValue = getAssetPath('impulses_impulse_rev.wav');
 });
 
 if (process.env.NODE_ENV === 'production') {
