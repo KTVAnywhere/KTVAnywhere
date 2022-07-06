@@ -26,6 +26,7 @@ electron-frontend/*.scss.d.ts
 
 # Spleeter build
 electron-frontend/build
+electron-frontend/dist
 electron-frontend/*.spec
 electron-frontend/pretrained_models
 electron-frontend/src/python_scripts/extra-hooks/__pycache__

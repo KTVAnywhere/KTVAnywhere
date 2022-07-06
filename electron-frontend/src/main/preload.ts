@@ -1,4 +1,3 @@
-import { NoteEventTime } from '@spotify/basic-pitch/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
@@ -134,39 +133,6 @@ contextBridge.exposeInMainWorld('electron', {
         ipcRenderer.removeListener('preprocess:processResult', (_event, data) =>
           callback(data)
         );
-    },
-    basicPitchProcessSong(
-      callback: (
-        song: SongProps,
-        vocalsPath: string,
-        accompanimentPath: string
-      ) => void
-    ) {
-      ipcRenderer.on(
-        'preprocess:basicPitchProcessSong',
-        (_event, song, vocalsPath, accompanimentPath) =>
-          callback(song, vocalsPath, accompanimentPath)
-      );
-      return () =>
-        ipcRenderer.removeListener(
-          'preprocess:basicPitchProcessSong',
-          (_event, song, vocalsPath, accompanimentPath) =>
-            callback(song, vocalsPath, accompanimentPath)
-        );
-    },
-    basicPitchProcessResult(
-      song: SongProps,
-      vocalsPath: string,
-      accompanimentPath: string,
-      result: { noteEvents: NoteEventTime[]; error?: Error }
-    ) {
-      ipcRenderer.send(
-        'preprocess:basicPitchProcessResult',
-        song,
-        vocalsPath,
-        accompanimentPath,
-        result
-      );
     },
   },
 });

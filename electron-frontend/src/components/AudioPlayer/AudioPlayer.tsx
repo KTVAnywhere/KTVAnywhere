@@ -310,7 +310,7 @@ export const AudioPlayer = () => {
     if (
       !graphEnabled &&
       !(
-        currentSong?.lyricsPath &&
+        currentSong?.graphPath &&
         window.electron.file.ifFileExists(currentSong?.graphPath)
       )
     ) {

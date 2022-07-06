@@ -1,7 +1,13 @@
 import { Box, Container, Divider } from '@mui/material';
-import { NoteEventTime } from '@spotify/basic-pitch/';
 import { useEffect, useState } from 'react';
 import { useAudioStatus } from '../AudioStatus.context';
+
+interface NoteEventTime {
+  startTimeSeconds: number;
+  durationSeconds: number;
+  pitchMidi: number;
+  amplitude: number;
+}
 
 const readGraphData = async (filePath: string) => {
   if (window.electron.file.ifFileExists(filePath)) {
@@ -79,7 +85,7 @@ const PitchGraph = () => {
           height: '800px',
           left: `${STEP * BEFORE}px`,
           transform: `translateX(-${currentTime * STEP}px)`,
-          transition: 'transform 0.5s linear',
+          transition: 'transform 0.3s linear',
         }}
       >
         {pitchArray.map(

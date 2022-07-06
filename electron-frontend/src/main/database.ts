@@ -23,6 +23,7 @@ export const createQueueItemsStore = () =>
 export const createConfigStore = () =>
   new Store<ConfigType>({
     schema: schemas.configSchema,
+    watch: true,
     defaults: {
       playingSong: {
         songId: '',
