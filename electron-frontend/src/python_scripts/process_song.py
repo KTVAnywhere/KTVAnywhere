@@ -4,7 +4,7 @@ def spleeter(source, output):
   separator.separate_to_file('{}'.format(source), '{}'.format(output), codec="mp3", bitrate="128k", filename_format=naming_format)
 
 def basicpitch(source, output):
-  _, _, noteEvents = predict(source, ICASSP_2022_MODEL_PATH, 0.95, 0.3, 58, 80, 800)
+  _, _, noteEvents = predict(source, ICASSP_2022_MODEL_PATH, 0.95, 0.3, 58, 80, 800, True)
   result = [{'startTimeSeconds': startTimeSeconds, 'durationSeconds': endTimeSeconds - startTimeSeconds, 'pitchMidi': int(pitchMidi), \
     'amplitude': float(amplitude)} for startTimeSeconds, endTimeSeconds, pitchMidi, amplitude, _ in noteEvents]
   result.sort(key=lambda x: x.get('startTimeSeconds'))

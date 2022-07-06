@@ -4,6 +4,30 @@ import schemas, { SongsType, QueueItemsType, ConfigType } from './schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
+const configStoreDefaults = {
+  audioStatusConfig: {
+    songId: '',
+    currentTime: 0,
+    duration: 0,
+    volume: 50,
+    pitch: 0,
+    vocalsEnabled: true,
+    lyricsEnabled: false,
+    graphEnabled: false,
+    audioInput1Id: 'default',
+    audioInput2Id: 'default',
+    microphone1Volume: 50,
+    microphone2Volume: 50,
+    reverb1Volume: 50,
+    reverb2Volume: 50,
+  },
+  settings: {
+    errorMessagesTimeout: 5,
+    audioBufferSize: 4096,
+    colorThemeId: 0,
+  },
+};
+
 export const createSongsStore = () =>
   new Store<SongsType>({
     name: 'songs',
@@ -24,29 +48,7 @@ export const createConfigStore = () =>
   new Store<ConfigType>({
     schema: schemas.configSchema,
     watch: true,
-    defaults: {
-      audioStatusConfig: {
-        songId: '',
-        currentTime: 0,
-        duration: 0,
-        volume: 50,
-        pitch: 0,
-        vocalsEnabled: true,
-        lyricsEnabled: false,
-        graphEnabled: false,
-        audioInput1Id: 'default',
-        audioInput2Id: 'default',
-        microphone1Volume: 50,
-        microphone2Volume: 50,
-        reverb1Volume: 50,
-        reverb2Volume: 50,
-      },
-      settings: {
-        errorMessagesTimeout: 5,
-        audioBufferSize: 4096,
-        colorThemeId: 0,
-      },
-    },
+    defaults: configStoreDefaults,
   });
 
 export const songFunctions = {
@@ -143,8 +145,12 @@ export const queueItemFunctions = {
 };
 
 export const configFunctions = {
-  getAudioStatusConfig: (store: Store<ConfigType>) =>
-    store.get('audioStatusConfig'),
+  getAudioStatusConfig: (store: Store<ConfigType>) => {
+    return {
+      ...configStoreDefaults.audioStatusConfig,
+      ...store.get('audioStatusConfig'),
+    };
+  },
   setAudioStatusConfig: (
     store: Store<ConfigType>,
     audioStatusConfig: ConfigType['audioStatusConfig']

@@ -85,7 +85,7 @@ const PitchGraph = () => {
           height: '800px',
           left: `${STEP * BEFORE}px`,
           transform: `translateX(-${currentTime * STEP}px)`,
-          transition: 'transform 0.3s linear',
+          transition: 'transform 0.5s linear',
         }}
       >
         {pitchArray.map(
