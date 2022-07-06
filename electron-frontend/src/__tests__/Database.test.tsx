@@ -239,6 +239,12 @@ describe('config store', () => {
       vocalsEnabled: true,
       lyricsEnabled: true,
       graphEnabled: true,
+      audioInput1Id: 'default',
+      audioInput2Id: 'default',
+      microphone1Volume: 50,
+      microphone2Volume: 50,
+      reverb1Volume: 50,
+      reverb2Volume: 50,
     };
     setPlayingSong(configStore, playingSong);
     expect(mockSet).toBeCalledWith('playingSong', playingSong);

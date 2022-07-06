@@ -22,9 +22,8 @@ import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import { useEffect } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
-import { useAudioStatus } from './AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
 import { LyricsAdjust } from '../LyricsPlayer';
-import Microphone from './Microphone';
 
 const ProgressBar = () => {
   const { duration, currentTime, setCurrentTime, source } = useAudioStatus();
@@ -115,6 +114,12 @@ export const AudioPlayer = () => {
     gainNode,
     source,
     setSource,
+    audioInput1Id,
+    audioInput2Id,
+    microphone1Volume,
+    microphone2Volume,
+    reverb1Volume,
+    reverb2Volume,
   } = useAudioStatus();
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
 
@@ -419,6 +424,12 @@ export const AudioPlayer = () => {
       vocalsEnabled: isPlayingVocals,
       lyricsEnabled,
       graphEnabled,
+      audioInput1Id,
+      audioInput2Id,
+      microphone1Volume,
+      microphone2Volume,
+      reverb1Volume,
+      reverb2Volume,
     });
     destroySource();
   };
@@ -435,7 +446,7 @@ export const AudioPlayer = () => {
             data-testid="end-song-button"
             onClick={endSong}
           >
-            <SkipNextIcon sx={{ fontSize: '35px' }} />
+            <SkipNextIcon fontSize="large" />
           </IconButton>
         </Tooltip>
       </Grid>
@@ -461,12 +472,9 @@ export const AudioPlayer = () => {
             </Typography>
           </Tooltip>
         </Grid>
-        <Grid item sx={{ mx: '1%' }}>
-          <Microphone />
-        </Grid>
         <Grid item>
           <Grid container direction="row" alignItems="center">
-            <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
+            <RecordVoiceOverIcon fontSize="medium" />
             <Switch
               checked={isPlayingVocals}
               onClick={() =>
@@ -480,10 +488,10 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item sx={{ marginLeft: '1%' }}>
           <IconButton sx={{ padding: 0 }} onClick={pitchZero}>
-            <GraphicEqIcon sx={{ fontSize: '35px' }} />
+            <GraphicEqIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginLeft: '1%', width: '8%' }}>
+        <Grid item sx={{ marginLeft: '1%', width: '5%' }}>
           <Slider
             aria-label="Pitch"
             value={pitch}
@@ -504,7 +512,7 @@ export const AudioPlayer = () => {
               data-testid="backward-10-button"
               onClick={backwardTenSeconds}
             >
-              <FastRewindIcon sx={{ fontSize: '35px' }} />
+              <FastRewindIcon fontSize="large" />
             </IconButton>
           </Tooltip>
           {isPlaying ? (
@@ -513,7 +521,7 @@ export const AudioPlayer = () => {
               data-testid="pause-button"
               onClick={pauseSong}
             >
-              <PauseCircleIcon sx={{ fontSize: '64px' }} />
+              <PauseCircleIcon sx={{ fontSize: '42px' }} />
             </IconButton>
           ) : (
             <IconButton
@@ -521,7 +529,7 @@ export const AudioPlayer = () => {
               data-testid="play-button"
               onClick={playSong}
             >
-              <PlayCircleIcon sx={{ fontSize: '64px' }} />
+              <PlayCircleIcon sx={{ fontSize: '42px' }} />
             </IconButton>
           )}
           <Tooltip title="Forward 10s" placement="top">
@@ -530,13 +538,13 @@ export const AudioPlayer = () => {
               data-testid="forward-10-button"
               onClick={forwardTenSeconds}
             >
-              <FastForwardIcon sx={{ fontSize: '35px' }} />
+              <FastForwardIcon fontSize="large" />
             </IconButton>
           </Tooltip>
         </Grid>
         <Grid item sx={{ marginRight: '1%' }}>
           <IconButton sx={{ padding: 0 }} onClick={() => volumeZero()}>
-            <VolumeMuteIcon sx={{ fontSize: '35px' }} />
+            <VolumeMuteIcon fontSize="medium" />
           </IconButton>
         </Grid>
         <Grid item sx={{ marginRight: '1%', width: '8%' }}>
@@ -553,7 +561,7 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item sx={{ marginRight: '1%' }}>
           <Grid container direction="row" alignItems="center">
-            <AutoGraphIcon sx={{ fontSize: '30px' }} />
+            <AutoGraphIcon fontSize="medium" />
             <Switch
               checked={graphEnabled}
               data-testid="toggle-graph-button"
@@ -570,7 +578,7 @@ export const AudioPlayer = () => {
             alignItems="center"
             position="relative"
           >
-            <LyricsIcon sx={{ fontSize: '30px' }} />
+            <LyricsIcon fontSize="medium" />
             <Switch
               checked={lyricsEnabled}
               data-testid="toggle-lyrics-button"

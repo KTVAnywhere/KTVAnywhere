@@ -28,6 +28,12 @@ export interface ConfigType {
     vocalsEnabled: boolean;
     lyricsEnabled: boolean;
     graphEnabled: boolean;
+    audioInput1Id: string;
+    audioInput2Id: string;
+    microphone1Volume: number;
+    microphone2Volume: number;
+    reverb1Volume: number;
+    reverb2Volume: number;
   };
   settings: {
     errorMessagesTimeout: number;
@@ -90,6 +96,12 @@ const configSchema: Schema<ConfigType> = {
       vocalsEnabled: { type: 'boolean' },
       lyricsEnabled: { type: 'boolean' },
       graphEnabled: { type: 'boolean' },
+      audioInput1Id: { type: 'string' },
+      audioInput2Id: { type: 'string' },
+      microphone1Volume: { type: 'number' },
+      microphone2Volume: { type: 'number' },
+      reverb1Volume: { type: 'number' },
+      reverb2Volume: { type: 'number' },
     },
   },
   settings: {

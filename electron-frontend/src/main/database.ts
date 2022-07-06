@@ -33,6 +33,12 @@ export const createConfigStore = () =>
         vocalsEnabled: true,
         lyricsEnabled: false,
         graphEnabled: false,
+        audioInput1Id: 'default',
+        audioInput2Id: 'default',
+        microphone1Volume: 50,
+        microphone2Volume: 50,
+        reverb1Volume: 50,
+        reverb2Volume: 50,
       },
       settings: {
         errorMessagesTimeout: 5,

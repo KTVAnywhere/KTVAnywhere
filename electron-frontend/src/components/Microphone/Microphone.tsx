@@ -1,26 +1,34 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import {
   Divider,
+  FormControl,
   IconButton,
+  MenuItem,
   Paper,
   Popper,
+  Select,
+  SelectChangeEvent,
   Slider,
   Stack,
   Switch,
   Tooltip,
   Typography,
 } from '@mui/material';
+import RestoreIcon from '@mui/icons-material/Restore';
 import MicIcon from '@mui/icons-material/Mic';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { useAlertMessage } from '../AlertMessage';
-import { useAudioStatus } from './AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
 
 const MicrophoneMenuElementsForEachMicrophone = ({
   micNo,
   microphoneEnabled,
   setMicrophoneEnabled,
+  audioInputDevices,
   microphoneMedia,
   setMicrophoneMedia,
   audioInputId,
+  setAudioInputId,
   microphoneGainNode,
   microphoneVolume,
   setMicrophoneVolume,
@@ -39,11 +47,13 @@ const MicrophoneMenuElementsForEachMicrophone = ({
   micNo: number;
   microphoneEnabled: boolean;
   setMicrophoneEnabled: Dispatch<SetStateAction<boolean>>;
+  audioInputDevices: MediaDeviceInfo[];
   microphoneMedia: MediaStreamAudioSourceNode | null | undefined;
   setMicrophoneMedia: Dispatch<
     SetStateAction<MediaStreamAudioSourceNode | null | undefined>
   >;
   audioInputId: string;
+  setAudioInputId: Dispatch<SetStateAction<string>>;
   microphoneGainNode: GainNode;
   microphoneVolume: number;
   setMicrophoneVolume: Dispatch<SetStateAction<number>>;
@@ -66,14 +76,23 @@ const MicrophoneMenuElementsForEachMicrophone = ({
   const { audioContext } = useAudioStatus();
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
 
+  const audioInputIdChange = (event: SelectChangeEvent<string>) => {
+    setAudioInputId(event.target.value);
+  };
+
+  const enableMicrophone = async () => {
+    const micSource = await getMicrophoneMedia(audioInputId);
+    if (micSource) {
+      setMicrophoneEnabled(true);
+      setMicrophoneMedia(micSource);
+      micSource.connect(microphoneGainNode);
+      microphoneGainNode.connect(audioContext.destination);
+    }
+  };
+
   const enableReverb = async () => {
     if (!microphoneEnabled) {
-      setAlertMessage({
-        message: 'microphone not enabled',
-        severity: 'info',
-      });
-      setShowAlertMessage(true);
-      return;
+      enableMicrophone();
     }
     let newReverbMedia;
     let newReverbNode;
@@ -137,16 +156,6 @@ const MicrophoneMenuElementsForEachMicrophone = ({
     setMicrophoneMedia(null);
   };
 
-  const enableMicrophone = async () => {
-    const micSource = await getMicrophoneMedia(audioInputId);
-    if (micSource) {
-      setMicrophoneEnabled(true);
-      setMicrophoneMedia(micSource);
-      micSource.connect(microphoneGainNode);
-      microphoneGainNode.connect(audioContext.destination);
-    }
-  };
-
   const disableMicrophone = () => {
     setMicrophoneEnabled(false);
     if (microphoneMedia) {
@@ -170,37 +179,37 @@ const MicrophoneMenuElementsForEachMicrophone = ({
     microphoneGainNode.gain.value = (newValue as number) / 100;
   };
 
+  const restoreDefaults = () => {
+    disableMicrophone();
+    setAudioInputId('default');
+    setMicrophoneVolume(50);
+    setReverbVolume(50);
+  };
+
   return (
     <>
-      <Typography gutterBottom variant="h6">
-        mic {micNo}
-      </Typography>
-      <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
-        <Typography sx={{ width: '230px' }}>Reverb: {reverbVolume}%</Typography>
-        <Slider
-          aria-label="Volume"
-          value={reverbVolume}
-          onChange={reverbVolumeChange}
-          min={0}
-          max={100}
-          color="secondary"
-          data-testid={`microphone-${micNo}-reverb-slider`}
-        />
-      </Stack>
-      <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
-        <Typography sx={{ width: '230px' }}>
-          Volume: {microphoneVolume}%
-        </Typography>
-        <Slider
-          aria-label="Volume"
-          value={microphoneVolume}
-          onChange={microphoneVolumeChange}
-          min={0}
-          max={100}
-          color="secondary"
-          data-testid={`microphone-${micNo}-volume-slider`}
-        />
-      </Stack>
+      <FormControl sx={{ width: 100 }}>
+        <Select
+          value={
+            audioInputDevices
+              .map((device) => device.deviceId)
+              .includes(audioInputId)
+              ? audioInputId
+              : ''
+          }
+          onChange={audioInputIdChange}
+          defaultValue=""
+          MenuProps={{ PaperProps: { sx: { maxHeight: 150 } } }}
+        >
+          {audioInputDevices.map((device) => {
+            return (
+              <MenuItem key={device.deviceId} value={device.deviceId}>
+                {device.label}
+              </MenuItem>
+            );
+          })}
+        </Select>
+      </FormControl>
       <Stack
         direction="row"
         sx={{ padding: '5px', width: '280px', paddingBottom: '0px' }}
@@ -224,6 +233,41 @@ const MicrophoneMenuElementsForEachMicrophone = ({
           data-testid={`toggle-reverb-${micNo}-switch`}
         />
       </Stack>
+      <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
+        <Typography sx={{ width: '230px' }}>
+          Volume: {microphoneVolume}%
+        </Typography>
+        <Slider
+          aria-label="Volume"
+          value={microphoneVolume}
+          onChange={microphoneVolumeChange}
+          min={0}
+          max={100}
+          color="secondary"
+          data-testid={`microphone-${micNo}-volume-slider`}
+        />
+      </Stack>
+      <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
+        <Typography sx={{ width: '230px' }}>Reverb: {reverbVolume}%</Typography>
+        <Slider
+          aria-label="Volume"
+          value={reverbVolume}
+          onChange={reverbVolumeChange}
+          min={0}
+          max={100}
+          color="secondary"
+          data-testid={`microphone-${micNo}-reverb-slider`}
+        />
+      </Stack>
+      <Tooltip title="restore defaults" placement="right">
+        <IconButton
+          onClick={restoreDefaults}
+          sx={{ padding: 0 }}
+          data-testid={`restore-microphone-${micNo}-defaults-button`}
+        >
+          <RestoreIcon fontSize="medium" />
+        </IconButton>
+      </Tooltip>
     </>
   );
 };
@@ -246,7 +290,9 @@ const MicrophoneMenu = ({
     microphone2Media,
     setMicrophone2Media,
     audioInput1Id,
+    setAudioInput1Id,
     audioInput2Id,
+    setAudioInput2Id,
     microphone1GainNode,
     microphone2GainNode,
     microphone1Volume,
@@ -273,6 +319,23 @@ const MicrophoneMenu = ({
     setReverb2Volume,
   } = useAudioStatus();
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[]>(
+    []
+  );
+  const getAudioInputDevices = async () => {
+    const audioDevices = await navigator.mediaDevices
+      .enumerateDevices()
+      .then((devices) =>
+        devices.filter((device) => device.kind === 'audioinput')
+      );
+    return audioDevices;
+  };
+
+  useEffect(() => {
+    getAudioInputDevices()
+      .then((devices) => setAudioInputDevices(devices))
+      .catch((err) => console.log(err));
+  }, []);
 
   const getMicrophoneMedia = async (audioInputId: string) => {
     let microphoneSource = null;
@@ -304,6 +367,12 @@ const MicrophoneMenu = ({
     return ab;
   };
 
+  const refreshInputDevices = () => {
+    getAudioInputDevices()
+      .then((devices) => setAudioInputDevices(devices))
+      .catch((err) => console.log(err));
+  };
+
   return (
     <Popper open={open} anchorEl={anchorEl} placement="top">
       <Paper
@@ -311,43 +380,24 @@ const MicrophoneMenu = ({
           padding: '20px',
         }}
       >
+        <Tooltip
+          title="Refresh microphone list, click if mic just plugged in"
+          placement="right"
+        >
+          <IconButton onClick={refreshInputDevices} sx={{ padding: 0 }}>
+            <RefreshIcon fontSize="medium" />
+          </IconButton>
+        </Tooltip>
         <Stack direction="column" alignItems="center" justifyContent="center">
-          <MicrophoneMenuElementsForEachMicrophone
-            micNo={2}
-            microphoneEnabled={microphone2Enabled}
-            setMicrophoneEnabled={setMicrophone2Enabled}
-            microphoneMedia={microphone2Media}
-            setMicrophoneMedia={setMicrophone2Media}
-            audioInputId={audioInput2Id}
-            microphoneGainNode={microphone2GainNode}
-            microphoneVolume={microphone2Volume}
-            setMicrophoneVolume={setMicrophone2Volume}
-            reverbEnabled={reverb2Enabled}
-            setReverbEnabled={setReverb2Enabled}
-            reverbMedia={reverb2Media}
-            setReverbMedia={setReverb2Media}
-            reverbNode={reverb2Node}
-            setReverbNode={setReverb2Node}
-            reverbGainNode={reverb2GainNode}
-            reverbVolume={reverb2Volume}
-            setReverbVolume={setReverb2Volume}
-            getMicrophoneMedia={getMicrophoneMedia}
-            toArrayBuffer={toArrayBuffer}
-          />
-          <Divider
-            variant="middle"
-            sx={{
-              width: '100%',
-              borderBottomWidth: 5,
-            }}
-          />
           <MicrophoneMenuElementsForEachMicrophone
             micNo={1}
             microphoneEnabled={microphone1Enabled}
             setMicrophoneEnabled={setMicrophone1Enabled}
+            audioInputDevices={audioInputDevices}
             microphoneMedia={microphone1Media}
             setMicrophoneMedia={setMicrophone1Media}
             audioInputId={audioInput1Id}
+            setAudioInputId={setAudioInput1Id}
             microphoneGainNode={microphone1GainNode}
             microphoneVolume={microphone1Volume}
             setMicrophoneVolume={setMicrophone1Volume}
@@ -360,6 +410,38 @@ const MicrophoneMenu = ({
             reverbGainNode={reverb1GainNode}
             reverbVolume={reverb1Volume}
             setReverbVolume={setReverb1Volume}
+            getMicrophoneMedia={getMicrophoneMedia}
+            toArrayBuffer={toArrayBuffer}
+          />
+          <Divider
+            variant="middle"
+            sx={{
+              width: '100%',
+              borderBottomWidth: 5,
+              margin: 2,
+            }}
+          />
+          <MicrophoneMenuElementsForEachMicrophone
+            micNo={2}
+            microphoneEnabled={microphone2Enabled}
+            setMicrophoneEnabled={setMicrophone2Enabled}
+            audioInputDevices={audioInputDevices}
+            microphoneMedia={microphone2Media}
+            setMicrophoneMedia={setMicrophone2Media}
+            audioInputId={audioInput2Id}
+            setAudioInputId={setAudioInput2Id}
+            microphoneGainNode={microphone2GainNode}
+            microphoneVolume={microphone2Volume}
+            setMicrophoneVolume={setMicrophone2Volume}
+            reverbEnabled={reverb2Enabled}
+            setReverbEnabled={setReverb2Enabled}
+            reverbMedia={reverb2Media}
+            setReverbMedia={setReverb2Media}
+            reverbNode={reverb2Node}
+            setReverbNode={setReverb2Node}
+            reverbGainNode={reverb2GainNode}
+            reverbVolume={reverb2Volume}
+            setReverbVolume={setReverb2Volume}
             getMicrophoneMedia={getMicrophoneMedia}
             toArrayBuffer={toArrayBuffer}
           />
@@ -379,27 +461,21 @@ const Microphone = () => {
   };
 
   return (
-    <Stack
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      sx={{ paddingTop: 1 }}
-    >
+    <>
       <Tooltip
         title={openMicrophoneMenu ? 'close mic settings' : 'open mic settings'}
-        placement="bottom"
+        placement="right"
       >
         <IconButton
           onClick={clickToggleMenu}
-          sx={{ padding: 0 }}
+          sx={{ position: 'fixed', bottom: 10, left: 60, padding: 0 }}
           data-testid="toggle-mic-settings-menu"
         >
-          <MicIcon sx={{ fontSize: '30px' }} />
+          <MicIcon fontSize="medium" />
         </IconButton>
       </Tooltip>
       <MicrophoneMenu open={openMicrophoneMenu} anchorEl={anchorEl} />
-      <Typography>mic</Typography>
-    </Stack>
+    </>
   );
 };
 

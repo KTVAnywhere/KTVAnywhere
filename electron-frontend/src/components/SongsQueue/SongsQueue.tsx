@@ -18,7 +18,7 @@ import {
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
 import { SongProps } from '../Song';
-import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
 
 export interface QueueItemProps {
   song: SongProps;

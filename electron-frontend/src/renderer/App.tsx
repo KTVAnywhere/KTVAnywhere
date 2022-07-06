@@ -32,8 +32,9 @@ import {
   useAlertMessage,
   AlertMessage,
 } from '../components/AlertMessage';
-import { AudioStatusProvider } from '../components/AudioPlayer/AudioStatus.context';
+import { AudioStatusProvider } from '../components/AudioStatus.context';
 import AudioPlayer from '../components/AudioPlayer';
+import Microphone from '../components/Microphone';
 import LyricsPlayer, { LyricsProvider } from '../components/LyricsPlayer';
 import './App.css';
 import {
@@ -173,7 +174,7 @@ const MainPage = ({
       </Container>
       <Tooltip title="Settings">
         <IconButton
-          sx={{ position: 'fixed', bottom: 10, left: '2%', padding: 0 }}
+          sx={{ position: 'fixed', bottom: 10, left: 20, padding: 0 }}
           data-testid="settings-button"
           onClick={() => setShowSettings(true)}
         >
@@ -185,6 +186,7 @@ const MainPage = ({
         setShowSettings={setShowSettings}
         setCurrentTheme={setCurrentTheme}
       />
+      <Microphone />
     </Container>
   );
 };

@@ -1,7 +1,7 @@
 import { Box, Container, Divider } from '@mui/material';
 import { NoteEventTime } from '@spotify/basic-pitch/';
 import { useEffect, useState } from 'react';
-import { useAudioStatus } from '../AudioPlayer';
+import { useAudioStatus } from '../AudioStatus.context';
 
 const readGraphData = async (filePath: string) => {
   if (window.electron.file.ifFileExists(filePath)) {
@@ -67,7 +67,11 @@ const PitchGraph = () => {
     <Container sx={{ position: 'relative' }}>
       <Divider
         orientation="vertical"
-        sx={{ position: 'absolute', left: `${STEP * BEFORE}px` }}
+        sx={{
+          position: 'absolute',
+          borderWidth: 3,
+          left: `${STEP * BEFORE}px`,
+        }}
       />
       <Container
         sx={{
@@ -75,7 +79,7 @@ const PitchGraph = () => {
           height: '800px',
           left: `${STEP * BEFORE}px`,
           transform: `translateX(-${currentTime * STEP}px)`,
-          transition: 'transform 0.3s ease-out',
+          transition: 'transform 0.5s linear',
         }}
       >
         {pitchArray.map(

@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import { cyan } from '@mui/material/colors';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useAudioStatus } from './AudioPlayer';
 
 export interface ColorThemeProps {
   colorThemeId: number;
@@ -134,11 +133,6 @@ const SettingsMenu = ({
   const [colorThemeId, setColorThemeId] = useState(
     getCurrentSettings().colorThemeId ?? 0
   );
-  const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[]>(
-    []
-  );
-  const { audioInput1Id, setAudioInput1Id, audioInput2Id, setAudioInput2Id } =
-    useAudioStatus();
 
   useEffect(() => {
     window.electron.store.config.setSettings({
@@ -160,33 +154,10 @@ const SettingsMenu = ({
     setColorThemeId(event.target.value as number);
   };
 
-  const audioInput1IdChange = (event: SelectChangeEvent<string>) => {
-    setAudioInput1Id(event.target.value);
-  };
-
-  const audioInput2IdChange = (event: SelectChangeEvent<string>) => {
-    setAudioInput2Id(event.target.value);
-  };
-
   const closeDialog = () => {
     setShowSettings(false);
     setCurrentTheme(GetColorTheme());
   };
-
-  const getAudioInputDevices = async () => {
-    const audioDevices = await navigator.mediaDevices
-      .enumerateDevices()
-      .then((devices) =>
-        devices.filter((device) => device.kind === 'audioinput')
-      );
-    return audioDevices;
-  };
-
-  useEffect(() => {
-    getAudioInputDevices()
-      .then((devices) => setAudioInputDevices(devices))
-      .catch((err) => console.log(err));
-  }, []);
 
   return (
     <Dialog
@@ -199,74 +170,6 @@ const SettingsMenu = ({
     >
       <DialogTitle>Settings</DialogTitle>
       <DialogContent>
-        <Grid container paddingBottom={2}>
-          <Grid
-            item
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-          >
-            <Typography sx={{ opacity: '90%' }}>Microphone 1</Typography>
-          </Grid>
-          <Grid
-            item
-            sx={{ marginLeft: 'auto' }}
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-          >
-            <FormControl sx={{ minWidth: 100 }}>
-              <Select
-                value={audioInput1Id}
-                onChange={audioInput1IdChange}
-                sx={{ maxWidth: 300 }}
-                defaultValue=""
-              >
-                {audioInputDevices.map((device) => {
-                  return (
-                    <MenuItem key={device.deviceId} value={device.deviceId}>
-                      {device.label}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-        <Grid container paddingBottom={2}>
-          <Grid
-            item
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-          >
-            <Typography sx={{ opacity: '90%' }}>Microphone 2</Typography>
-          </Grid>
-          <Grid
-            item
-            sx={{ marginLeft: 'auto' }}
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-          >
-            <FormControl sx={{ minWidth: 100 }}>
-              <Select
-                value={audioInput2Id}
-                onChange={audioInput2IdChange}
-                sx={{ maxWidth: 300 }}
-                defaultValue=""
-              >
-                {audioInputDevices.map((device) => {
-                  return (
-                    <MenuItem key={device.deviceId} value={device.deviceId}>
-                      {device.label}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
         <Grid container paddingBottom={2}>
           <Grid
             item

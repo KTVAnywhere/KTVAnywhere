@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Grid, Typography } from '@mui/material';
 import { Lrc, Runner } from 'lrc-kit';
-import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
 import { useLyrics } from './Lyrics.context';
 
 const LyricsPlayer = () => {

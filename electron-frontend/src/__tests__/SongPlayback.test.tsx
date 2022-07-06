@@ -14,8 +14,9 @@ import LyricsPlayer, {
   LyricsAdjust,
   LyricsProvider,
 } from '../components/LyricsPlayer';
-import AudioPlayer, { AudioStatusProvider } from '../components/AudioPlayer';
-import * as AudioStatusContext from '../components/AudioPlayer/AudioStatus.context';
+import AudioPlayer from '../components/AudioPlayer';
+import { AudioStatusProvider } from '../components/AudioStatus.context';
+import * as AudioStatusContext from '../components/AudioStatus.context';
 import * as LyricsContext from '../components/LyricsPlayer/Lyrics.context';
 
 describe('Lyrics player', () => {

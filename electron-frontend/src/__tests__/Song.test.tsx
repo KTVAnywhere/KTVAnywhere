@@ -13,8 +13,8 @@ import SongComponent, {
   SongDialogProvider,
   SongsStatusProvider,
 } from '../components/Song';
-import { AudioStatusProvider } from '../components/AudioPlayer';
-import * as AudioStatusContext from '../components/AudioPlayer/AudioStatus.context';
+import { AudioStatusProvider } from '../components/AudioStatus.context';
+import * as AudioStatusContext from '../components/AudioStatus.context';
 import {
   ConfirmationDialog,
   ConfirmationProvider,

@@ -11,7 +11,7 @@ import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { Runner } from 'lrc-kit';
 import { useEffect, useState } from 'react';
 import { useLyrics } from './Lyrics.context';
-import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
 import { useAlertMessage } from '../AlertMessage';
 
 const LyricsAdjust = () => {
