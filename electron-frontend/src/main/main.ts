@@ -11,7 +11,6 @@
 import path from 'path';
 import fs from 'fs-extra';
 import Fuse from 'fuse.js';
-import { NoteEventTime } from '@spotify/basic-pitch';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import { spawn } from 'child_process';
 import MenuBuilder from './menu';
@@ -34,7 +33,7 @@ import {
 import { SongProps } from '../components/Song';
 
 let mainWindow: BrowserWindow | null = null;
-let workerWindow: BrowserWindow | null = null;
+console.log(app.getVersion());
 
 ipcMain.handle('file:read', async (_, filePath: string) => {
   const data = await fs.promises.readFile(filePath, 'utf-8');
@@ -121,20 +120,6 @@ const createWindow = async () => {
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
-  if (workerWindow === null) {
-    workerWindow = new BrowserWindow({
-      show: false,
-      icon: getAssetPath('icon.png'),
-      webPreferences: {
-        backgroundThrottling: false,
-        preload: app.isPackaged
-          ? path.join(__dirname, 'preload.js')
-          : path.join(__dirname, '../../.erb/dll/preload.js'),
-      },
-    });
-    workerWindow.loadURL(resolveHtmlPath('worker.html'));
-  }
-
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
@@ -148,7 +133,6 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
-    workerWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
@@ -192,8 +176,8 @@ app
           fs.mkdirSync(songFolder, { recursive: true });
         }
         const spleeterPath = app.isPackaged
-          ? path.join(process.resourcesPath, 'assets', 'spleeter_stems')
-          : path.join(__dirname, '../python_scripts/spleeter_stems.py');
+          ? path.join(process.resourcesPath, 'assets', 'process_song')
+          : path.join(__dirname, '../python_scripts/process_song.py');
 
         const spleeterProcess = app.isPackaged
           ? spawn(spleeterPath, [song.songPath, songFolder, song.songId])
@@ -205,13 +189,13 @@ app
             ]);
 
         spleeterProcess?.stdout.on('data', (message: string) => {
-          if (`${message}` === `done splitting ${song.songId}`) {
-            workerWindow?.webContents.send(
-              'preprocess:basicPitchProcessSong',
-              song,
-              path.join(songFolder, 'vocals.mp3'),
-              path.join(songFolder, 'accompaniment.mp3')
-            );
+          if (`${message}` === `done processing ${song.songId}`) {
+            mainWindow?.webContents.send('preprocess:processResult', {
+              vocalsPath: path.join(songFolder, 'vocals.mp3'),
+              accompanimentPath: path.join(songFolder, 'accompaniment.mp3'),
+              graphPath: path.join(songFolder, 'graph.json'),
+              songId: song.songId,
+            });
           } else if (`${message}` === 'ffmpeg binary not found') {
             mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
@@ -256,50 +240,6 @@ app
         });
       }
     });
-    ipcMain.on(
-      'preprocess:basicPitchProcessResult',
-      async (
-        _,
-        song,
-        vocalsPath,
-        accompanimentPath,
-        result: { noteEvents: NoteEventTime[]; error: Error }
-      ) => {
-        const { noteEvents, error } = result;
-        if (!error) {
-          const graphPath = path.join(vocalsPath, '..', 'graph.json');
-          const { error: writeError } = await writeFile(
-            graphPath,
-            JSON.stringify(noteEvents)
-          );
-          if (writeError) {
-            mainWindow?.webContents.send('preprocess:processResult', {
-              vocalsPath: '',
-              accompanimentPath: '',
-              graphPath: '',
-              songId: song.songId,
-              error: writeError,
-            });
-          } else {
-            mainWindow?.webContents.send('preprocess:processResult', {
-              vocalsPath,
-              accompanimentPath,
-              graphPath,
-              songId: song.songId,
-            });
-          }
-        } else {
-          mainWindow?.webContents.send('preprocess:processResult', {
-            vocalsPath: '',
-            accompanimentPath: '',
-            graphPath: '',
-            songId: song.songId,
-            error,
-          });
-        }
-      }
-    );
-
     // custom protocol for reading local files
     protocol.registerFileProtocol('atom', (request, callback) => {
       const url = request.url.substring(7);

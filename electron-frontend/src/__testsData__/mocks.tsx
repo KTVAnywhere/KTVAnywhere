@@ -58,8 +58,6 @@ const mockedElectron = {
     getSongDetails: jest.fn(),
     processSong: jest.fn(),
     processResult: jest.fn().mockReturnValue(jest.fn()),
-    basicPitchProcessSong: jest.fn().mockReturnValue(jest.fn()),
-    basicPitchProcessResult: jest.fn(),
   },
   file: {
     read: jest.fn().mockResolvedValue('lyrics'),
