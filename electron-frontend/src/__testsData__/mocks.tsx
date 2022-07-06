@@ -25,7 +25,7 @@ const mockedElectron = {
       onChange: jest.fn().mockReturnValue(jest.fn()),
     },
     config: {
-      getPlayingSong: () => {
+      getAudioStatusConfig: () => {
         return {
           songId: '',
           currentTime: 0,
@@ -43,7 +43,7 @@ const mockedElectron = {
           reverb2Volume: 50,
         };
       },
-      setPlayingSong: jest.fn(),
+      setAudioStatusConfig: jest.fn(),
       getSettings: () => {
         return {
           errorMessagesTimeout: 5,

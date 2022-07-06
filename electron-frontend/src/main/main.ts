@@ -342,8 +342,12 @@ app
       getAllQueueItems,
       setAllQueueItems,
     } = queueItemFunctions;
-    const { getPlayingSong, setPlayingSong, getSettings, setSettings } =
-      configFunctions;
+    const {
+      getAudioStatusConfig,
+      setAudioStatusConfig,
+      getSettings,
+      setSettings,
+    } = configFunctions;
     const fuseOptions = {
       keys: ['songName', 'artist'],
       findAllMatches: true,
@@ -429,12 +433,12 @@ app
       mainWindow?.webContents.send('store:onQueueItemsChange', results)
     );
 
-    ipcMain.on('store:getPlayingSong', (event) => {
-      event.returnValue = getPlayingSong(configStore);
+    ipcMain.on('store:getAudioStatusConfig', (event) => {
+      event.returnValue = getAudioStatusConfig(configStore);
     });
 
-    ipcMain.on('store:setPlayingSong', (_, playingSong) => {
-      setPlayingSong(configStore, playingSong);
+    ipcMain.on('store:setAudioStatusConfig', (_, audioStatusConfig) => {
+      setAudioStatusConfig(configStore, audioStatusConfig);
     });
 
     ipcMain.on('store:getSettings', (event) => {

@@ -47,8 +47,10 @@ declare global {
           ): () => void;
         };
         config: {
-          getPlayingSong(): ConfigType['playingSong'];
-          setPlayingSong(playingSong: ConfigType['playingSong']): void;
+          getAudioStatusConfig(): ConfigType['audioStatusConfig'];
+          setAudioStatusConfig(
+            audioStatusConfig: ConfigType['audioStatusConfig']
+          ): void;
           getSettings(): ConfigType['settings'];
           setSettings(settings: ConfigType['settings']): void;
         };

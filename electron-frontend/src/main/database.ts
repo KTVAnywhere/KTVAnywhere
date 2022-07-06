@@ -24,7 +24,7 @@ export const createConfigStore = () =>
   new Store<ConfigType>({
     schema: schemas.configSchema,
     defaults: {
-      playingSong: {
+      audioStatusConfig: {
         songId: '',
         currentTime: 0,
         duration: 0,
@@ -142,11 +142,12 @@ export const queueItemFunctions = {
 };
 
 export const configFunctions = {
-  getPlayingSong: (store: Store<ConfigType>) => store.get('playingSong'),
-  setPlayingSong: (
+  getAudioStatusConfig: (store: Store<ConfigType>) =>
+    store.get('audioStatusConfig'),
+  setAudioStatusConfig: (
     store: Store<ConfigType>,
-    playingSong: ConfigType['playingSong']
-  ) => store.set('playingSong', playingSong),
+    audioStatusConfig: ConfigType['audioStatusConfig']
+  ) => store.set('audioStatusConfig', audioStatusConfig),
   getSettings: (store: Store<ConfigType>) => store.get('settings'),
   setSettings: (store: Store<ConfigType>, settings: ConfigType['settings']) =>
     store.set('settings', settings),

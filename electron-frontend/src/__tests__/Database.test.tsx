@@ -223,14 +223,14 @@ describe('config store', () => {
   });
 
   test('get settings for playing song', () => {
-    const { getPlayingSong } = configFunctions;
-    getPlayingSong(configStore);
+    const { getAudioStatusConfig } = configFunctions;
+    getAudioStatusConfig(configStore);
     expect(mockGet).toBeCalled();
   });
 
   test('set settings for playing song', () => {
-    const { setPlayingSong } = configFunctions;
-    const playingSong: ConfigType['playingSong'] = {
+    const { setAudioStatusConfig } = configFunctions;
+    const audioStatusConfig: ConfigType['audioStatusConfig'] = {
       songId: '1',
       currentTime: 5,
       duration: 10,
@@ -246,8 +246,8 @@ describe('config store', () => {
       reverb1Volume: 50,
       reverb2Volume: 50,
     };
-    setPlayingSong(configStore, playingSong);
-    expect(mockSet).toBeCalledWith('playingSong', playingSong);
+    setAudioStatusConfig(configStore, audioStatusConfig);
+    expect(mockSet).toBeCalledWith('audioStatusConfig', audioStatusConfig);
   });
 
   test('get settings', () => {

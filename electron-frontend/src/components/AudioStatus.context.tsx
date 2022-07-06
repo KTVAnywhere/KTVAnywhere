@@ -87,13 +87,15 @@ interface ContextState {
 const AudioStatusContext = createContext({} as ContextState);
 
 export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
-  const playingSong = window.electron.store.config.getPlayingSong();
+  const audioStatusConfig = window.electron.store.config.getAudioStatusConfig();
   const song =
-    playingSong.songId === ''
+    audioStatusConfig.songId === ''
       ? null
-      : window.electron.store.songs.getSong(playingSong.songId);
-  const timePlayed = playingSong.songId === '' ? 0 : playingSong.currentTime;
-  const songDuration = playingSong.songId === '' ? 0 : playingSong.duration;
+      : window.electron.store.songs.getSong(audioStatusConfig.songId);
+  const timePlayed =
+    audioStatusConfig.songId === '' ? 0 : audioStatusConfig.currentTime;
+  const songDuration =
+    audioStatusConfig.songId === '' ? 0 : audioStatusConfig.duration;
   const newAudioContext = new AudioContext();
 
   const newGainNode = newAudioContext.createGain();
@@ -101,29 +103,29 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const newMicrophone2GainNode = newAudioContext.createGain();
   const newReverb1GainNode = newAudioContext.createGain();
   const newReverb2GainNode = newAudioContext.createGain();
-  newGainNode.gain.value = playingSong.volume / 100;
-  newMicrophone1GainNode.gain.value = playingSong.microphone1Volume / 100;
-  newMicrophone2GainNode.gain.value = playingSong.microphone2Volume / 100;
-  newReverb1GainNode.gain.value = playingSong.reverb1Volume / 100;
-  newReverb2GainNode.gain.value = playingSong.reverb2Volume / 100;
+  newGainNode.gain.value = audioStatusConfig.volume / 100;
+  newMicrophone1GainNode.gain.value = audioStatusConfig.microphone1Volume / 100;
+  newMicrophone2GainNode.gain.value = audioStatusConfig.microphone2Volume / 100;
+  newReverb1GainNode.gain.value = audioStatusConfig.reverb1Volume / 100;
+  newReverb2GainNode.gain.value = audioStatusConfig.reverb2Volume / 100;
 
   const [duration, setDuration] = useState<number>(songDuration);
   const [songEnded, setSongEnded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlayingVocals, setIsPlayingVocals] = useState(
-    playingSong.vocalsEnabled
+    audioStatusConfig.vocalsEnabled
   );
-  const [volume, setVolume] = useState<number>(playingSong.volume);
-  const [pitch, setPitch] = useState<number>(playingSong.pitch);
+  const [volume, setVolume] = useState<number>(audioStatusConfig.volume);
+  const [pitch, setPitch] = useState<number>(audioStatusConfig.pitch);
   const [currentTime, setCurrentTime] = useState<number>(timePlayed);
   const [currentSong, setCurrentSong] = useState<SongProps | null>(song);
   const [nextSong, setNextSong] = useState<SongProps | null>(null);
   const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(
-    playingSong.lyricsEnabled
+    audioStatusConfig.lyricsEnabled
   );
   const [graphEnabled, setGraphEnabled] = useState<boolean>(
-    playingSong.graphEnabled
+    audioStatusConfig.graphEnabled
   );
   const [audioContext] = useState<AudioContext>(newAudioContext);
   const [gainNode] = useState<GainNode>(newGainNode);
@@ -135,18 +137,18 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const [microphone2Media, setMicrophone2Media] =
     useState<MediaStreamAudioSourceNode | null>();
   const [audioInput1Id, setAudioInput1Id] = useState<string>(
-    playingSong.audioInput1Id
+    audioStatusConfig.audioInput1Id
   );
   const [audioInput2Id, setAudioInput2Id] = useState<string>(
-    playingSong.audioInput2Id
+    audioStatusConfig.audioInput2Id
   );
   const [microphone1GainNode] = useState<GainNode>(newMicrophone1GainNode);
   const [microphone2GainNode] = useState<GainNode>(newMicrophone2GainNode);
   const [microphone1Volume, setMicrophone1Volume] = useState<number>(
-    playingSong.microphone1Volume
+    audioStatusConfig.microphone1Volume
   );
   const [microphone2Volume, setMicrophone2Volume] = useState<number>(
-    playingSong.microphone2Volume
+    audioStatusConfig.microphone2Volume
   );
   const [reverb1Enabled, setReverb1Enabled] = useState<boolean>(false);
   const [reverb2Enabled, setReverb2Enabled] = useState<boolean>(false);
@@ -159,10 +161,10 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const [reverb1GainNode] = useState<GainNode>(newReverb1GainNode);
   const [reverb2GainNode] = useState<GainNode>(newReverb2GainNode);
   const [reverb1Volume, setReverb1Volume] = useState<number>(
-    playingSong.reverb1Volume
+    audioStatusConfig.reverb1Volume
   );
   const [reverb2Volume, setReverb2Volume] = useState<number>(
-    playingSong.reverb2Volume
+    audioStatusConfig.reverb2Volume
   );
 
   return (

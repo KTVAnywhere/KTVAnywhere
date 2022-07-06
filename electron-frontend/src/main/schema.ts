@@ -19,7 +19,7 @@ export interface QueueItemsType {
 }
 
 export interface ConfigType {
-  playingSong: {
+  audioStatusConfig: {
     songId: string;
     currentTime: number;
     duration: number;
@@ -85,7 +85,7 @@ const queueItemsSchema: Schema<QueueItemsType> = {
 };
 
 const configSchema: Schema<ConfigType> = {
-  playingSong: {
+  audioStatusConfig: {
     type: 'object',
     properties: {
       songId: { type: 'string' },

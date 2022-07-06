@@ -97,11 +97,11 @@ contextBridge.exposeInMainWorld('electron', {
       },
     },
     config: {
-      getPlayingSong() {
-        return ipcRenderer.sendSync('store:getPlayingSong');
+      getAudioStatusConfig() {
+        return ipcRenderer.sendSync('store:getAudioStatusConfig');
       },
-      setPlayingSong(playingSong: ConfigType['playingSong']) {
-        ipcRenderer.send('store:setPlayingSong', playingSong);
+      setAudioStatusConfig(audioStatusConfig: ConfigType['audioStatusConfig']) {
+        ipcRenderer.send('store:setAudioStatusConfig', audioStatusConfig);
       },
       getSettings() {
         return ipcRenderer.sendSync('store:getSettings');

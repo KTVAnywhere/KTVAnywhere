@@ -415,7 +415,7 @@ export const AudioPlayer = () => {
 
   const saveConfig = () => {
     window.removeEventListener('beforeunload', saveConfig);
-    window.electron.store.config.setPlayingSong({
+    window.electron.store.config.setAudioStatusConfig({
       songId: currentSong ? currentSong.songId : '',
       currentTime,
       duration,
