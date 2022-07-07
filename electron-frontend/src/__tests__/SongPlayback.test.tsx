@@ -444,4 +444,57 @@ describe('Audio player component tests', () => {
 
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
   });
+
+  test('tempo slider should change tempo', async () => {
+    const mockSetTempo = jest.fn();
+    const mockSource = {
+      tempo: 1,
+    };
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      setTempo: mockSetTempo,
+      source: mockSource,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <AudioPlayer />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    const sliderInput = screen.getByTestId('tempo-slider');
+    const originalGetBoundingClientRect = sliderInput.getBoundingClientRect;
+
+    sliderInput.getBoundingClientRect = jest.fn(() => ({
+      width: 100,
+      height: 10,
+      bottom: 10,
+      left: 0,
+      x: 0,
+      y: 0,
+      right: 0,
+      top: 0,
+      toJSON: jest.fn(),
+    }));
+
+    // set tempo to 0.8
+    fireEvent.mouseDown(sliderInput, {
+      clientX: 0,
+    });
+    await waitFor(() => {
+      expect(mockSetTempo).toBeCalledWith(0.8);
+      expect(mockSource.tempo).toEqual(0.8);
+    });
+
+    // set tempo to 1.2
+    fireEvent.mouseDown(sliderInput, {
+      clientX: 100,
+    });
+    await waitFor(() => {
+      expect(mockSetTempo).toBeCalledWith(1.2);
+      expect(mockSource.tempo).toEqual(1.2);
+    });
+
+    sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
+  });
 });

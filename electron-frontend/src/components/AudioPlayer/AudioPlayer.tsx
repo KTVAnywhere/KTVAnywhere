@@ -17,6 +17,7 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import LyricsIcon from '@mui/icons-material/Lyrics';
 import VolumeMuteIcon from '@mui/icons-material/VolumeMute';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import SpeedIcon from '@mui/icons-material/Speed';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import { useEffect } from 'react';
@@ -100,6 +101,8 @@ export const AudioPlayer = () => {
     setVolume,
     pitch,
     setPitch,
+    tempo,
+    setTempo,
     currentTime,
     setCurrentTime,
     currentSong,
@@ -182,6 +185,7 @@ export const AudioPlayer = () => {
     newSource.on('play', onPlay);
     newSource.percentagePlayed = percentagePlayed;
     newSource.pitchSemitones = pitch;
+    newSource.tempo = tempo;
     destroySource();
     newSource.connect(gainNode);
     if (playNow) {
@@ -261,11 +265,25 @@ export const AudioPlayer = () => {
     setPitch(newValue as number);
   };
 
-  const pitchZero = () => {
+  const pitchReset = () => {
     if (source) {
       source.pitchSemitones = 0;
     }
     setPitch(0);
+  };
+
+  const tempoChange = (_event: Event, newValue: number | number[]) => {
+    if (source) {
+      source.tempo = newValue as number;
+    }
+    setTempo(newValue as number);
+  };
+
+  const tempoReset = () => {
+    if (source) {
+      source.tempo = 1;
+    }
+    setTempo(1);
   };
 
   const playSong = () => {
@@ -487,11 +505,30 @@ export const AudioPlayer = () => {
           <Typography align="center">vocals</Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '1%' }}>
-          <IconButton sx={{ padding: 0 }} onClick={pitchZero}>
+          <IconButton sx={{ padding: 0 }} onClick={tempoReset}>
+            <SpeedIcon fontSize="medium" />
+          </IconButton>
+        </Grid>
+        <Grid item sx={{ marginLeft: '10px', width: '5%' }}>
+          <Slider
+            aria-label="Tempo"
+            value={tempo}
+            onChange={tempoChange}
+            marks
+            min={0.8}
+            max={1.2}
+            step={0.1}
+            color="secondary"
+            data-testid="tempo-slider"
+          />
+          <Typography>tempo: {tempo}</Typography>
+        </Grid>
+        <Grid item sx={{ marginTop: '2px', marginLeft: '1%' }}>
+          <IconButton sx={{ padding: 0 }} onClick={pitchReset}>
             <GraphicEqIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginLeft: '1%', width: '5%' }}>
+        <Grid item sx={{ marginLeft: '10px', width: '5%' }}>
           <Slider
             aria-label="Pitch"
             value={pitch}
@@ -503,7 +540,7 @@ export const AudioPlayer = () => {
             color="secondary"
             data-testid="pitch-slider"
           />
-          <Typography>Pitch: {pitch > 0 ? `+${pitch}` : pitch}</Typography>
+          <Typography>pitch: {pitch > 0 ? `+${pitch}` : pitch}</Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '1%', marginRight: '1%' }}>
           <Tooltip title="Backward 10s" placement="top">
@@ -512,7 +549,7 @@ export const AudioPlayer = () => {
               data-testid="backward-10-button"
               onClick={backwardTenSeconds}
             >
-              <FastRewindIcon fontSize="large" />
+              <FastRewindIcon fontSize="medium" />
             </IconButton>
           </Tooltip>
           {isPlaying ? (
@@ -538,16 +575,16 @@ export const AudioPlayer = () => {
               data-testid="forward-10-button"
               onClick={forwardTenSeconds}
             >
-              <FastForwardIcon fontSize="large" />
+              <FastForwardIcon fontSize="medium" />
             </IconButton>
           </Tooltip>
         </Grid>
-        <Grid item sx={{ marginRight: '1%' }}>
+        <Grid item sx={{ marginTop: '3px' }}>
           <IconButton sx={{ padding: 0 }} onClick={() => volumeZero()}>
             <VolumeMuteIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginRight: '1%', width: '8%' }}>
+        <Grid item sx={{ marginLeft: '10px', marginRight: '1%', width: '6%' }}>
           <Slider
             aria-label="Volume"
             value={volume}
@@ -557,7 +594,7 @@ export const AudioPlayer = () => {
             color="secondary"
             data-testid="volume-slider"
           />
-          <Typography>Volume: {volume}%</Typography>
+          <Typography>volume: {volume}%</Typography>
         </Grid>
         <Grid item sx={{ marginRight: '1%' }}>
           <Grid container direction="row" alignItems="center">
@@ -571,7 +608,7 @@ export const AudioPlayer = () => {
           </Grid>
           <Typography align="center">graph</Typography>
         </Grid>
-        <Grid item>
+        <Grid item sx={{ marginRight: '2%' }}>
           <Grid
             container
             direction="row"

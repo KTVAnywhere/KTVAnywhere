@@ -75,10 +75,9 @@ const MicrophoneMenuElementsForEachMicrophone = ({
 }) => {
   const { audioContext } = useAudioStatus();
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
-
-  const audioInputIdChange = (event: SelectChangeEvent<string>) => {
-    setAudioInputId(event.target.value);
-  };
+  const [callToEnableMicrophone, setCallToEnableMicrophone] =
+    useState<boolean>(false);
+  const [callToEnableReverb, setCallToEnableReverb] = useState<boolean>(false);
 
   const enableMicrophone = async () => {
     const micSource = await getMicrophoneMedia(audioInputId);
@@ -143,12 +142,14 @@ const MicrophoneMenuElementsForEachMicrophone = ({
   };
 
   const disableReverb = () => {
-    if (reverbNode && reverbMedia) {
+    setReverbEnabled(false);
+    if (reverbNode) {
       reverbNode.disconnect();
+    }
+    if (reverbMedia) {
       reverbMedia.disconnect();
     }
     reverbGainNode.disconnect();
-    setReverbEnabled(false);
   };
 
   const destroySources = () => {
@@ -160,8 +161,8 @@ const MicrophoneMenuElementsForEachMicrophone = ({
     setMicrophoneEnabled(false);
     if (microphoneMedia) {
       microphoneMedia.disconnect();
-      microphoneGainNode.disconnect();
     }
+    microphoneGainNode.disconnect();
     disableReverb();
     destroySources();
   };
@@ -185,6 +186,37 @@ const MicrophoneMenuElementsForEachMicrophone = ({
     setMicrophoneVolume(50);
     setReverbVolume(50);
   };
+
+  const audioInputIdChange = (event: SelectChangeEvent<string>) => {
+    setAudioInputId(event.target.value);
+  };
+
+  useEffect(() => {
+    if (reverbEnabled) {
+      disableMicrophone();
+      setCallToEnableReverb(true);
+    } else if (microphoneEnabled) {
+      disableMicrophone();
+      setCallToEnableMicrophone(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audioInputId]);
+
+  useEffect(() => {
+    if (callToEnableMicrophone) {
+      enableMicrophone();
+      setCallToEnableMicrophone(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callToEnableMicrophone]);
+
+  useEffect(() => {
+    if (callToEnableReverb) {
+      enableReverb();
+      setCallToEnableReverb(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callToEnableReverb]);
 
   return (
     <>
@@ -367,7 +399,7 @@ const MicrophoneMenu = ({
     return ab;
   };
 
-  const refreshInputDevices = () => {
+  const refreshAudioInputDevices = () => {
     getAudioInputDevices()
       .then((devices) => setAudioInputDevices(devices))
       .catch((err) => console.log(err));
@@ -384,7 +416,11 @@ const MicrophoneMenu = ({
           title="Refresh microphone list, click if mic just plugged in"
           placement="right"
         >
-          <IconButton onClick={refreshInputDevices} sx={{ padding: 0 }}>
+          <IconButton
+            onClick={refreshAudioInputDevices}
+            sx={{ padding: 0 }}
+            data-testid="refresh-audio-input-devices-button"
+          >
             <RefreshIcon fontSize="medium" />
           </IconButton>
         </Tooltip>

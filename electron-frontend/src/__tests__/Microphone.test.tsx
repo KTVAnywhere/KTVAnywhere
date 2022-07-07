@@ -136,6 +136,36 @@ describe('Microphone component test', () => {
     });
   });
 
+  test('toggle reverb switch off (initially on) should disable reverb', async () => {
+    const mockSetReverb1Enabled = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      reverb1Enabled: true,
+      setReverb1Enabled: mockSetReverb1Enabled,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+
+    // switch off
+    const reverb1ToggleSwitch = screen.getByTestId('toggle-reverb-1-switch');
+    fireEvent.click(reverb1ToggleSwitch);
+
+    expect(mockSetReverb1Enabled).toHaveBeenCalledWith(false);
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
+  });
+
   test('microphone volume slider should change microphone volume', async () => {
     const mockGain = { value: 70 };
     const mockSetMicrophoneVolume = jest.fn();
@@ -260,6 +290,81 @@ describe('Microphone component test', () => {
     });
 
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
+  });
+
+  test('click restore microphone defaults button should restore defaults', async () => {
+    const mockSetAudioInputId = jest.fn();
+    const mockSetMicrophoneVolume = jest.fn();
+    const mockSetReverbVolume = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      audioInput1Id: 'not-default',
+      setAudioInput1Id: mockSetAudioInputId,
+      microphone1Volume: 80,
+      setMicrophone1Volume: mockSetMicrophoneVolume,
+      reverb1Volume: 40,
+      setReverb1Volume: mockSetReverbVolume,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+
+    // click restore defaults for mic 1
+    const restoreMicrophone1Defaults = screen.getByTestId(
+      'restore-microphone-1-defaults-button'
+    );
+    fireEvent.click(restoreMicrophone1Defaults);
+
+    expect(mockSetAudioInputId).toHaveBeenCalledWith('default');
+    expect(mockSetMicrophoneVolume).toHaveBeenCalledWith(50);
+    expect(mockSetReverbVolume).toHaveBeenCalledWith(50);
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
+  });
+
+  test('click refresh audio input devices button should call to obtain all audio input devices', async () => {
+    const mockEnumerateDevices = jest.fn(() => mediaDevicesPromise);
+
+    Object.defineProperty(global.navigator, 'mediaDevices', {
+      writable: true,
+      value: {
+        enumerateDevices: mockEnumerateDevices,
+      },
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+    expect(mockEnumerateDevices).toHaveBeenCalledTimes(1);
+
+    // click restore defaults for mic 1
+    const refreshAudioInputDevicesButton = screen.getByTestId(
+      'refresh-audio-input-devices-button'
+    );
+    fireEvent.click(refreshAudioInputDevicesButton);
+
+    expect(mockEnumerateDevices).toHaveBeenCalledTimes(2);
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;

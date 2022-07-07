@@ -24,6 +24,8 @@ interface ContextState {
   setVolume: Dispatch<SetStateAction<number>>;
   pitch: number;
   setPitch: Dispatch<SetStateAction<number>>;
+  tempo: number;
+  setTempo: Dispatch<SetStateAction<number>>;
   currentTime: number;
   setCurrentTime: Dispatch<SetStateAction<number>>;
   currentSong: SongProps | null;
@@ -118,6 +120,7 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   );
   const [volume, setVolume] = useState<number>(audioStatusConfig.volume);
   const [pitch, setPitch] = useState<number>(audioStatusConfig.pitch);
+  const [tempo, setTempo] = useState<number>(1);
   const [currentTime, setCurrentTime] = useState<number>(timePlayed);
   const [currentSong, setCurrentSong] = useState<SongProps | null>(song);
   const [nextSong, setNextSong] = useState<SongProps | null>(null);
@@ -184,6 +187,8 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
         setVolume,
         pitch,
         setPitch,
+        tempo,
+        setTempo,
         currentTime,
         setCurrentTime,
         currentSong,

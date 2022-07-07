@@ -97,6 +97,8 @@ export const mockedAudioStatus = {
   setVolume: jest.fn(),
   pitch: 0,
   setPitch: jest.fn(),
+  tempo: 1,
+  setTempo: jest.fn(),
   currentTime: 0,
   setCurrentTime: jest.fn(),
   currentSong: null,
