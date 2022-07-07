@@ -140,7 +140,20 @@ const MainPage = ({
             </SongDialogProvider>
           </SongStagingDialogProvider>
         </ConfirmationProvider>
-        <Grid container direction="column" alignItems="center">
+        <Grid container direction="column" sx={{ position: 'relative' }}>
+          <Grid
+            item
+            sx={{
+              position: 'absolute',
+              bottom: 'calc(50% + 200px)',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '100%',
+              mx: 0,
+            }}
+          >
+            <PitchGraph />
+          </Grid>
           <Grid
             item
             sx={{
@@ -148,11 +161,8 @@ const MainPage = ({
               bottom: '0',
               left: '330px',
               right: '330px',
-              px: '2%',
-              pb: '1%',
             }}
           >
-            <PitchGraph />
             <LyricsPlayer />
           </Grid>
         </Grid>

@@ -33,7 +33,6 @@ import {
 import { SongProps } from '../components/Song';
 
 let mainWindow: BrowserWindow | null = null;
-console.log(app.getVersion());
 
 ipcMain.handle('file:read', async (_, filePath: string) => {
   const data = await fs.promises.readFile(filePath, 'utf-8');

@@ -1,5 +1,5 @@
-import { Box, Container, Divider } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Container } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
 import { useAudioStatus } from '../AudioStatus.context';
 
 interface NoteEventTime {
@@ -16,11 +16,6 @@ const readGraphData = async (filePath: string) => {
       .read(filePath)
       .then((values) => JSON.parse(values) as NoteEventTime[])
       .then((noteEvents) =>
-        noteEvents.sort(
-          (note1, note2) => note1.startTimeSeconds - note2.startTimeSeconds
-        )
-      )
-      .then((noteEvents) =>
         noteEvents.forEach((note) => {
           if (processedPitches.length === 0) {
             processedPitches.push(note);
@@ -36,10 +31,10 @@ const readGraphData = async (filePath: string) => {
                   ? note.pitchMidi
                   : endNote.pitchMidi;
               processedPitches[lastIndex].durationSeconds = Math.max(
-                note.durationSeconds,
-                endNote.startTimeSeconds +
-                  endNote.durationSeconds -
-                  note.startTimeSeconds
+                endNote.durationSeconds,
+                note.startTimeSeconds +
+                  note.durationSeconds -
+                  endNote.startTimeSeconds
               );
             } else {
               processedPitches.push(note);
@@ -55,8 +50,11 @@ const readGraphData = async (filePath: string) => {
 const PitchGraph = () => {
   const BEFORE = 1;
   const STEP = 200;
+  const NUM_TRACKS = 30;
+  const TRACK_HEIGHT = 20;
+  const BAR_HEIGHT = '50%';
   const [pitchArray, setPitchArray] = useState<NoteEventTime[]>([]);
-  const { currentSong, currentTime, graphEnabled } = useAudioStatus();
+  const { currentSong, currentTime, graphEnabled, pitch } = useAudioStatus();
   useEffect(() => {
     if (!graphEnabled || currentSong === null) {
       setPitchArray([]);
@@ -69,23 +67,55 @@ const PitchGraph = () => {
     }
   }, [currentSong, graphEnabled]);
 
+  const time = useRef(currentTime);
+  useEffect(() => {
+    time.current = currentTime;
+  }, [currentTime]);
+
+  const roundToNearest = (valueToRound: number, precision: number) =>
+    Math.round(valueToRound / precision) * precision;
+
   return (
-    <Container sx={{ position: 'relative' }}>
-      <Divider
-        orientation="vertical"
+    <Container
+      sx={{
+        position: 'relative',
+      }}
+    >
+      <Box
+        bgcolor="primary.main"
         sx={{
           position: 'absolute',
-          borderWidth: 3,
+          opacity: '50%',
+          width: '2px',
+          height: `${(NUM_TRACKS - 1) * TRACK_HEIGHT}px`,
+          bottom: 0,
           left: `${STEP * BEFORE}px`,
         }}
       />
+      {Array.from(Array(NUM_TRACKS).keys()).map((index) => (
+        <Box
+          bgcolor="primary.main"
+          key={`track-${index}`}
+          sx={{
+            position: 'absolute',
+            bottom: `${index * TRACK_HEIGHT}px`,
+            left: '-5%',
+            opacity: '20%',
+            height: '1px',
+            width: '110%',
+          }}
+        />
+      ))}
       <Container
         sx={{
           position: 'relative',
-          height: '800px',
           left: `${STEP * BEFORE}px`,
-          transform: `translateX(-${currentTime * STEP}px)`,
-          transition: 'transform 0.5s linear',
+          transform: `translateX(-${(currentTime + 0.25) * STEP}px)`,
+          transition:
+            Math.abs(time.current - currentTime) < 2
+              ? 'transform 0.5s linear'
+              : 'transform 33ms linear',
+          willChange: 'transform, transition',
         }}
       >
         {pitchArray.map(
@@ -93,17 +123,29 @@ const PitchGraph = () => {
             currentTime + 5 >= startTimeSeconds &&
             currentTime - 5 <= startTimeSeconds + durationSeconds && (
               <Box
-                key={`${startTimeSeconds}-${pitchMidi}`}
                 sx={{
                   position: 'absolute',
+                  display: 'flex',
+                  direction: 'column',
+                  alignItems: 'center',
                   left: `${startTimeSeconds * STEP}px`,
-                  bottom: `${(pitchMidi - 39) * 10}px`,
-                  bgcolor: 'white',
-                  height: '10px',
-                  width: `${durationSeconds * STEP + 1}px`,
-                  borderRadius: 10,
+                  bottom: `${
+                    (roundToNearest(pitchMidi / 2, 0.5) + pitch - 17) *
+                    TRACK_HEIGHT
+                  }px`,
+                  height: `${TRACK_HEIGHT}px`,
                 }}
-              />
+              >
+                <Box
+                  key={`${startTimeSeconds}-${pitchMidi}`}
+                  sx={{
+                    bgcolor: 'secondary.main',
+                    height: `${BAR_HEIGHT}`,
+                    width: `${durationSeconds * STEP + 1}px`,
+                    borderRadius: 10,
+                  }}
+                />
+              </Box>
             )
         )}
       </Container>

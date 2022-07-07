@@ -44,7 +44,13 @@ const LyricsPlayer = () => {
   }, [currentTime, lyricsRunner]);
 
   return (
-    <Grid container direction="column" alignItems="center" textAlign="center">
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      textAlign="center"
+      sx={{ py: '1vh' }}
+    >
       <Grid item>
         <Typography
           sx={{ fontSize: '32px', fontWeight: 600 }}
