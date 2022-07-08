@@ -79,7 +79,7 @@ const LyricsAdjust = () => {
       <Stack direction="column" alignItems="center" justifyContent="center">
         <Stack
           direction="row"
-          spacing={0.5}
+          spacing={0}
           alignItems="center"
           justifyItems="center"
         >
@@ -97,7 +97,7 @@ const LyricsAdjust = () => {
             size="small"
             color="secondary"
             sx={{
-              width: '50px',
+              width: '40px',
               '& .MuiOutlinedInput-input': {
                 '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
                   WebkitAppearance: 'none',
@@ -107,7 +107,11 @@ const LyricsAdjust = () => {
             inputProps={{
               'data-testid': 'offset',
               step: '0.2',
-              style: { textAlign: 'center', paddingLeft: 0, paddingRight: 0 },
+              style: {
+                textAlign: 'center',
+                fontSize: '0.9em',
+                padding: 3,
+              },
             }}
             value={currentOffset}
             onChange={(event) => changeLyricsOffset(event.target.value)}
