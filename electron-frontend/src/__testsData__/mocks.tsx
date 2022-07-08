@@ -1,5 +1,6 @@
 import { AudioContext } from 'standardized-audio-context-mock';
 import { queueTestDataWithSongs012, songListTestData } from './testData';
+import { configStoreDefaults } from '../main/database';
 
 const mockedElectron = {
   ...window.electron,
@@ -29,22 +30,7 @@ const mockedElectron = {
     },
     config: {
       getAudioStatusConfig: () => {
-        return {
-          songId: '',
-          currentTime: 0,
-          duration: 0,
-          volume: 50,
-          pitch: 0,
-          vocalsEnabled: true,
-          lyricsEnabled: true,
-          graphEnabled: true,
-          audioInput1Id: 'default',
-          audioInput2Id: 'default',
-          microphone1Volume: 50,
-          microphone2Volume: 50,
-          reverb1Volume: 50,
-          reverb2Volume: 50,
-        };
+        return configStoreDefaults.audioStatusConfig;
       },
       setAudioStatusConfig: jest.fn(),
       getSettings: () => {
@@ -67,7 +53,7 @@ const mockedElectron = {
     readAsBuffer: jest.fn(),
     ifFileExists: jest.fn(),
     write: jest.fn(),
-    getWavFileForReverbPath: jest.fn().mockResolvedValue(''),
+    getAssetsPath: jest.fn().mockResolvedValue(''),
   },
 };
 
@@ -152,6 +138,10 @@ export const mockedAudioStatus = {
   setReverb1Volume: jest.fn(),
   reverb2Volume: 70,
   setReverb2Volume: jest.fn(),
+  microphone1NoiseSuppression: false,
+  setMicrophone1NoiseSuppression: jest.fn(),
+  microphone2NoiseSuppression: false,
+  setMicrophone2NoiseSuppression: jest.fn(),
 };
 
 export default mockedElectron;

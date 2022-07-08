@@ -166,6 +166,70 @@ describe('Microphone component test', () => {
     });
   });
 
+  test('toggle noise suppression switch on (initially off) enable noise suppression', async () => {
+    const mockSetMicrophoneNoiseSuppression = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      microphone1NoiseSuppression: false,
+      setMicrophone1NoiseSuppression: mockSetMicrophoneNoiseSuppression,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+
+    // switch on
+    const microphone1NoiseSuppressionToggleSwitch = screen.getByTestId(
+      'toggle-microphone-1-noise-suppression-switch'
+    );
+    fireEvent.click(microphone1NoiseSuppressionToggleSwitch);
+
+    expect(mockSetMicrophoneNoiseSuppression).toHaveBeenCalledWith(true);
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
+  });
+
+  test('toggle noise suppression switch off (initially on) disable noise suppression', async () => {
+    const mockSetMicrophoneNoiseSuppression = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      microphone1NoiseSuppression: true,
+      setMicrophone1NoiseSuppression: mockSetMicrophoneNoiseSuppression,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+
+    // switch off
+    const microphone1NoiseSuppressionToggleSwitch = screen.getByTestId(
+      'toggle-microphone-1-noise-suppression-switch'
+    );
+    fireEvent.click(microphone1NoiseSuppressionToggleSwitch);
+
+    expect(mockSetMicrophoneNoiseSuppression).toHaveBeenCalledWith(false);
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
+  });
+
   test('microphone volume slider should change microphone volume', async () => {
     const mockGain = { value: 70 };
     const mockSetMicrophoneVolume = jest.fn();

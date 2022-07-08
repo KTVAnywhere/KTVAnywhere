@@ -4,7 +4,7 @@ import schemas, { SongsType, QueueItemsType, ConfigType } from './schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
-const configStoreDefaults = {
+export const configStoreDefaults = {
   audioStatusConfig: {
     songId: '',
     currentTime: 0,
@@ -20,6 +20,8 @@ const configStoreDefaults = {
     microphone2Volume: 50,
     reverb1Volume: 50,
     reverb2Volume: 50,
+    microphone1NoiseSuppression: false,
+    microphone2NoiseSuppression: false,
   },
   settings: {
     errorMessagesTimeout: 5,

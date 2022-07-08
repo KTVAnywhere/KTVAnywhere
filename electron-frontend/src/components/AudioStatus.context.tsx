@@ -84,6 +84,10 @@ interface ContextState {
   setReverb1Volume: Dispatch<SetStateAction<number>>;
   reverb2Volume: number;
   setReverb2Volume: Dispatch<SetStateAction<number>>;
+  microphone1NoiseSuppression: boolean;
+  setMicrophone1NoiseSuppression: Dispatch<SetStateAction<boolean>>;
+  microphone2NoiseSuppression: boolean;
+  setMicrophone2NoiseSuppression: Dispatch<SetStateAction<boolean>>;
 }
 
 const AudioStatusContext = createContext({} as ContextState);
@@ -169,6 +173,10 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
   const [reverb2Volume, setReverb2Volume] = useState<number>(
     audioStatusConfig.reverb2Volume
   );
+  const [microphone1NoiseSuppression, setMicrophone1NoiseSuppression] =
+    useState<boolean>(audioStatusConfig.microphone1NoiseSuppression);
+  const [microphone2NoiseSuppression, setMicrophone2NoiseSuppression] =
+    useState<boolean>(audioStatusConfig.microphone2NoiseSuppression);
 
   return (
     <AudioStatusContext.Provider
@@ -239,6 +247,10 @@ export const AudioStatusProvider = ({ children }: { children: ReactNode }) => {
         setReverb1Volume,
         reverb2Volume,
         setReverb2Volume,
+        microphone1NoiseSuppression,
+        setMicrophone1NoiseSuppression,
+        microphone2NoiseSuppression,
+        setMicrophone2NoiseSuppression,
       }}
     >
       {children}

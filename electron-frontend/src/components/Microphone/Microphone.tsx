@@ -17,6 +17,7 @@ import {
 import RestoreIcon from '@mui/icons-material/Restore';
 import MicIcon from '@mui/icons-material/Mic';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { NoiseSuppressionProcessor } from '@shiguredo/noise-suppression';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
 
@@ -41,7 +42,10 @@ const MicrophoneMenuElementsForEachMicrophone = ({
   reverbGainNode,
   reverbVolume,
   setReverbVolume,
+  microphoneNoiseSuppression,
+  setMicrophoneNoiseSuppression,
   getMicrophoneMedia,
+  getMicrophoneMediaWithRnnoise,
   toArrayBuffer,
 }: {
   micNo: number;
@@ -68,19 +72,32 @@ const MicrophoneMenuElementsForEachMicrophone = ({
   reverbGainNode: GainNode;
   reverbVolume: number;
   setReverbVolume: Dispatch<SetStateAction<number>>;
+  microphoneNoiseSuppression: boolean;
+  setMicrophoneNoiseSuppression: Dispatch<SetStateAction<boolean>>;
   getMicrophoneMedia: (
+    audioInputId: string
+  ) => Promise<MediaStreamAudioSourceNode | null>;
+  getMicrophoneMediaWithRnnoise: (
     audioInputId: string
   ) => Promise<MediaStreamAudioSourceNode | null>;
   toArrayBuffer: (buffer: Buffer) => ArrayBuffer;
 }) => {
   const { audioContext } = useAudioStatus();
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const [callToReconnect, setCallToReconnect] = useState<boolean>(false);
   const [callToEnableMicrophone, setCallToEnableMicrophone] =
     useState<boolean>(false);
   const [callToEnableReverb, setCallToEnableReverb] = useState<boolean>(false);
 
+  const getMicrophoneMediaFn = async (id: string) => {
+    if (microphoneNoiseSuppression) {
+      return getMicrophoneMediaWithRnnoise(id);
+    }
+    return getMicrophoneMedia(id);
+  };
+
   const enableMicrophone = async () => {
-    const micSource = await getMicrophoneMedia(audioInputId);
+    const micSource = await getMicrophoneMediaFn(audioInputId);
     if (micSource) {
       setMicrophoneEnabled(true);
       setMicrophoneMedia(micSource);
@@ -96,7 +113,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
     let newReverbMedia;
     let newReverbNode;
     if (!reverbMedia) {
-      newReverbMedia = await getMicrophoneMedia(audioInputId);
+      newReverbMedia = await getMicrophoneMediaFn(audioInputId);
       if (newReverbMedia) {
         setReverbMedia(newReverbMedia);
       }
@@ -106,7 +123,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
         newReverbNode = audioContext.createConvolver();
         const arrayBuffer = toArrayBuffer(
           await window.electron.file.readAsBuffer(
-            window.electron.file.getWavFileForReverbPath()
+            window.electron.file.getAssetsPath('impulses_impulse_rev.wav')
           )
         );
         newReverbNode.buffer = await audioContext.decodeAudioData(arrayBuffer);
@@ -185,6 +202,17 @@ const MicrophoneMenuElementsForEachMicrophone = ({
     setAudioInputId('default');
     setMicrophoneVolume(50);
     setReverbVolume(50);
+    setMicrophoneNoiseSuppression(false);
+  };
+
+  const enableNoiseSuppression = () => {
+    setMicrophoneNoiseSuppression(true);
+    setCallToReconnect(true);
+  };
+
+  const disableNoiseSuppression = () => {
+    setMicrophoneNoiseSuppression(false);
+    setCallToReconnect(true);
   };
 
   const audioInputIdChange = (event: SelectChangeEvent<string>) => {
@@ -192,15 +220,23 @@ const MicrophoneMenuElementsForEachMicrophone = ({
   };
 
   useEffect(() => {
-    if (reverbEnabled) {
-      disableMicrophone();
-      setCallToEnableReverb(true);
-    } else if (microphoneEnabled) {
-      disableMicrophone();
-      setCallToEnableMicrophone(true);
-    }
+    setCallToReconnect(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioInputId]);
+
+  useEffect(() => {
+    if (callToReconnect) {
+      if (reverbEnabled) {
+        disableMicrophone();
+        setCallToEnableReverb(true);
+      } else if (microphoneEnabled) {
+        disableMicrophone();
+        setCallToEnableMicrophone(true);
+      }
+      setCallToReconnect(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callToReconnect]);
 
   useEffect(() => {
     if (callToEnableMicrophone) {
@@ -263,6 +299,20 @@ const MicrophoneMenuElementsForEachMicrophone = ({
           color="secondary"
           sx={{ bottom: '7px' }}
           data-testid={`toggle-reverb-${micNo}-switch`}
+        />
+      </Stack>
+      <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
+        <Typography>Noise suppression</Typography>
+        <Switch
+          checked={microphoneNoiseSuppression}
+          onClick={() =>
+            microphoneNoiseSuppression
+              ? disableNoiseSuppression()
+              : enableNoiseSuppression()
+          }
+          color="secondary"
+          sx={{ bottom: '7px' }}
+          data-testid={`toggle-microphone-${micNo}-noise-suppression-switch`}
         />
       </Stack>
       <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
@@ -349,6 +399,10 @@ const MicrophoneMenu = ({
     setReverb1Volume,
     reverb2Volume,
     setReverb2Volume,
+    microphone1NoiseSuppression,
+    setMicrophone1NoiseSuppression,
+    microphone2NoiseSuppression,
+    setMicrophone2NoiseSuppression,
   } = useAudioStatus();
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
   const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[]>(
@@ -378,6 +432,38 @@ const MicrophoneMenu = ({
           audio: { deviceId: audioInputId },
           video: false,
         })
+        .then((stream) => audioContext.createMediaStreamSource(stream));
+    } catch (err) {
+      setAlertMessage({
+        message:
+          'Cannot connect to selected microphone, please change input in settings',
+        severity: 'error',
+      });
+      setShowAlertMessage(true);
+    }
+    return microphoneSource;
+  };
+
+  const getMicrophoneMediaWithRnnoise = async (audioInputId: string) => {
+    let microphoneSource = null;
+    const assetsPath = window.electron.file.getAssetsPath();
+    const processor = new NoiseSuppressionProcessor(assetsPath);
+    const constraints = {
+      sampleRate: { ideal: 48000 },
+      sampleSize: { ideal: 480 },
+      channelCount: { exact: 1 },
+      deviceId: audioInputId,
+    };
+
+    try {
+      microphoneSource = await navigator.mediaDevices
+        .getUserMedia({
+          audio: constraints,
+          video: false,
+        })
+        .then((stream) => stream.getAudioTracks()[0])
+        .then((track) => processor.startProcessing(track))
+        .then((processed_track) => new MediaStream([processed_track]))
         .then((stream) => audioContext.createMediaStreamSource(stream));
     } catch (err) {
       setAlertMessage({
@@ -446,7 +532,10 @@ const MicrophoneMenu = ({
             reverbGainNode={reverb1GainNode}
             reverbVolume={reverb1Volume}
             setReverbVolume={setReverb1Volume}
+            microphoneNoiseSuppression={microphone1NoiseSuppression}
+            setMicrophoneNoiseSuppression={setMicrophone1NoiseSuppression}
             getMicrophoneMedia={getMicrophoneMedia}
+            getMicrophoneMediaWithRnnoise={getMicrophoneMediaWithRnnoise}
             toArrayBuffer={toArrayBuffer}
           />
           <Divider
@@ -478,7 +567,10 @@ const MicrophoneMenu = ({
             reverbGainNode={reverb2GainNode}
             reverbVolume={reverb2Volume}
             setReverbVolume={setReverb2Volume}
+            microphoneNoiseSuppression={microphone2NoiseSuppression}
+            setMicrophoneNoiseSuppression={setMicrophone2NoiseSuppression}
             getMicrophoneMedia={getMicrophoneMedia}
+            getMicrophoneMediaWithRnnoise={getMicrophoneMediaWithRnnoise}
             toArrayBuffer={toArrayBuffer}
           />
         </Stack>

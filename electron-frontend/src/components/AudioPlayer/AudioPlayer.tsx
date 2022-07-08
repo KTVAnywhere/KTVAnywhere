@@ -123,6 +123,8 @@ export const AudioPlayer = () => {
     microphone2Volume,
     reverb1Volume,
     reverb2Volume,
+    microphone1NoiseSuppression,
+    microphone2NoiseSuppression,
   } = useAudioStatus();
   const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
 
@@ -450,6 +452,8 @@ export const AudioPlayer = () => {
       microphone2Volume,
       reverb1Volume,
       reverb2Volume,
+      microphone1NoiseSuppression,
+      microphone2NoiseSuppression,
     });
     destroySource();
   };

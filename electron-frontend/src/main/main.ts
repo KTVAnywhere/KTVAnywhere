@@ -53,7 +53,7 @@ ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
   return result;
 });
 
-ipcMain.on('file:getWavFileForReverbPath', async (event) => {
+ipcMain.on('file:getAssetsPath', async (event, fileName?: string) => {
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
@@ -61,7 +61,7 @@ ipcMain.on('file:getWavFileForReverbPath', async (event) => {
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
   };
-  event.returnValue = getAssetPath('impulses_impulse_rev.wav');
+  event.returnValue = fileName ? getAssetPath(fileName) : RESOURCES_PATH;
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -114,6 +114,7 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
+      webSecurity: false,
     },
   });
 
@@ -238,16 +239,6 @@ app
           error: error as Error,
         });
       }
-    });
-    // custom protocol for reading local files
-    protocol.registerFileProtocol('atom', (request, callback) => {
-      const url = request.url.substring(7);
-      try {
-        return callback({ path: decodeURI(path.normalize(url)) });
-      } catch (error) {
-        console.error('Failed to register protocol');
-      }
-      return false;
     });
     createWindow();
     app.on('activate', () => {

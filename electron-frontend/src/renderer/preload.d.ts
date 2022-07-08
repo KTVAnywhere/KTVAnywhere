@@ -15,7 +15,7 @@ declare global {
         readAsBuffer(filePath: string): Promise<Buffer>;
         ifFileExists(filePath: string): boolean;
         write(filePath: string, data: string): Promise<{ error?: Error }>;
-        getWavFileForReverbPath(): string;
+        getAssetsPath(filePath?: string): string;
       };
       music: {
         getLrc(song: SongProps): Promise<{ lyricsPath: string; error?: Error }>;

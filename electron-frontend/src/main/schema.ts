@@ -34,6 +34,8 @@ export interface ConfigType {
     microphone2Volume: number;
     reverb1Volume: number;
     reverb2Volume: number;
+    microphone1NoiseSuppression: boolean;
+    microphone2NoiseSuppression: boolean;
   };
   settings: {
     errorMessagesTimeout: number;
@@ -102,6 +104,8 @@ const configSchema: Schema<ConfigType> = {
       microphone2Volume: { type: 'number' },
       reverb1Volume: { type: 'number' },
       reverb2Volume: { type: 'number' },
+      microphone1NoiseSuppression: { type: 'boolean' },
+      microphone2NoiseSuppression: { type: 'boolean' },
     },
   },
   settings: {

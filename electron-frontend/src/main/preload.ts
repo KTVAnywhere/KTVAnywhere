@@ -25,8 +25,8 @@ contextBridge.exposeInMainWorld('electron', {
     write(filePath: string, data: string) {
       return ipcRenderer.invoke('file:write', filePath, data);
     },
-    getWavFileForReverbPath() {
-      return ipcRenderer.sendSync('file:getWavFileForReverbPath');
+    getAssetsPath(fileName?: string) {
+      return ipcRenderer.sendSync('file:getAssetsPath', fileName);
     },
   },
   music: {

@@ -275,6 +275,8 @@ describe('config store', () => {
       microphone2Volume: 50,
       reverb1Volume: 50,
       reverb2Volume: 50,
+      microphone1NoiseSuppression: false,
+      microphone2NoiseSuppression: false,
     };
     setAudioStatusConfig(configStore, audioStatusConfig);
     expect(mockSet).toBeCalledWith('audioStatusConfig', audioStatusConfig);
