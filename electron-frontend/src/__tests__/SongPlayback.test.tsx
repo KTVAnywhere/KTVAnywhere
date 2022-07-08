@@ -157,7 +157,7 @@ describe('Lyrics adjust', () => {
 });
 
 describe('Audio player component tests', () => {
-  const mockGetSong = jest.fn();
+  const mockDequeueItem = jest.fn().mockReturnValue(songTestData[0]);
 
   beforeEach(() => {
     global.window.AudioContext = AudioContext as any;
@@ -165,9 +165,9 @@ describe('Audio player component tests', () => {
       ...mockedElectron,
       store: {
         ...mockedElectron.store,
-        songs: {
-          ...mockedElectron.store.songs,
-          getSong: mockGetSong,
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          dequeueItem: mockDequeueItem,
         },
       },
       file: {
@@ -195,12 +195,11 @@ describe('Audio player component tests', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-    expect(mockGetSong).not.toHaveBeenCalled();
-
+    expect(mockDequeueItem).not.toBeCalled();
     const playButton = screen.getByTestId('play-button');
     fireEvent.click(playButton);
     await waitFor(() => {
-      expect(mockGetSong).toBeCalled();
+      expect(mockDequeueItem).toBeCalled();
     });
   });
 
@@ -279,12 +278,11 @@ describe('Audio player component tests', () => {
     );
 
     const endSongButton = screen.getByTestId('end-song-button');
-
-    expect(mockGetSong).not.toBeCalled();
+    expect(mockDequeueItem).not.toBeCalled();
     // there are songs in queue
     fireEvent.click(endSongButton);
     await waitFor(() => {
-      expect(mockGetSong).toBeCalled();
+      expect(mockDequeueItem).toBeCalled();
     });
 
     // no song in queue

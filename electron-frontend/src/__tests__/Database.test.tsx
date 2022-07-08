@@ -122,6 +122,10 @@ describe('songs store', () => {
     expect(mockSet).toBeCalledWith('songs', newsongListTestData);
     expect(mockIndexSet).toBeCalledWith(newsongListTestData);
   });
+  test('get random song', () => {
+    const { getRandomSong } = songFunctions;
+    expect(songListTestData).toContain(getRandomSong(songsStore));
+  });
 });
 
 describe('queueItems store', () => {
@@ -150,8 +154,8 @@ describe('queueItems store', () => {
       queueTestDataWithSongs012[0]
     );
   });
-  test('add queueItem to end of queueItems store', () => {
-    const toAdd: QueueItemProps = {
+  test('enqueue item to end of queueItems store', () => {
+    const toEnqueue: QueueItemProps = {
       song: {
         songId: '3',
         songName: 'Test song 3',
@@ -164,12 +168,29 @@ describe('queueItems store', () => {
       },
       queueItemId: '3',
     };
-    const { addQueueItem } = queueItemFunctions;
-    addQueueItem(queueItemsStore, toAdd);
+    const { enqueueItem } = queueItemFunctions;
+    enqueueItem(queueItemsStore, toEnqueue);
     expect(mockSet).toBeCalledWith('queueItems', [
       ...queueTestDataWithSongs012,
-      toAdd,
+      toEnqueue,
     ]);
+  });
+  test('dequeue item from queueItems store', () => {
+    data = [{ song: songListTestData[0], queueItemId: '0' }];
+    let songsData = songListTestData;
+    const mockGetSongs = jest.fn(() => songsData);
+    const mockSetSongs = jest.fn((_, songs: SongProps[]) => {
+      songsData = songs;
+    });
+    const songsStore = {
+      ...new ActualStore({}),
+      get: mockGetSongs,
+      set: mockSetSongs,
+    };
+    const { dequeueItem } = queueItemFunctions;
+    expect(dequeueItem(queueItemsStore, songsStore)).toEqual(
+      songListTestData[0]
+    );
   });
   test('change queueItem in queueItems store', () => {
     const newTestQueueItem: QueueItemProps = {
@@ -204,6 +225,15 @@ describe('queueItems store', () => {
     const { setAllQueueItems } = queueItemFunctions;
     setAllQueueItems(queueItemsStore, queueTestDataWithSongs102);
     expect(mockSet).toBeCalledWith('queueItems', queueTestDataWithSongs102);
+  });
+  test('shuffle queue', () => {
+    const { shuffleQueue } = queueItemFunctions;
+    expect(mockSet).not.toBeCalled();
+    shuffleQueue(queueItemsStore);
+    expect(mockSet).toBeCalled();
+    expect(data).toContain(queueTestDataWithSongs012[0]);
+    expect(data).toContain(queueTestDataWithSongs012[1]);
+    expect(data).toContain(queueTestDataWithSongs012[2]);
   });
 });
 

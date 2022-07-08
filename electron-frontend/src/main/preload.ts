@@ -57,6 +57,9 @@ contextBridge.exposeInMainWorld('electron', {
       setAllSongs(songs: SongProps[]) {
         ipcRenderer.send('store:setAllSongs', songs);
       },
+      getRandomSong() {
+        return ipcRenderer.sendSync('store:getRandomSong');
+      },
       onChange: (
         callback: (_event: IpcRendererEvent, results: SongProps[]) => void
       ) => {
@@ -72,11 +75,14 @@ contextBridge.exposeInMainWorld('electron', {
       getQueueItem(key: string) {
         return ipcRenderer.sendSync('store:getQueueItem', key);
       },
-      addQueueItem(queue: QueueItemProps) {
-        ipcRenderer.send('store:addQueueItem', queue);
+      enqueueItem(queueItem: QueueItemProps) {
+        ipcRenderer.send('store:enqueueItem', queueItem);
       },
-      setQueueItem(queue: QueueItemProps) {
-        ipcRenderer.send('store:setQueueItem', queue);
+      dequeueItem() {
+        return ipcRenderer.sendSync('store:dequeueItem');
+      },
+      setQueueItem(queueItem: QueueItemProps) {
+        ipcRenderer.send('store:setQueueItem', queueItem);
       },
       deleteSong(queueItemId: string) {
         ipcRenderer.send('store:deleteQueueItem', queueItemId);
@@ -86,6 +92,9 @@ contextBridge.exposeInMainWorld('electron', {
       },
       setAllQueueItems(queueItems: QueueItemProps[]) {
         ipcRenderer.send('store:setAllQueueItems', queueItems);
+      },
+      shuffleQueue() {
+        ipcRenderer.send('store:shuffleQueue');
       },
       onChange: (
         callback: (_event: IpcRendererEvent, results: QueueItemProps[]) => void

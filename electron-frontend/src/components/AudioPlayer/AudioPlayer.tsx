@@ -372,10 +372,12 @@ export const AudioPlayer = () => {
       if (song) {
         loadSong(song.songPath, false, isPlaying, () => {
           setCurrentSong(song);
+          setCurrentTime(0);
           setIsPlayingVocals(true);
         });
       }
     } else {
+      gainNode.disconnect();
       destroySource();
       setCurrentSong(null);
       setIsPlaying(false);
@@ -499,6 +501,7 @@ export const AudioPlayer = () => {
                 isPlayingVocals ? disableVocals() : enableVocals()
               }
               color="secondary"
+              size="small"
               data-testid="toggle-vocals-switch"
             />
           </Grid>
@@ -603,6 +606,7 @@ export const AudioPlayer = () => {
               checked={graphEnabled}
               data-testid="toggle-graph-button"
               onClick={toggleGraph}
+              size="small"
               color="secondary"
             />
           </Grid>
@@ -620,6 +624,7 @@ export const AudioPlayer = () => {
               checked={lyricsEnabled}
               data-testid="toggle-lyrics-button"
               onClick={toggleLyrics}
+              size="small"
               color="secondary"
             />
             <Box position="absolute" left="80px" top="0">

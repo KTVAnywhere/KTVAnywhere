@@ -108,6 +108,12 @@ export const songFunctions = {
     store.set('songs', songs);
     songSearcher.setCollection(songs);
   },
+  getRandomSong: (store: Store<SongsType>) => {
+    const allSongs = store.get('songs');
+    return allSongs.length > 0
+      ? allSongs[Math.floor(Math.random() * allSongs.length)]
+      : null;
+  },
 };
 
 export const queueItemFunctions = {
@@ -123,9 +129,25 @@ export const queueItemFunctions = {
       );
     store.set('queueItems', newQueue);
   },
-  addQueueItem: (store: Store<QueueItemsType>, queueItem: QueueItemProps) => {
+  enqueueItem: (store: Store<QueueItemsType>, queueItem: QueueItemProps) => {
     const newQueue = [...store.get('queueItems'), queueItem];
     store.set('queueItems', newQueue);
+  },
+  dequeueItem: (
+    queueStore: Store<QueueItemsType>,
+    songStore: Store<SongsType>
+  ) => {
+    const queue = queueStore.get('queueItems');
+    const nextSong =
+      (queue.length > 0 &&
+        songStore
+          .get('songs')
+          .find((song) => song.songId === queue[0].song.songId)) ||
+      null;
+    if (queue.length > 0) {
+      queueStore.set('queueItems', [...queue.slice(1)]);
+    }
+    return nextSong;
   },
   deleteQueueItem: (store: Store<QueueItemsType>, queueItemId: string) => {
     store.set(
@@ -141,6 +163,28 @@ export const queueItemFunctions = {
     queueItems: QueueItemProps[]
   ) => {
     store.set('queueItems', queueItems);
+  },
+  shuffleQueue: (store: Store<QueueItemsType>) => {
+    const newQueue = store.get('queueItems');
+    // Fisher-Yates algorithm
+    if (newQueue.length === 0) return;
+    let currentIndex = newQueue.length;
+    let randomIndex;
+
+    // While there remain elements to shuffle.
+    while (currentIndex !== 0) {
+      // Pick a remaining element.
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      // And swap it with the current element.
+      [newQueue[currentIndex], newQueue[randomIndex]] = [
+        newQueue[randomIndex],
+        newQueue[currentIndex],
+      ];
+    }
+
+    store.set('queueItems', newQueue);
   },
 };
 

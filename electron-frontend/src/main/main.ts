@@ -272,14 +272,17 @@ app
       deleteSong,
       getAllSongs,
       setAllSongs,
+      getRandomSong,
     } = songFunctions;
     const {
       getQueueItem,
       setQueueItem,
-      addQueueItem,
+      enqueueItem,
+      dequeueItem,
       deleteQueueItem,
       getAllQueueItems,
       setAllQueueItems,
+      shuffleQueue,
     } = queueItemFunctions;
     const {
       getAudioStatusConfig,
@@ -338,6 +341,9 @@ app
       setAllSongs(songsStore, songSearcher, songs);
       saveSongIndex();
     });
+    ipcMain.on('store:getRandomSong', async (event) => {
+      event.returnValue = getRandomSong(songsStore);
+    });
 
     songsStore.onDidChange('songs', (results) =>
       mainWindow?.webContents.send('store:onSongsChange', results)
@@ -353,8 +359,11 @@ app
     ipcMain.on('store:setQueueItem', async (_, queueItem) => {
       setQueueItem(queueItemsStore, queueItem);
     });
-    ipcMain.on('store:addQueueItem', async (_, queueItem) => {
-      addQueueItem(queueItemsStore, queueItem);
+    ipcMain.on('store:enqueueItem', async (_, queueItem) => {
+      enqueueItem(queueItemsStore, queueItem);
+    });
+    ipcMain.on('store:dequeueItem', async (event) => {
+      event.returnValue = dequeueItem(queueItemsStore, songsStore);
     });
     ipcMain.on('store:deleteQueueItem', async (_, queueItemId) => {
       deleteQueueItem(queueItemsStore, queueItemId);
@@ -366,6 +375,9 @@ app
 
     ipcMain.on('store:setAllQueueItems', async (_, queueItems) => {
       setAllQueueItems(queueItemsStore, queueItems);
+    });
+    ipcMain.on('store:shuffleQueue', async () => {
+      shuffleQueue(queueItemsStore);
     });
 
     queueItemsStore.onDidChange('queueItems', (results) =>

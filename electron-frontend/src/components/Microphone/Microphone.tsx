@@ -220,7 +220,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
 
   return (
     <>
-      <FormControl sx={{ width: 100 }}>
+      <FormControl sx={{ width: 270, marginY: 1 }}>
         <Select
           value={
             audioInputDevices

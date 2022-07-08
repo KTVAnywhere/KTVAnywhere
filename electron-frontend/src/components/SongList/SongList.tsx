@@ -14,7 +14,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import QueuePlayNext from '@mui/icons-material/QueuePlayNext';
+import QueueIcon from '@mui/icons-material/Queue';
 import LoadingButton from '@mui/lab/LoadingButton';
 import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { SongProps, useSongDialog, useSongsStatus } from '../Song';
@@ -111,7 +111,7 @@ const SongCard = ({
           </Tooltip>
           <Tooltip title="Enqueue song" placement="right">
             <IconButton aria-label="enqueue" onClick={() => EnqueueSong(song)}>
-              <QueuePlayNext />
+              <QueueIcon />
             </IconButton>
           </Tooltip>
           <LoadingButton
