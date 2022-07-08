@@ -1,4 +1,5 @@
 import { SongProps } from '../components/Song';
+import { NoteEventTime } from '../components/PitchGraph';
 
 export const songTestData: SongProps[] = [
   {
@@ -84,3 +85,24 @@ export const testLyrics = `
 [00:05.00]${lineAt5s}
 [00:10.00]${lineAt10s}
 [00:15.00]${lineAt15s}`;
+
+export const testGraph: NoteEventTime[] = [
+  {
+    startTimeSeconds: 5,
+    durationSeconds: 1,
+    pitchMidi: 50,
+    amplitude: expect.any(Number),
+  },
+  {
+    startTimeSeconds: 7,
+    durationSeconds: 2,
+    pitchMidi: 51,
+    amplitude: expect.any(Number),
+  },
+  {
+    startTimeSeconds: 15,
+    durationSeconds: 3,
+    pitchMidi: 55,
+    amplitude: expect.any(Number),
+  },
+];

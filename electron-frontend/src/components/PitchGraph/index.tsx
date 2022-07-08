@@ -1,3 +1,4 @@
-import PitchGraph from './PitchGraph';
+import PitchGraph, { NoteEventTime } from './PitchGraph';
 
 export default PitchGraph;
+export { NoteEventTime };

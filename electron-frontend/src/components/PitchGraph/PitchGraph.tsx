@@ -2,7 +2,7 @@ import { Box, Container } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useAudioStatus } from '../AudioStatus.context';
 
-interface NoteEventTime {
+export interface NoteEventTime {
   startTimeSeconds: number;
   durationSeconds: number;
   pitchMidi: number;
@@ -76,80 +76,87 @@ const PitchGraph = () => {
     Math.round(valueToRound / precision) * precision;
 
   return (
-    <Container
-      sx={{
-        position: 'relative',
-      }}
-    >
-      <Box
-        bgcolor="primary.main"
-        sx={{
-          position: 'absolute',
-          opacity: '50%',
-          width: '2px',
-          height: `${(NUM_TRACKS - 1) * TRACK_HEIGHT}px`,
-          bottom: 0,
-          left: `${STEP * BEFORE}px`,
-        }}
-      />
-      {Array.from(Array(NUM_TRACKS).keys()).map((index) => (
-        <Box
-          bgcolor="primary.main"
-          key={`track-${index}`}
+    <>
+      {graphEnabled && (
+        <Container
+          data-testid="pitch-graph"
           sx={{
-            position: 'absolute',
-            bottom: `${index * TRACK_HEIGHT}px`,
-            left: '-5%',
-            opacity: '20%',
-            height: '1px',
-            width: '110%',
+            position: 'relative',
           }}
-        />
-      ))}
-      <Container
-        sx={{
-          position: 'relative',
-          left: `${STEP * BEFORE}px`,
-          transform: `translateX(-${(currentTime + 0.25) * STEP}px)`,
-          transition:
-            Math.abs(time.current - currentTime) < 2
-              ? 'transform 0.5s linear'
-              : 'transform 33ms linear',
-          willChange: 'transform, transition',
-        }}
-      >
-        {pitchArray.map(
-          ({ startTimeSeconds, durationSeconds, pitchMidi }) =>
-            currentTime + 5 >= startTimeSeconds &&
-            currentTime - 5 <= startTimeSeconds + durationSeconds && (
-              <Box
-                sx={{
-                  position: 'absolute',
-                  display: 'flex',
-                  direction: 'column',
-                  alignItems: 'center',
-                  left: `${startTimeSeconds * STEP}px`,
-                  bottom: `${
-                    (roundToNearest(pitchMidi / 2, 0.5) + pitch - 17) *
-                    TRACK_HEIGHT
-                  }px`,
-                  height: `${TRACK_HEIGHT}px`,
-                }}
-              >
-                <Box
-                  key={`${startTimeSeconds}-${pitchMidi}`}
-                  sx={{
-                    bgcolor: 'secondary.main',
-                    height: `${BAR_HEIGHT}`,
-                    width: `${durationSeconds * STEP + 1}px`,
-                    borderRadius: 10,
-                  }}
-                />
-              </Box>
-            )
-        )}
-      </Container>
-    </Container>
+        >
+          <Box
+            bgcolor="text.primary"
+            sx={{
+              position: 'absolute',
+              opacity: '50%',
+              width: '2px',
+              height: `${(NUM_TRACKS - 1) * TRACK_HEIGHT}px`,
+              bottom: 0,
+              left: `${STEP * BEFORE}px`,
+            }}
+          />
+          {Array.from(Array(NUM_TRACKS).keys()).map((index) => (
+            <Box
+              bgcolor="text.primary"
+              key={`track-${index}`}
+              sx={{
+                position: 'absolute',
+                bottom: `${index * TRACK_HEIGHT}px`,
+                left: '-5%',
+                opacity: '20%',
+                height: '1px',
+                width: '110%',
+              }}
+            />
+          ))}
+          <Container
+            sx={{
+              position: 'relative',
+              left: `${STEP * BEFORE}px`,
+              transform: `translateX(-${(currentTime + 0.25) * STEP}px)`,
+              transition:
+                Math.abs(time.current - currentTime) < 2
+                  ? 'transform 0.5s linear'
+                  : 'transform 33ms linear',
+              willChange: 'transform, transition',
+            }}
+          >
+            {pitchArray.map(
+              ({ startTimeSeconds, durationSeconds, pitchMidi }) =>
+                currentTime + 5 >= startTimeSeconds &&
+                currentTime - 2 <= startTimeSeconds + durationSeconds && (
+                  <Box
+                    data-testid={`${startTimeSeconds}-${pitchMidi}-${durationSeconds}`}
+                    key={`${startTimeSeconds}-${pitchMidi}-outer`}
+                    sx={{
+                      position: 'absolute',
+                      display: 'flex',
+                      direction: 'column',
+                      alignItems: 'center',
+                      left: `${startTimeSeconds * STEP}px`,
+                      bottom: `${
+                        (roundToNearest(pitchMidi / 2, 0.5) + pitch - 17) *
+                        TRACK_HEIGHT
+                      }px`,
+                      height: `${TRACK_HEIGHT}px`,
+                    }}
+                  >
+                    <Box
+                      key={`${startTimeSeconds}-${pitchMidi}-inner`}
+                      sx={{
+                        bgcolor: 'primary.main',
+                        height: `${BAR_HEIGHT}`,
+                        width: `${durationSeconds * STEP}px`,
+                        borderRadius: 10,
+                      }}
+                    />
+                  </Box>
+                )
+            )}
+          </Container>
+        </Container>
+      )}
+    </>
   );
 };
 
