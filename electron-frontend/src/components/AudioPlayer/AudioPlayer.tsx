@@ -494,7 +494,12 @@ export const AudioPlayer = () => {
           </IconButton>
         </Tooltip>
       </Grid>
-      <Grid item container direction="row" sx={{ justifyContent: 'center' }}>
+      <Grid
+        item
+        container
+        direction="row"
+        sx={{ justifyContent: 'center', alignItems: 'center' }}
+      >
         <Grid
           item
           sx={{ position: 'absolute', left: '2%', right: '85%', top: '15px' }}
@@ -529,7 +534,13 @@ export const AudioPlayer = () => {
               data-testid="toggle-vocals-switch"
             />
           </Grid>
-          <Typography align="center">vocals</Typography>
+          <Typography
+            position="absolute"
+            variant="subtitle2"
+            sx={{ ml: '10px' }}
+          >
+            vocals
+          </Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '1%' }}>
           <IconButton sx={{ padding: 0 }} onClick={tempoReset}>
@@ -548,10 +559,13 @@ export const AudioPlayer = () => {
             size="small"
             color="secondary"
             data-testid="tempo-slider"
+            sx={{ py: 0.6 }}
           />
-          <Typography>tempo: {tempo}</Typography>
+          <Typography position="absolute" variant="subtitle2">
+            tempo: {tempo}
+          </Typography>
         </Grid>
-        <Grid item sx={{ marginTop: '2px', marginLeft: '1%' }}>
+        <Grid item sx={{ marginLeft: '1%' }}>
           <IconButton sx={{ padding: 0 }} onClick={pitchReset}>
             <GraphicEqIcon fontSize="medium" />
           </IconButton>
@@ -568,8 +582,11 @@ export const AudioPlayer = () => {
             size="small"
             color="secondary"
             data-testid="pitch-slider"
+            sx={{ py: 0.6 }}
           />
-          <Typography>pitch: {pitch > 0 ? `+${pitch}` : pitch}</Typography>
+          <Typography position="absolute" variant="subtitle2">
+            pitch: {pitch > 0 ? `+${pitch}` : pitch}
+          </Typography>
         </Grid>
         <Grid item sx={{ marginLeft: '1%', marginRight: '1%' }}>
           <Tooltip title="Backward 10s" placement="top">
@@ -608,12 +625,12 @@ export const AudioPlayer = () => {
             </IconButton>
           </Tooltip>
         </Grid>
-        <Grid item sx={{ marginTop: '3px' }}>
+        <Grid item>
           <IconButton sx={{ padding: 0 }} onClick={() => volumeZero()}>
             <VolumeMuteIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginLeft: '10px', marginRight: '1%', width: '6%' }}>
+        <Grid item sx={{ marginLeft: '10px', marginRight: '2%', width: '6%' }}>
           <Slider
             aria-label="Volume"
             value={volume}
@@ -623,11 +640,14 @@ export const AudioPlayer = () => {
             size="small"
             color="secondary"
             data-testid="volume-slider"
+            sx={{ py: 0.6 }}
           />
-          <Typography>volume: {volume}%</Typography>
+          <Typography position="absolute" variant="subtitle2">
+            volume: {volume}%
+          </Typography>
         </Grid>
         <Grid item sx={{ marginRight: '1%' }}>
-          <Grid container direction="row" alignItems="center">
+          <Grid container direction="row">
             <AutoGraphIcon fontSize="medium" />
             <Switch
               checked={graphEnabled}
@@ -637,7 +657,13 @@ export const AudioPlayer = () => {
               color="secondary"
             />
           </Grid>
-          <Typography align="center">graph</Typography>
+          <Typography
+            position="absolute"
+            variant="subtitle2"
+            sx={{ ml: '10px' }}
+          >
+            graph
+          </Typography>
         </Grid>
         <Grid item sx={{ marginRight: '2%' }}>
           <Grid
@@ -654,7 +680,7 @@ export const AudioPlayer = () => {
               size="small"
               color="secondary"
             />
-            <Box position="absolute" left="80px" top="0">
+            <Box position="absolute" left="70px" top="-6px">
               {lyricsEnabled &&
                 currentSong?.lyricsPath &&
                 window.electron.file.ifFileExists(currentSong?.lyricsPath) && (
@@ -662,7 +688,13 @@ export const AudioPlayer = () => {
                 )}
             </Box>
           </Grid>
-          <Typography align="center">lyrics</Typography>
+          <Typography
+            position="absolute"
+            variant="subtitle2"
+            sx={{ ml: '10px' }}
+          >
+            lyrics
+          </Typography>
         </Grid>
       </Grid>
     </Grid>

@@ -49,9 +49,10 @@ const readGraphData = async (filePath: string) => {
 
 const PitchGraph = () => {
   const BEFORE = 1;
-  const STEP = 200;
+  const AFTER = 4;
+  const STEP = `calc(100% / ${BEFORE + AFTER})`;
   const NUM_TRACKS = 30;
-  const TRACK_HEIGHT = 20;
+  const TRACK_HEIGHT = `calc(100% / ${NUM_TRACKS - 1})`;
   const BAR_HEIGHT = '50%';
   const [pitchArray, setPitchArray] = useState<NoteEventTime[]>([]);
   const { currentSong, currentTime, graphEnabled, pitch } = useAudioStatus();
@@ -81,7 +82,12 @@ const PitchGraph = () => {
         <Container
           data-testid="pitch-graph"
           sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
             position: 'relative',
+            height: '100%',
+            width: '100%',
           }}
         >
           <Box
@@ -90,9 +96,9 @@ const PitchGraph = () => {
               position: 'absolute',
               opacity: '50%',
               width: '2px',
-              height: `${(NUM_TRACKS - 1) * TRACK_HEIGHT}px`,
+              height: `calc(${NUM_TRACKS - 1} * ${TRACK_HEIGHT})`,
               bottom: 0,
-              left: `${STEP * BEFORE}px`,
+              left: `calc(${STEP} * ${BEFORE})`,
             }}
           />
           {Array.from(Array(NUM_TRACKS).keys()).map((index) => (
@@ -101,9 +107,9 @@ const PitchGraph = () => {
               key={`track-${index}`}
               sx={{
                 position: 'absolute',
-                bottom: `${index * TRACK_HEIGHT}px`,
-                left: '-5%',
+                bottom: `calc(${index} * ${TRACK_HEIGHT})`,
                 opacity: '20%',
+                left: '-5%',
                 height: '1px',
                 width: '110%',
               }}
@@ -112,8 +118,10 @@ const PitchGraph = () => {
           <Container
             sx={{
               position: 'relative',
-              left: `${STEP * BEFORE}px`,
-              transform: `translateX(-${(currentTime + 0.25) * STEP}px)`,
+              height: '100%',
+              width: '100%',
+              left: `calc(${STEP} * ${BEFORE})`,
+              transform: `translateX(calc(-${currentTime + 0.25} * ${STEP}))`,
               transition:
                 Math.abs(time.current - currentTime) < 2
                   ? 'transform 0.5s linear'
@@ -133,12 +141,13 @@ const PitchGraph = () => {
                       display: 'flex',
                       direction: 'column',
                       alignItems: 'center',
-                      left: `${startTimeSeconds * STEP}px`,
-                      bottom: `${
-                        (roundToNearest(pitchMidi / 2, 0.5) + pitch - 17) *
-                        TRACK_HEIGHT
-                      }px`,
-                      height: `${TRACK_HEIGHT}px`,
+                      left: `calc(${startTimeSeconds} * ${STEP})`,
+                      bottom: `calc(${
+                        roundToNearest(pitchMidi / 2, 0.5) + pitch - 17
+                      } *
+                        ${TRACK_HEIGHT})`,
+                      height: `${TRACK_HEIGHT}`,
+                      width: `calc(${durationSeconds} * ${STEP})`,
                     }}
                   >
                     <Box
@@ -146,7 +155,7 @@ const PitchGraph = () => {
                       sx={{
                         bgcolor: 'primary.main',
                         height: `${BAR_HEIGHT}`,
-                        width: `${durationSeconds * STEP}px`,
+                        width: '100%',
                         borderRadius: 10,
                       }}
                     />

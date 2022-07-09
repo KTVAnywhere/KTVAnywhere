@@ -116,6 +116,7 @@ const MainPage = ({
           left: 0,
           right: 0,
           bottom: '130px',
+          top: '0px',
         }}
       >
         <AlertMessage />
@@ -138,18 +139,16 @@ const MainPage = ({
             </SongDialogProvider>
           </SongStagingDialogProvider>
         </ConfirmationProvider>
-        <Grid container direction="column" sx={{ position: 'relative' }}>
-          <Grid
-            item
-            sx={{
-              position: 'absolute',
-              bottom: 'calc(50% + 200px)',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '100%',
-              mx: 0,
-            }}
-          >
+        <Grid
+          container
+          direction="column"
+          sx={{
+            position: 'relative',
+            height: '100%',
+            justifyContent: 'center',
+          }}
+        >
+          <Grid item sx={{ height: '60%' }}>
             <PitchGraph />
           </Grid>
           <Grid

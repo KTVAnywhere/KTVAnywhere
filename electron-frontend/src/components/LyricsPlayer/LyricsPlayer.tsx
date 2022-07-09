@@ -47,13 +47,13 @@ const LyricsPlayer = () => {
     <Grid
       container
       direction="column"
-      alignItems="center"
+      alignContent="center"
       textAlign="center"
       sx={{ py: '1vh' }}
     >
       <Grid item>
         <Typography
-          sx={{ fontSize: '32px', fontWeight: 600 }}
+          sx={{ fontSize: '1.8vw', fontWeight: 600 }}
           data-testid="lyrics"
         >
           {lyrics}
@@ -61,7 +61,7 @@ const LyricsPlayer = () => {
       </Grid>
       <Grid item>
         <Typography
-          sx={{ fontSize: '24px', fontWeight: 500, opacity: '40%' }}
+          sx={{ fontSize: '1.5vw', fontWeight: 500, opacity: '40%' }}
           data-testid="next-lyrics"
         >
           {nextLyrics}

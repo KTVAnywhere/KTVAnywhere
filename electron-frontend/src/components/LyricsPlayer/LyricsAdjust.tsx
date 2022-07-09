@@ -127,7 +127,7 @@ const LyricsAdjust = () => {
           justifyItems="center"
           sx={{ position: 'relative' }}
         >
-          <Typography>offset (s)</Typography>
+          <Typography variant="subtitle2">offset (s)</Typography>
           <Tooltip title="Save changes" placement="right">
             <IconButton
               aria-label="saveOffset"
