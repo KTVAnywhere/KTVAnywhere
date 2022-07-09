@@ -83,7 +83,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
   toArrayBuffer: (buffer: Buffer) => ArrayBuffer;
 }) => {
   const { audioContext } = useAudioStatus();
-  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const { setAlertMessage } = useAlertMessage();
   const [callToReconnect, setCallToReconnect] = useState<boolean>(false);
   const [callToEnableMicrophone, setCallToEnableMicrophone] =
     useState<boolean>(false);
@@ -134,7 +134,6 @@ const MicrophoneMenuElementsForEachMicrophone = ({
             'reverb error: impulses_impulse_rev.wav not found, reinstall application to restore file',
           severity: 'error',
         });
-        setShowAlertMessage(true);
       }
     }
     if (reverbMedia && reverbNode) {
@@ -282,27 +281,27 @@ const MicrophoneMenuElementsForEachMicrophone = ({
         direction="row"
         sx={{ padding: '5px', width: '280px', paddingBottom: '0px' }}
       >
-        <Typography>Microphone</Typography>
+        <Typography>microphone</Typography>
         <Switch
           checked={microphoneEnabled}
           onClick={() =>
             microphoneEnabled ? disableMicrophone() : enableMicrophone()
           }
           color="secondary"
-          sx={{ bottom: '7px' }}
+          size="small"
           data-testid={`toggle-microphone-${micNo}-switch`}
         />
-        <Typography>Reverb</Typography>
+        <Typography>reverb</Typography>
         <Switch
           checked={reverbEnabled}
           onClick={() => (reverbEnabled ? disableReverb() : enableReverb())}
           color="secondary"
-          sx={{ bottom: '7px' }}
+          size="small"
           data-testid={`toggle-reverb-${micNo}-switch`}
         />
       </Stack>
       <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
-        <Typography>Noise suppression</Typography>
+        <Typography>noise suppression</Typography>
         <Switch
           checked={microphoneNoiseSuppression}
           onClick={() =>
@@ -311,13 +310,13 @@ const MicrophoneMenuElementsForEachMicrophone = ({
               : enableNoiseSuppression()
           }
           color="secondary"
-          sx={{ bottom: '7px' }}
+          size="small"
           data-testid={`toggle-microphone-${micNo}-noise-suppression-switch`}
         />
       </Stack>
       <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
         <Typography sx={{ width: '230px' }}>
-          Volume: {microphoneVolume}%
+          volume: {microphoneVolume}%
         </Typography>
         <Slider
           aria-label="Volume"
@@ -326,11 +325,12 @@ const MicrophoneMenuElementsForEachMicrophone = ({
           min={0}
           max={100}
           color="secondary"
+          size="small"
           data-testid={`microphone-${micNo}-volume-slider`}
         />
       </Stack>
       <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
-        <Typography sx={{ width: '230px' }}>Reverb: {reverbVolume}%</Typography>
+        <Typography sx={{ width: '230px' }}>reverb: {reverbVolume}%</Typography>
         <Slider
           aria-label="Volume"
           value={reverbVolume}
@@ -338,6 +338,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
           min={0}
           max={100}
           color="secondary"
+          size="small"
           data-testid={`microphone-${micNo}-reverb-slider`}
         />
       </Stack>
@@ -404,7 +405,7 @@ const MicrophoneMenu = ({
     microphone2NoiseSuppression,
     setMicrophone2NoiseSuppression,
   } = useAudioStatus();
-  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const { setAlertMessage } = useAlertMessage();
   const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[]>(
     []
   );
@@ -439,7 +440,6 @@ const MicrophoneMenu = ({
           'Cannot connect to selected microphone, please change input in settings',
         severity: 'error',
       });
-      setShowAlertMessage(true);
     }
     return microphoneSource;
   };
@@ -471,7 +471,6 @@ const MicrophoneMenu = ({
           'Cannot connect to selected microphone, please change input in settings',
         severity: 'error',
       });
-      setShowAlertMessage(true);
     }
     return microphoneSource;
   };

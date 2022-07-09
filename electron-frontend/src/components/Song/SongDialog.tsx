@@ -49,7 +49,7 @@ const SongDialog = ({ song, setSong }: SongDialogProps) => {
   const deleteSong = () => {
     setConfirmationMessage({
       heading: 'Delete song',
-      message: `Are you sure you want to delete ${song.songName}?`,
+      message: `Are you sure you want to delete "${song.songName}"?`,
     });
     setActions([
       {

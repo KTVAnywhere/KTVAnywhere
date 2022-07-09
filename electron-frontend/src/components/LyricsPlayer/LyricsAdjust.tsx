@@ -18,7 +18,7 @@ const LyricsAdjust = () => {
   const { lyricsRunner, setLyricsRunner } = useLyrics();
   const { currentSong } = useAudioStatus();
   const [currentOffset, setCurrentOffset] = useState('0');
-  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const { setAlertMessage } = useAlertMessage();
 
   useEffect(() => {
     setCurrentOffset('0');
@@ -53,7 +53,6 @@ const LyricsAdjust = () => {
               message: 'Error updating lyrics file',
               severity: 'warning',
             });
-            setShowAlertMessage(true);
             return false;
           }
           setCurrentOffset('0');
@@ -61,16 +60,13 @@ const LyricsAdjust = () => {
             message: 'Successfully updated lyrics file',
             severity: 'success',
           });
-          setShowAlertMessage(true);
           return true;
         })
         .catch((error) => {
           setAlertMessage({ message: error.message, severity: 'error' });
-          setShowAlertMessage(true);
         });
     } else {
       setAlertMessage({ message: 'No lyrics file found', severity: 'info' });
-      setShowAlertMessage(true);
     }
   };
 

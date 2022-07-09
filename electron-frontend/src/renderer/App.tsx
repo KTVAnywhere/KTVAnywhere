@@ -57,7 +57,7 @@ const MainPage = ({
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
-  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const { setAlertMessage } = useAlertMessage();
 
   useEffect(() => {
     const processSongUnsubscribe = window.electron.preprocess.processResult(
@@ -76,13 +76,11 @@ const MainPage = ({
             message: `${songProcessedSuccessfully.songName} successfully processed`,
             severity: 'success',
           });
-          setShowAlertMessage(true);
         } else {
           setAlertMessage({
             message: error.message,
             severity: 'error',
           });
-          setShowAlertMessage(true);
         }
         setSongsStatus((state) => state.slice(1));
       }
@@ -180,7 +178,10 @@ const MainPage = ({
           bottom: 0,
         }}
       >
-        <AudioPlayer />
+        <ConfirmationProvider>
+          <AudioPlayer />
+          <ConfirmationDialog />
+        </ConfirmationProvider>
       </Container>
       <Tooltip title="Settings">
         <IconButton

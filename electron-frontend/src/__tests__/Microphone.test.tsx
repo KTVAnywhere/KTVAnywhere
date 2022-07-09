@@ -43,7 +43,7 @@ describe('Microphone component test', () => {
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
 
-    expect(screen.getAllByText('Microphone')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('microphone')[0]).toBeInTheDocument();
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;

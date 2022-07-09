@@ -11,7 +11,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import Fuse from 'fuse.js';
-import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { spawn } from 'child_process';
 import MenuBuilder from './menu';
 import {
@@ -203,7 +203,7 @@ app
               graphPath: '',
               songId: song.songId,
               error: new Error(
-                'Failed to run spleeter: ffmpeg binary not found'
+                'Processing failed: FFMPEG binary not found, Fix: add FFMPEG binary to path'
               ),
             });
           } else if (`${message}` === 'input file does not exist') {
@@ -213,7 +213,7 @@ app
               graphPath: '',
               songId: song.songId,
               error: new Error(
-                `Failed to run spleeter: ${song.songPath} does not exist`
+                `Processing failed: ${song.songPath} does not exist`
               ),
             });
           } else if (`${message}` === 'generic error message') {
@@ -222,7 +222,7 @@ app
               accompanimentPath: '',
               graphPath: '',
               songId: song.songId,
-              error: new Error('Failed to run spleeter'),
+              error: new Error('Processing failed: error encountered'),
             });
           }
         });
@@ -324,6 +324,14 @@ app
     ipcMain.on('store:deleteSong', async (_, songId) => {
       deleteSong(songsStore, songSearcher, songId);
       saveSongIndex();
+      try {
+        const songFolder = path.join(app.getPath('userData'), 'songs', songId);
+        if (fs.existsSync(songFolder)) {
+          fs.rmSync(songFolder, { recursive: true, force: true });
+        }
+      } catch (error) {
+        console.log(error);
+      }
     });
     ipcMain.on('store:getAllSongs', async (event) => {
       event.returnValue = getAllSongs(songsStore);

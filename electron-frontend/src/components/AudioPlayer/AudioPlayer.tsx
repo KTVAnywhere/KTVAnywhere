@@ -24,6 +24,8 @@ import { useEffect } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
+import { useConfirmation } from '../ConfirmationDialog';
+import { SongProps } from '../Song';
 import { LyricsAdjust } from '../LyricsPlayer';
 
 const ProgressBar = () => {
@@ -66,7 +68,6 @@ const ProgressBar = () => {
           max={duration}
           sx={{
             display: 'flex',
-            height: '10px',
             '& .MuiSlider-thumb': {
               width: 0,
               height: 0,
@@ -126,7 +127,25 @@ export const AudioPlayer = () => {
     microphone1NoiseSuppression,
     microphone2NoiseSuppression,
   } = useAudioStatus();
-  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const { setAlertMessage } = useAlertMessage();
+  const { setConfirmationMessage, setActions, setOpen } = useConfirmation();
+
+  const filePathMissingDeleteSong = (song: SongProps, filePath: string) => {
+    setConfirmationMessage({
+      heading: 'Delete song with missing file',
+      message: `"${filePath}" does not exist, do you want to delete "${song.songName}"?`,
+    });
+    setActions([
+      {
+        label: 'Confirm',
+        fn: () => {
+          window.electron.store.songs.deleteSong(song.songId);
+          setOpen(false);
+        },
+      },
+    ]);
+    setOpen(true);
+  };
 
   const reconnectNodes = () => {
     if (source) {
@@ -198,6 +217,7 @@ export const AudioPlayer = () => {
   };
 
   const loadSong = async (
+    song: SongProps,
     filePath: string,
     resumeTime: boolean,
     playNow: boolean,
@@ -226,7 +246,6 @@ export const AudioPlayer = () => {
               message: `${error}`,
               severity: 'error',
             });
-            setShowAlertMessage(true);
             setIsLoading(false);
           });
         if (callback) {
@@ -237,7 +256,7 @@ export const AudioPlayer = () => {
           message: `${filePath} does not exist`,
           severity: 'error',
         });
-        setShowAlertMessage(true);
+        filePathMissingDeleteSong(song, filePath);
         setIsLoading(false);
       }
     } catch (error) {
@@ -245,7 +264,6 @@ export const AudioPlayer = () => {
         message: `${error}`,
         severity: 'error',
       });
-      setShowAlertMessage(true);
       setIsLoading(false);
     }
   };
@@ -295,7 +313,7 @@ export const AudioPlayer = () => {
     } else if (!currentSong && GetQueueLength() > 0) {
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, true, () => {
+        loadSong(song, song.songPath, false, true, () => {
           setCurrentSong(song);
           setIsPlaying(true);
         });
@@ -317,10 +335,10 @@ export const AudioPlayer = () => {
       )
     ) {
       setAlertMessage({
-        message: 'Lyrics file not found',
+        message:
+          'Lyrics file not found, please fetch lyrics or upload lyrics file in song details',
         severity: 'info',
       });
-      setShowAlertMessage(true);
     } else {
       setLyricsEnabled((state) => !state);
     }
@@ -335,10 +353,9 @@ export const AudioPlayer = () => {
       )
     ) {
       setAlertMessage({
-        message: 'Graph file not found',
+        message: 'Song must be processed for graph to be displayed',
         severity: 'info',
       });
-      setShowAlertMessage(true);
     } else {
       setGraphEnabled((state) => !state);
     }
@@ -346,7 +363,7 @@ export const AudioPlayer = () => {
 
   const enableVocals = () => {
     if (currentSong) {
-      loadSong(currentSong.songPath, true, isPlaying, () =>
+      loadSong(currentSong, currentSong.songPath, true, isPlaying, () =>
         setIsPlayingVocals(true)
       );
     }
@@ -359,10 +376,13 @@ export const AudioPlayer = () => {
           message: 'Song must be processed for vocals to be turned off',
           severity: 'info',
         });
-        setShowAlertMessage(true);
       } else {
-        loadSong(currentSong.accompanimentPath, true, isPlaying, () =>
-          setIsPlayingVocals(false)
+        loadSong(
+          currentSong,
+          currentSong.accompanimentPath,
+          true,
+          isPlaying,
+          () => setIsPlayingVocals(false)
         );
       }
     }
@@ -372,7 +392,7 @@ export const AudioPlayer = () => {
     if (GetQueueLength() > 0) {
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, isPlaying, () => {
+        loadSong(song, song.songPath, false, isPlaying, () => {
           setCurrentSong(song);
           setCurrentTime(0);
           setIsPlayingVocals(true);
@@ -409,7 +429,7 @@ export const AudioPlayer = () => {
 
   useEffect(() => {
     if (nextSong === null) return;
-    loadSong(nextSong.songPath, false, true, () => {
+    loadSong(nextSong, nextSong.songPath, false, true, () => {
       setCurrentSong(nextSong);
       setIsPlaying(true);
       setIsPlayingVocals(true);
@@ -430,7 +450,7 @@ export const AudioPlayer = () => {
 
   useEffect(() => {
     if (currentSong) {
-      loadSong(currentSong.songPath, true, false);
+      loadSong(currentSong, currentSong.songPath, true, false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -525,6 +545,7 @@ export const AudioPlayer = () => {
             min={0.8}
             max={1.2}
             step={0.1}
+            size="small"
             color="secondary"
             data-testid="tempo-slider"
           />
@@ -544,6 +565,7 @@ export const AudioPlayer = () => {
             min={-3.5}
             max={3.5}
             step={0.5}
+            size="small"
             color="secondary"
             data-testid="pitch-slider"
           />
@@ -598,6 +620,7 @@ export const AudioPlayer = () => {
             onChange={volumeChange}
             min={0}
             max={100}
+            size="small"
             color="secondary"
             data-testid="volume-slider"
           />
