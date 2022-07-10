@@ -113,6 +113,7 @@ const configSchema: Schema<ConfigType> = {
     properties: {
       errorMessagesTimeout: { type: 'number' },
       audioBufferSize: { type: 'number' },
+      colorThemeId: { type: 'number' },
     },
   },
 };

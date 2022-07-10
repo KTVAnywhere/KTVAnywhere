@@ -34,13 +34,7 @@ describe('Settings menu component test', () => {
 
   test('click close settings button should close settings menu', async () => {
     const mockSetShowSettings = jest.fn();
-    render(
-      <SettingsMenu
-        showSettings
-        setShowSettings={mockSetShowSettings}
-        setCurrentTheme={jest.fn()}
-      />
-    );
+    render(<SettingsMenu showSettings setShowSettings={mockSetShowSettings} />);
     const closeSettingsButton = screen.getByTestId('close-settings-button');
     fireEvent.click(closeSettingsButton);
     expect(mockSetShowSettings).toBeCalledWith(false);
@@ -58,13 +52,7 @@ describe('Settings menu component test', () => {
         },
       },
     };
-    render(
-      <SettingsMenu
-        showSettings
-        setShowSettings={jest.fn()}
-        setCurrentTheme={jest.fn()}
-      />
-    );
+    render(<SettingsMenu showSettings setShowSettings={jest.fn()} />);
 
     const colorThemeOptions = screen.getAllByRole('button')[0];
     fireEvent.mouseDown(colorThemeOptions);
@@ -89,13 +77,7 @@ describe('Settings menu component test', () => {
         },
       },
     };
-    render(
-      <SettingsMenu
-        showSettings
-        setShowSettings={jest.fn()}
-        setCurrentTheme={jest.fn()}
-      />
-    );
+    render(<SettingsMenu showSettings setShowSettings={jest.fn()} />);
 
     const errorMessagesTimeoutOptions = screen.getAllByRole('button')[1];
     fireEvent.mouseDown(errorMessagesTimeoutOptions);
@@ -120,13 +102,7 @@ describe('Settings menu component test', () => {
         },
       },
     };
-    render(
-      <SettingsMenu
-        showSettings
-        setShowSettings={jest.fn()}
-        setCurrentTheme={jest.fn()}
-      />
-    );
+    render(<SettingsMenu showSettings setShowSettings={jest.fn()} />);
 
     const audioBufferSizeOptions = screen.getAllByRole('button')[2];
     fireEvent.mouseDown(audioBufferSizeOptions);

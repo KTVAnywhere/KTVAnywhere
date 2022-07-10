@@ -41,6 +41,7 @@ const mockedElectron = {
         };
       },
       setSettings: jest.fn(),
+      onSettingsChange: jest.fn().mockReturnValue(jest.fn()),
     },
   },
   preprocess: {

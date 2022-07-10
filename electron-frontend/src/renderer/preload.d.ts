@@ -56,6 +56,12 @@ declare global {
           ): void;
           getSettings(): ConfigType['settings'];
           setSettings(settings: ConfigType['settings']): void;
+          onSettingsChange(
+            callback: (
+              _event: IpcRenderer,
+              results: ConfigType['settings']
+            ) => void
+          ): () => void;
         };
       };
       preprocess: {

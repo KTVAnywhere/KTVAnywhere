@@ -415,5 +415,9 @@ app
     ipcMain.on('store:setSettings', (_, settings) => {
       setSettings(configStore, settings);
     });
+
+    configStore.onDidChange('settings', (results) =>
+      mainWindow?.webContents.send('store:onSettingsChange', results)
+    );
   })
   .catch(console.error);

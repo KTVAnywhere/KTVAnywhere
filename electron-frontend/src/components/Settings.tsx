@@ -117,11 +117,9 @@ export const GetColorTheme = () => {
 const SettingsMenu = ({
   showSettings,
   setShowSettings,
-  setCurrentTheme,
 }: {
   showSettings: boolean;
   setShowSettings: Dispatch<SetStateAction<boolean>>;
-  setCurrentTheme: Dispatch<SetStateAction<ColorThemeProps>>;
 }) => {
   const getCurrentSettings = () => window.electron.store.config.getSettings();
   const [errorMessagesTimeout, setErrorMessagesTimeout] = useState<number>(
@@ -156,7 +154,6 @@ const SettingsMenu = ({
 
   const closeDialog = () => {
     setShowSettings(false);
-    setCurrentTheme(GetColorTheme());
   };
 
   return (

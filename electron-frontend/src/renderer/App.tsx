@@ -1,6 +1,6 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Grid,
   Container,
@@ -42,17 +42,10 @@ import {
   ConfirmationDialog,
   ConfirmationProvider,
 } from '../components/ConfirmationDialog';
-import SettingsMenu, {
-  ColorThemeProps,
-  GetColorTheme,
-} from '../components/Settings';
+import SettingsMenu, { GetColorTheme } from '../components/Settings';
 import PitchGraph from '../components/PitchGraph';
 
-const MainPage = ({
-  setCurrentTheme,
-}: {
-  setCurrentTheme: Dispatch<SetStateAction<ColorThemeProps>>;
-}) => {
+const MainPage = () => {
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
@@ -197,7 +190,6 @@ const MainPage = ({
       <SettingsMenu
         showSettings={showSettings}
         setShowSettings={setShowSettings}
-        setCurrentTheme={setCurrentTheme}
       />
       <Microphone />
     </Container>
@@ -206,6 +198,12 @@ const MainPage = ({
 
 export default function App() {
   const [currentTheme, setCurrentTheme] = useState(GetColorTheme());
+  useEffect(() => {
+    const settingsUnsubscribe = window.electron.store.config.onSettingsChange(
+      () => setCurrentTheme(GetColorTheme())
+    );
+    return () => settingsUnsubscribe();
+  });
 
   const chosenTheme = useMemo(
     () =>
@@ -272,7 +270,7 @@ export default function App() {
                 <SongsStatusProvider>
                   <AudioStatusProvider>
                     <LyricsProvider>
-                      <MainPage setCurrentTheme={setCurrentTheme} />
+                      <MainPage />
                     </LyricsProvider>
                   </AudioStatusProvider>
                 </SongsStatusProvider>

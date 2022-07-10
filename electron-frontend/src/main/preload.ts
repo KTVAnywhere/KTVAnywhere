@@ -128,6 +128,16 @@ contextBridge.exposeInMainWorld('electron', {
       setSettings(settings: ConfigType['settings']) {
         ipcRenderer.send('store:setSettings', settings);
       },
+      onSettingsChange: (
+        callback: (
+          _event: IpcRendererEvent,
+          results: ConfigType['settings']
+        ) => void
+      ) => {
+        ipcRenderer.on('store:onSettingsChange', callback);
+        return () =>
+          ipcRenderer.removeListener('store:onSettingsChange', callback);
+      },
     },
   },
   preprocess: {
