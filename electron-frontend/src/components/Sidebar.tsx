@@ -9,6 +9,7 @@ interface SidebarProps {
 const drawerHeight = 'calc(100vh - 130px)';
 export const LeftSidebar = ({ children }: SidebarProps) => {
   const backgroundColor = GetColorTheme().sidebarBackground;
+  const titleBarHeight = '22px';
 
   return (
     <Drawer
@@ -17,6 +18,7 @@ export const LeftSidebar = ({ children }: SidebarProps) => {
           height: drawerHeight,
           boxSizing: 'border-box',
           background: backgroundColor,
+          top: titleBarHeight,
         },
       }}
       variant="permanent"
@@ -29,6 +31,8 @@ export const LeftSidebar = ({ children }: SidebarProps) => {
 
 export const RightSidebar = ({ children }: SidebarProps) => {
   const backgroundColor = GetColorTheme().sidebarBackground;
+  const titleBarHeight = '22px';
+
   return (
     <Drawer
       sx={{
@@ -38,6 +42,7 @@ export const RightSidebar = ({ children }: SidebarProps) => {
           boxSizing: 'border-box',
           alignItems: 'center',
           background: backgroundColor,
+          top: titleBarHeight,
         },
       }}
       variant="permanent"

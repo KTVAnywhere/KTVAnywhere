@@ -4,6 +4,17 @@ import { QueueItemProps } from '../components/SongsQueue';
 import { ConfigType } from './schema';
 
 contextBridge.exposeInMainWorld('electron', {
+  window: {
+    closeApp() {
+      ipcRenderer.invoke('window:closeApp');
+    },
+    minimizeApp() {
+      ipcRenderer.invoke('window:minimizeApp');
+    },
+    maximizeApp() {
+      ipcRenderer.invoke('window:maximizeApp');
+    },
+  },
   dialog: {
     openFile(config: Electron.OpenDialogOptions) {
       return ipcRenderer.invoke('dialog:openFile', config);

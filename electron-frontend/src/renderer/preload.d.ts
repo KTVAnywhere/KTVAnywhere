@@ -6,6 +6,7 @@ import { QueueItemProps } from '../components/SongsQueue';
 declare global {
   interface Window {
     electron: {
+      window: { closeApp(): void; minimizeApp(): void; maximizeApp(): void };
       dialog: {
         openFile(config: Electron.OpenDialogOptions): Promise<string>;
         openFiles(config: Electron.OpenDialogOptions): Promise<string[]>;

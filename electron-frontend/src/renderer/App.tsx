@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import TitleBar from '../components/TitleBar';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList from '../components/SongsQueue';
 import {
@@ -58,6 +59,7 @@ const MainPage = ({
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
   const { setAlertMessage } = useAlertMessage();
+  const titleBarHeight = '22px';
 
   useEffect(() => {
     const processSongUnsubscribe = window.electron.preprocess.processResult(
@@ -109,6 +111,7 @@ const MainPage = ({
   return (
     <Container>
       <CssBaseline enableColorScheme />
+      <TitleBar />
       <Container
         maxWidth={false}
         sx={{
@@ -116,7 +119,7 @@ const MainPage = ({
           left: 0,
           right: 0,
           bottom: '130px',
-          top: '0px',
+          top: titleBarHeight,
         }}
       >
         <AlertMessage />

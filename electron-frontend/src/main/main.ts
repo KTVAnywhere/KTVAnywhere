@@ -89,6 +89,22 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+ipcMain.handle('window:closeApp', () => {
+  mainWindow?.close();
+});
+ipcMain.handle('window:minimizeApp', () => {
+  mainWindow?.minimize();
+});
+ipcMain.handle('window:maximizeApp', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.restore();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
 const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
@@ -110,6 +126,7 @@ const createWindow = async () => {
     minHeight: 728,
     autoHideMenuBar: true,
     icon: getAssetPath('icon.png'),
+    frame: false,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
