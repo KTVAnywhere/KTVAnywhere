@@ -4,6 +4,17 @@ import { QueueItemProps } from '../components/SongsQueue';
 import { ConfigType } from './schema';
 
 contextBridge.exposeInMainWorld('electron', {
+  window: {
+    closeApp() {
+      ipcRenderer.invoke('window:closeApp');
+    },
+    minimizeApp() {
+      ipcRenderer.invoke('window:minimizeApp');
+    },
+    maximizeApp() {
+      ipcRenderer.invoke('window:maximizeApp');
+    },
+  },
   dialog: {
     openFile(config: Electron.OpenDialogOptions) {
       return ipcRenderer.invoke('dialog:openFile', config);
@@ -24,6 +35,9 @@ contextBridge.exposeInMainWorld('electron', {
     },
     write(filePath: string, data: string) {
       return ipcRenderer.invoke('file:write', filePath, data);
+    },
+    getAssetsPath(fileName?: string) {
+      return ipcRenderer.sendSync('file:getAssetsPath', fileName);
     },
   },
   music: {
@@ -54,6 +68,9 @@ contextBridge.exposeInMainWorld('electron', {
       setAllSongs(songs: SongProps[]) {
         ipcRenderer.send('store:setAllSongs', songs);
       },
+      getRandomSong() {
+        return ipcRenderer.sendSync('store:getRandomSong');
+      },
       onChange: (
         callback: (_event: IpcRendererEvent, results: SongProps[]) => void
       ) => {
@@ -69,11 +86,14 @@ contextBridge.exposeInMainWorld('electron', {
       getQueueItem(key: string) {
         return ipcRenderer.sendSync('store:getQueueItem', key);
       },
-      addQueueItem(queue: QueueItemProps) {
-        ipcRenderer.send('store:addQueueItem', queue);
+      enqueueItem(queueItem: QueueItemProps) {
+        ipcRenderer.send('store:enqueueItem', queueItem);
       },
-      setQueueItem(queue: QueueItemProps) {
-        ipcRenderer.send('store:setQueueItem', queue);
+      dequeueItem() {
+        return ipcRenderer.sendSync('store:dequeueItem');
+      },
+      setQueueItem(queueItem: QueueItemProps) {
+        ipcRenderer.send('store:setQueueItem', queueItem);
       },
       deleteSong(queueItemId: string) {
         ipcRenderer.send('store:deleteQueueItem', queueItemId);
@@ -84,6 +104,9 @@ contextBridge.exposeInMainWorld('electron', {
       setAllQueueItems(queueItems: QueueItemProps[]) {
         ipcRenderer.send('store:setAllQueueItems', queueItems);
       },
+      shuffleQueue() {
+        ipcRenderer.send('store:shuffleQueue');
+      },
       onChange: (
         callback: (_event: IpcRendererEvent, results: QueueItemProps[]) => void
       ) => {
@@ -93,11 +116,11 @@ contextBridge.exposeInMainWorld('electron', {
       },
     },
     config: {
-      getPlayingSong() {
-        return ipcRenderer.sendSync('store:getPlayingSong');
+      getAudioStatusConfig() {
+        return ipcRenderer.sendSync('store:getAudioStatusConfig');
       },
-      setPlayingSong(playingSong: ConfigType['playingSong']) {
-        ipcRenderer.send('store:setPlayingSong', playingSong);
+      setAudioStatusConfig(audioStatusConfig: ConfigType['audioStatusConfig']) {
+        ipcRenderer.send('store:setAudioStatusConfig', audioStatusConfig);
       },
       getSettings() {
         return ipcRenderer.sendSync('store:getSettings');
@@ -105,30 +128,40 @@ contextBridge.exposeInMainWorld('electron', {
       setSettings(settings: ConfigType['settings']) {
         ipcRenderer.send('store:setSettings', settings);
       },
+      onSettingsChange: (
+        callback: (
+          _event: IpcRendererEvent,
+          results: ConfigType['settings']
+        ) => void
+      ) => {
+        ipcRenderer.on('store:onSettingsChange', callback);
+        return () =>
+          ipcRenderer.removeListener('store:onSettingsChange', callback);
+      },
     },
   },
   preprocess: {
     getSongDetails(songPaths: string[]) {
       return ipcRenderer.invoke('preprocess:getSongDetails', songPaths);
     },
-    spleeterProcessSong(song: SongProps) {
-      ipcRenderer.send('preprocess:spleeterProcessSong', song);
+    processSong(song: SongProps) {
+      ipcRenderer.send('preprocess:processSong', song);
     },
-    spleeterProcessResult(
+    processResult(
       callback: (results: {
         vocalsPath: string;
         accompanimentPath: string;
+        graphPath: string;
         songId: string;
         error?: Error;
       }) => void
     ) {
-      ipcRenderer.on('preprocess:spleeterProcessResult', (_event, data) =>
+      ipcRenderer.on('preprocess:processResult', (_event, data) =>
         callback(data)
       );
       return () =>
-        ipcRenderer.removeListener(
-          'preprocess:spleeterProcessResult',
-          (_event, data) => callback(data)
+        ipcRenderer.removeListener('preprocess:processResult', (_event, data) =>
+          callback(data)
         );
     },
   },

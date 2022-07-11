@@ -11,7 +11,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import Fuse from 'fuse.js';
-import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { spawn } from 'child_process';
 import MenuBuilder from './menu';
 import {
@@ -53,6 +53,17 @@ ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
   return result;
 });
 
+ipcMain.on('file:getAssetsPath', async (event, fileName?: string) => {
+  const RESOURCES_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets');
+
+  const getAssetPath = (...paths: string[]): string => {
+    return path.join(RESOURCES_PATH, ...paths);
+  };
+  event.returnValue = fileName ? getAssetPath(fileName) : RESOURCES_PATH;
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -78,6 +89,22 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+ipcMain.handle('window:closeApp', () => {
+  mainWindow?.close();
+});
+ipcMain.handle('window:minimizeApp', () => {
+  mainWindow?.minimize();
+});
+ipcMain.handle('window:maximizeApp', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.restore();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
 const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
@@ -99,10 +126,12 @@ const createWindow = async () => {
     minHeight: 728,
     autoHideMenuBar: true,
     icon: getAssetPath('icon.png'),
+    frame: !app.isPackaged,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
+      webSecurity: false,
     },
   });
 
@@ -153,7 +182,7 @@ app
     ipcMain.handle('preprocess:getSongDetails', async (_, songPaths) =>
       processSongDetails(songPaths)
     );
-    ipcMain.on('preprocess:spleeterProcessSong', async (event, song) => {
+    ipcMain.on('preprocess:processSong', async (event, song) => {
       try {
         const songFolder = path.join(
           app.getPath('userData'),
@@ -163,83 +192,76 @@ app
         if (!fs.existsSync(songFolder)) {
           fs.mkdirSync(songFolder, { recursive: true });
         }
-        const spleeterPath = app.isPackaged
-          ? path.join(process.resourcesPath, 'assets', 'spleeter_stems')
-          : path.join(__dirname, '../python_scripts/spleeter_stems.py');
+        const songProcessorPath = app.isPackaged
+          ? path.join(process.resourcesPath, 'assets', 'process_song')
+          : path.join(__dirname, '../python_scripts/process_song.py');
 
-        const spleeterProcess = app.isPackaged
-          ? spawn(spleeterPath, [song.songPath, songFolder, song.songId])
+        const processSongProcess = app.isPackaged
+          ? spawn(songProcessorPath, [song.songPath, songFolder, song.songId])
           : spawn('python', [
-              spleeterPath,
+              songProcessorPath,
               song.songPath,
               songFolder,
               song.songId,
             ]);
 
-        spleeterProcess?.stdout.on('data', (message: string) => {
-          if (`${message}` === `done splitting ${song.songId}`) {
-            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+        processSongProcess?.stdout.on('data', (message: string) => {
+          if (`${message}` === `done processing ${song.songId}`) {
+            mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: path.join(songFolder, 'vocals.mp3'),
               accompanimentPath: path.join(songFolder, 'accompaniment.mp3'),
+              graphPath: path.join(songFolder, 'graph.json'),
               songId: song.songId,
             });
           } else if (`${message}` === 'ffmpeg binary not found') {
-            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+            mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
+              graphPath: '',
               songId: song.songId,
               error: new Error(
-                'Failed to run spleeter: ffmpeg binary not found'
+                'Processing failed: FFMPEG binary not found, Fix: add FFMPEG binary to path'
               ),
             });
           } else if (`${message}` === 'input file does not exist') {
-            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+            mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
+              graphPath: '',
               songId: song.songId,
               error: new Error(
-                `Failed to run spleeter: ${song.songPath} does not exist`
+                `Processing failed: ${song.songPath} does not exist`
               ),
             });
           } else if (`${message}` === 'generic error message') {
-            mainWindow?.webContents.send('preprocess:spleeterProcessResult', {
+            mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
+              graphPath: '',
               songId: song.songId,
-              error: new Error('Failed to run spleeter'),
+              error: new Error('Processing failed: error encountered'),
             });
           }
         });
 
-        spleeterProcess.once('close', () => {
-          spleeterProcess.removeAllListeners();
+        processSongProcess.once('close', () => {
+          processSongProcess.removeAllListeners();
         });
       } catch (error) {
-        event.reply('preprocess:spleeterProcessResult', {
+        event.reply('preprocess:processResult', {
           vocalsPath: '',
           accompanimentPath: '',
+          graphPath: '',
+          songId: song.songId,
           error: error as Error,
         });
       }
     });
-
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
-    });
-    // custom protocol for reading local files
-    protocol.registerFileProtocol('atom', (request, callback) => {
-      const url = request.url.substring(8);
-      if (fs.existsSync(decodeURI(path.normalize(url)))) {
-        try {
-          return callback(decodeURI(path.normalize(url)));
-        } catch (error) {
-          console.error('Failed to register protocol');
-        }
-      }
-      return false;
     });
   })
   .then(() => {
@@ -258,17 +280,24 @@ app
       deleteSong,
       getAllSongs,
       setAllSongs,
+      getRandomSong,
     } = songFunctions;
     const {
       getQueueItem,
       setQueueItem,
-      addQueueItem,
+      enqueueItem,
+      dequeueItem,
       deleteQueueItem,
       getAllQueueItems,
       setAllQueueItems,
+      shuffleQueue,
     } = queueItemFunctions;
-    const { getPlayingSong, setPlayingSong, getSettings, setSettings } =
-      configFunctions;
+    const {
+      getAudioStatusConfig,
+      setAudioStatusConfig,
+      getSettings,
+      setSettings,
+    } = configFunctions;
     const fuseOptions = {
       keys: ['songName', 'artist'],
       findAllMatches: true,
@@ -312,6 +341,14 @@ app
     ipcMain.on('store:deleteSong', async (_, songId) => {
       deleteSong(songsStore, songSearcher, songId);
       saveSongIndex();
+      try {
+        const songFolder = path.join(app.getPath('userData'), 'songs', songId);
+        if (fs.existsSync(songFolder)) {
+          fs.rmSync(songFolder, { recursive: true, force: true });
+        }
+      } catch (error) {
+        console.log(error);
+      }
     });
     ipcMain.on('store:getAllSongs', async (event) => {
       event.returnValue = getAllSongs(songsStore);
@@ -319,6 +356,9 @@ app
     ipcMain.on('store:setAllSongs', async (_, songs) => {
       setAllSongs(songsStore, songSearcher, songs);
       saveSongIndex();
+    });
+    ipcMain.on('store:getRandomSong', async (event) => {
+      event.returnValue = getRandomSong(songsStore);
     });
 
     songsStore.onDidChange('songs', (results) =>
@@ -335,8 +375,11 @@ app
     ipcMain.on('store:setQueueItem', async (_, queueItem) => {
       setQueueItem(queueItemsStore, queueItem);
     });
-    ipcMain.on('store:addQueueItem', async (_, queueItem) => {
-      addQueueItem(queueItemsStore, queueItem);
+    ipcMain.on('store:enqueueItem', async (_, queueItem) => {
+      enqueueItem(queueItemsStore, queueItem);
+    });
+    ipcMain.on('store:dequeueItem', async (event) => {
+      event.returnValue = dequeueItem(queueItemsStore, songsStore);
     });
     ipcMain.on('store:deleteQueueItem', async (_, queueItemId) => {
       deleteQueueItem(queueItemsStore, queueItemId);
@@ -349,17 +392,20 @@ app
     ipcMain.on('store:setAllQueueItems', async (_, queueItems) => {
       setAllQueueItems(queueItemsStore, queueItems);
     });
+    ipcMain.on('store:shuffleQueue', async () => {
+      shuffleQueue(queueItemsStore);
+    });
 
     queueItemsStore.onDidChange('queueItems', (results) =>
       mainWindow?.webContents.send('store:onQueueItemsChange', results)
     );
 
-    ipcMain.on('store:getPlayingSong', (event) => {
-      event.returnValue = getPlayingSong(configStore);
+    ipcMain.on('store:getAudioStatusConfig', (event) => {
+      event.returnValue = getAudioStatusConfig(configStore);
     });
 
-    ipcMain.on('store:setPlayingSong', (_, playingSong) => {
-      setPlayingSong(configStore, playingSong);
+    ipcMain.on('store:setAudioStatusConfig', (_, audioStatusConfig) => {
+      setAudioStatusConfig(configStore, audioStatusConfig);
     });
 
     ipcMain.on('store:getSettings', (event) => {
@@ -369,5 +415,9 @@ app
     ipcMain.on('store:setSettings', (_, settings) => {
       setSettings(configStore, settings);
     });
+
+    configStore.onDidChange('settings', (results) =>
+      mainWindow?.webContents.send('store:onSettingsChange', results)
+    );
   })
   .catch(console.error);

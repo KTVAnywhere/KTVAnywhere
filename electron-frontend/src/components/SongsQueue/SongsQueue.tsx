@@ -1,15 +1,23 @@
 import { useEffect, useState } from 'react';
 import {
-  Button,
   CardActions,
   CardContent,
   Container,
+  IconButton,
   List,
   ListItem,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import Card from '@mui/material/Card';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import DeleteIcon from '@mui/icons-material/Delete';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
+import QueueIcon from '@mui/icons-material/Queue';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import {
   DragDropContext,
   Droppable,
@@ -18,16 +26,23 @@ import {
 } from 'react-beautiful-dnd';
 import uniqid from 'uniqid';
 import { SongProps } from '../Song';
-import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
 
 export interface QueueItemProps {
   song: SongProps;
   queueItemId: string;
 }
 
-const setQueue = (queueList: QueueItemProps[]) => {
+const setQueue = (queueList: QueueItemProps[]) =>
   window.electron.store.queueItems.setAllQueueItems(queueList);
-};
+
+export const EnqueueSong = (song: SongProps) =>
+  window.electron.store.queueItems.enqueueItem({ song, queueItemId: uniqid() });
+
+export const DequeueSong = () => window.electron.store.queueItems.dequeueItem();
+
+export const GetQueueLength = () =>
+  window.electron.store.queueItems.getAllQueueItems().length;
 
 export const QueueList = () => {
   const [queueItems, setQueueItems] = useState<QueueItemProps[]>([]);
@@ -44,7 +59,7 @@ export const QueueList = () => {
     };
   }, []);
 
-  const deleteSongFromQueue = (index: number): void => {
+  const deleteSongFromQueue = (index: number) => {
     const newQueue = [
       ...queueItems.slice(0, index),
       ...queueItems.slice(index + 1),
@@ -52,9 +67,16 @@ export const QueueList = () => {
     setQueue(newQueue);
   };
 
-  const clearQueue = (): void => {
-    setQueue([]);
+  const clearQueue = () => setQueue([]);
+
+  const addRandomSong = () => {
+    const randomSong = window.electron.store.songs.getRandomSong();
+    if (randomSong !== null) {
+      EnqueueSong(randomSong);
+    }
   };
+
+  const shuffleQueue = () => window.electron.store.queueItems.shuffleQueue();
 
   const shiftSongUp = (index: number): void => {
     if (queueItems.length === 0 || queueItems.length === 1 || index === 0) {
@@ -106,21 +128,40 @@ export const QueueList = () => {
         align="center"
         gutterBottom
         sx={{
-          paddingTop: '5%',
+          pt: '5%',
         }}
       >
         Songs Queue
       </Typography>
-      {queueItems.length > 0 && (
-        <Button
-          size="small"
-          variant="contained"
-          data-testid="clear-queue-button"
-          onClick={() => clearQueue()}
-          color="error"
+      <Tooltip title="Shuffle queue" placement="bottom">
+        <IconButton
+          aria-label="Shuffle queue"
+          onClick={shuffleQueue}
+          data-testid="shuffle-queue-button"
         >
-          Clear queue
-        </Button>
+          <ShuffleIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Add random song" placement="bottom">
+        <IconButton
+          aria-label="Add random song"
+          onClick={addRandomSong}
+          data-testid="add-random-song-button"
+        >
+          <QueueIcon />
+        </IconButton>
+      </Tooltip>
+      {queueItems.length > 0 && (
+        <Tooltip title="Clear queue" placement="bottom">
+          <IconButton
+            aria-label="Clear queue"
+            onClick={clearQueue}
+            color="error"
+            data-testid="clear-queue-button"
+          >
+            <DeleteSweepIcon />
+          </IconButton>
+        </Tooltip>
       )}
       {queueItems.length > 0 ? (
         <DragDropContext onDragEnd={onDragEnd}>
@@ -182,43 +223,43 @@ export const QueueList = () => {
                                 justifyContent: 'flex-start',
                               }}
                             >
-                              <Button
-                                sx={{ minWidth: '2px' }}
-                                size="small"
-                                variant="contained"
-                                data-testid="play-now-button"
-                                onClick={() => playSong(index)}
-                              >
-                                Play
-                              </Button>
-                              <Button
-                                sx={{ minWidth: '2px' }}
-                                size="small"
-                                variant="contained"
-                                data-testid="move-song-up-in-queue-button"
-                                onClick={() => shiftSongUp(index)}
-                              >
-                                Up
-                              </Button>
-                              <Button
-                                sx={{ minWidth: '2px' }}
-                                variant="contained"
-                                size="small"
-                                data-testid="send-to-front-of-queue-button"
-                                onClick={() => sendSongToFrontOfQueue(index)}
-                              >
-                                First
-                              </Button>
-                              <Button
-                                sx={{ minWidth: '2px' }}
-                                variant="contained"
-                                size="small"
-                                data-testid="delete-song-from-queue-button"
-                                onClick={() => deleteSongFromQueue(index)}
-                                color="error"
-                              >
-                                Delete
-                              </Button>
+                              <Tooltip title="Play song" placement="top">
+                                <IconButton
+                                  aria-label="play"
+                                  onClick={() => playSong(index)}
+                                  data-testid="play-now-button"
+                                >
+                                  <PlayArrowIcon fontSize="medium" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Up" placement="top">
+                                <IconButton
+                                  aria-label="up"
+                                  data-testid="move-song-up-in-queue-button"
+                                  onClick={() => shiftSongUp(index)}
+                                >
+                                  <KeyboardArrowUpIcon fontSize="medium" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="First" placement="top">
+                                <IconButton
+                                  aria-label="first"
+                                  data-testid="send-to-front-of-queue-button"
+                                  onClick={() => sendSongToFrontOfQueue(index)}
+                                >
+                                  <KeyboardDoubleArrowUpIcon fontSize="medium" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Delete" placement="top">
+                                <IconButton
+                                  aria-label="delete"
+                                  onClick={() => deleteSongFromQueue(index)}
+                                  color="error"
+                                  data-testid="delete-song-from-queue-button"
+                                >
+                                  <DeleteIcon fontSize="medium" />
+                                </IconButton>
+                              </Tooltip>
                             </CardActions>
                           </Card>
                         </ListItem>
@@ -235,7 +276,7 @@ export const QueueList = () => {
         <Typography
           textAlign="center"
           sx={{
-            paddingTop: '5%',
+            pt: '5%',
           }}
         >
           No songs in queue
@@ -244,28 +285,5 @@ export const QueueList = () => {
     </Container>
   );
 };
-
-export function EnqueueSong(song: SongProps): void {
-  const queue = window.electron.store.queueItems.getAllQueueItems();
-  setQueue([...queue, { song, queueItemId: uniqid() }]);
-}
-
-export function DequeueSong(): SongProps | null {
-  const queue = window.electron.store.queueItems.getAllQueueItems();
-  const nextSongId = queue.length > 0 ? queue[0].song.songId : null;
-  const nextSong =
-    nextSongId === null
-      ? null
-      : window.electron.store.songs.getSong(nextSongId);
-  if (queue.length > 0) {
-    setQueue([...queue.slice(1)]);
-  }
-  return nextSong;
-}
-
-export function GetQueueLength(): number {
-  const queue = window.electron.store.queueItems.getAllQueueItems();
-  return queue ? queue.length : 0;
-}
 
 export default QueueList;

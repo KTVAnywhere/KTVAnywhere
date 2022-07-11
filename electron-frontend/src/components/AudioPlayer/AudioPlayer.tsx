@@ -17,11 +17,15 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import LyricsIcon from '@mui/icons-material/Lyrics';
 import VolumeMuteIcon from '@mui/icons-material/VolumeMute';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import SpeedIcon from '@mui/icons-material/Speed';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import { useEffect } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
-import { useAudioStatus } from './AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
+import { useConfirmation } from '../ConfirmationDialog';
+import { SongProps } from '../Song';
 import { LyricsAdjust } from '../LyricsPlayer';
 
 const ProgressBar = () => {
@@ -52,8 +56,8 @@ const ProgressBar = () => {
         item
         sx={{
           width: '87%',
-          paddingLeft: '1%',
-          paddingRight: '1%',
+          pl: '1%',
+          pr: '1%',
         }}
       >
         <Slider
@@ -64,7 +68,6 @@ const ProgressBar = () => {
           max={duration}
           sx={{
             display: 'flex',
-            height: '10px',
             '& .MuiSlider-thumb': {
               width: 0,
               height: 0,
@@ -99,6 +102,8 @@ export const AudioPlayer = () => {
     setVolume,
     pitch,
     setPitch,
+    tempo,
+    setTempo,
     currentTime,
     setCurrentTime,
     currentSong,
@@ -107,12 +112,40 @@ export const AudioPlayer = () => {
     setNextSong,
     lyricsEnabled,
     setLyricsEnabled,
+    graphEnabled,
+    setGraphEnabled,
     audioContext,
     gainNode,
     source,
     setSource,
+    audioInput1Id,
+    audioInput2Id,
+    microphone1Volume,
+    microphone2Volume,
+    reverb1Volume,
+    reverb2Volume,
+    microphone1NoiseSuppression,
+    microphone2NoiseSuppression,
   } = useAudioStatus();
-  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const { setAlertMessage } = useAlertMessage();
+  const { setConfirmationMessage, setActions, setOpen } = useConfirmation();
+
+  const filePathMissingDeleteSong = (song: SongProps, filePath: string) => {
+    setConfirmationMessage({
+      heading: 'Delete song with missing file',
+      message: `"${filePath}" does not exist, do you want to delete "${song.songName}"?`,
+    });
+    setActions([
+      {
+        label: 'Confirm',
+        fn: () => {
+          window.electron.store.songs.deleteSong(song.songId);
+          setOpen(false);
+        },
+      },
+    ]);
+    setOpen(true);
+  };
 
   const reconnectNodes = () => {
     if (source) {
@@ -173,16 +206,17 @@ export const AudioPlayer = () => {
     newSource.on('play', onPlay);
     newSource.percentagePlayed = percentagePlayed;
     newSource.pitchSemitones = pitch;
+    newSource.tempo = tempo;
     destroySource();
-    newSource.connect(gainNode);
     if (playNow) {
-      gainNode.disconnect();
+      newSource.connect(gainNode);
       gainNode.connect(audioContext.destination);
     }
     setSource(newSource);
   };
 
   const loadSong = async (
+    song: SongProps,
     filePath: string,
     resumeTime: boolean,
     playNow: boolean,
@@ -211,7 +245,6 @@ export const AudioPlayer = () => {
               message: `${error}`,
               severity: 'error',
             });
-            setShowAlertMessage(true);
             setIsLoading(false);
           });
         if (callback) {
@@ -222,7 +255,7 @@ export const AudioPlayer = () => {
           message: `${filePath} does not exist`,
           severity: 'error',
         });
-        setShowAlertMessage(true);
+        filePathMissingDeleteSong(song, filePath);
         setIsLoading(false);
       }
     } catch (error) {
@@ -230,7 +263,6 @@ export const AudioPlayer = () => {
         message: `${error}`,
         severity: 'error',
       });
-      setShowAlertMessage(true);
       setIsLoading(false);
     }
   };
@@ -252,11 +284,25 @@ export const AudioPlayer = () => {
     setPitch(newValue as number);
   };
 
-  const pitchZero = () => {
+  const pitchReset = () => {
     if (source) {
       source.pitchSemitones = 0;
     }
     setPitch(0);
+  };
+
+  const tempoChange = (_event: Event, newValue: number | number[]) => {
+    if (source) {
+      source.tempo = newValue as number;
+    }
+    setTempo(newValue as number);
+  };
+
+  const tempoReset = () => {
+    if (source) {
+      source.tempo = 1;
+    }
+    setTempo(1);
   };
 
   const playSong = () => {
@@ -266,7 +312,7 @@ export const AudioPlayer = () => {
     } else if (!currentSong && GetQueueLength() > 0) {
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, true, () => {
+        loadSong(song, song.songPath, false, true, () => {
           setCurrentSong(song);
           setIsPlaying(true);
         });
@@ -288,18 +334,35 @@ export const AudioPlayer = () => {
       )
     ) {
       setAlertMessage({
-        message: 'Lyrics file not found',
+        message:
+          'Lyrics file not found, please fetch lyrics or upload lyrics file in song details',
         severity: 'info',
       });
-      setShowAlertMessage(true);
     } else {
       setLyricsEnabled((state) => !state);
     }
   };
 
+  const toggleGraph = () => {
+    if (
+      !graphEnabled &&
+      !(
+        currentSong?.graphPath &&
+        window.electron.file.ifFileExists(currentSong?.graphPath)
+      )
+    ) {
+      setAlertMessage({
+        message: 'Song must be processed for graph to be displayed',
+        severity: 'info',
+      });
+    } else {
+      setGraphEnabled((state) => !state);
+    }
+  };
+
   const enableVocals = () => {
     if (currentSong) {
-      loadSong(currentSong.songPath, true, isPlaying, () =>
+      loadSong(currentSong, currentSong.songPath, true, isPlaying, () =>
         setIsPlayingVocals(true)
       );
     }
@@ -312,10 +375,13 @@ export const AudioPlayer = () => {
           message: 'Song must be processed for vocals to be turned off',
           severity: 'info',
         });
-        setShowAlertMessage(true);
       } else {
-        loadSong(currentSong.accompanimentPath, true, isPlaying, () =>
-          setIsPlayingVocals(false)
+        loadSong(
+          currentSong,
+          currentSong.accompanimentPath,
+          true,
+          isPlaying,
+          () => setIsPlayingVocals(false)
         );
       }
     }
@@ -325,12 +391,14 @@ export const AudioPlayer = () => {
     if (GetQueueLength() > 0) {
       const song = DequeueSong();
       if (song) {
-        loadSong(song.songPath, false, isPlaying, () => {
+        loadSong(song, song.songPath, false, isPlaying, () => {
           setCurrentSong(song);
+          setCurrentTime(0);
           setIsPlayingVocals(true);
         });
       }
     } else {
+      gainNode.disconnect();
       destroySource();
       setCurrentSong(null);
       setIsPlaying(false);
@@ -352,7 +420,7 @@ export const AudioPlayer = () => {
   const forwardTenSeconds = () => {
     if (source && duration !== 0) {
       const nextTime =
-        currentTime + 10 >= duration ? duration : currentTime + 10;
+        currentTime + 10 >= duration ? duration - 1 : currentTime + 10;
       source.percentagePlayed = nextTime / duration;
       setCurrentTime(nextTime);
     }
@@ -360,7 +428,7 @@ export const AudioPlayer = () => {
 
   useEffect(() => {
     if (nextSong === null) return;
-    loadSong(nextSong.songPath, false, true, () => {
+    loadSong(nextSong, nextSong.songPath, false, true, () => {
       setCurrentSong(nextSong);
       setIsPlaying(true);
       setIsPlayingVocals(true);
@@ -381,14 +449,14 @@ export const AudioPlayer = () => {
 
   useEffect(() => {
     if (currentSong) {
-      loadSong(currentSong.songPath, true, false);
+      loadSong(currentSong, currentSong.songPath, true, false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveConfig = () => {
     window.removeEventListener('beforeunload', saveConfig);
-    window.electron.store.config.setPlayingSong({
+    window.electron.store.config.setAudioStatusConfig({
       songId: currentSong ? currentSong.songId : '',
       currentTime,
       duration,
@@ -396,6 +464,15 @@ export const AudioPlayer = () => {
       pitch,
       vocalsEnabled: isPlayingVocals,
       lyricsEnabled,
+      graphEnabled,
+      audioInput1Id,
+      audioInput2Id,
+      microphone1Volume,
+      microphone2Volume,
+      reverb1Volume,
+      reverb2Volume,
+      microphone1NoiseSuppression,
+      microphone2NoiseSuppression,
     });
     destroySource();
   };
@@ -408,15 +485,20 @@ export const AudioPlayer = () => {
         <ProgressBar />
         <Tooltip title="End song" placement="right">
           <IconButton
-            sx={{ padding: 0 }}
+            sx={{ p: 0 }}
             data-testid="end-song-button"
             onClick={endSong}
           >
-            <SkipNextIcon sx={{ fontSize: '35px' }} />
+            <SkipNextIcon fontSize="medium" />
           </IconButton>
         </Tooltip>
       </Grid>
-      <Grid item container direction="row" sx={{ justifyContent: 'center' }}>
+      <Grid
+        item
+        container
+        direction="row"
+        sx={{ justifyContent: 'center', alignItems: 'center' }}
+      >
         <Grid
           item
           sx={{ position: 'absolute', left: '2%', right: '85%', top: '15px' }}
@@ -440,24 +522,54 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item>
           <Grid container direction="row" alignItems="center">
-            <RecordVoiceOverIcon sx={{ fontSize: '30px' }} />
+            <RecordVoiceOverIcon fontSize="medium" />
             <Switch
               checked={isPlayingVocals}
               onClick={() =>
                 isPlayingVocals ? disableVocals() : enableVocals()
               }
               color="secondary"
+              size="small"
               data-testid="toggle-vocals-switch"
             />
           </Grid>
-          <Typography align="center">vocals</Typography>
+          <Typography
+            position="absolute"
+            variant="subtitle2"
+            sx={{ ml: '10px' }}
+          >
+            vocals
+          </Typography>
         </Grid>
-        <Grid item sx={{ marginLeft: '2%' }}>
-          <IconButton sx={{ padding: 0 }} onClick={pitchZero}>
-            <GraphicEqIcon sx={{ fontSize: '35px' }} />
+        <Grid item sx={{ ml: '1%' }}>
+          <IconButton sx={{ p: 0 }} onClick={tempoReset}>
+            <SpeedIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginLeft: '1%', width: '8%' }}>
+        <Grid item sx={{ ml: '10px', width: '5%' }}>
+          <Slider
+            aria-label="Tempo"
+            value={tempo}
+            onChange={tempoChange}
+            marks
+            min={0.8}
+            max={1.2}
+            step={0.1}
+            size="small"
+            color="secondary"
+            data-testid="tempo-slider"
+            sx={{ py: 0.6 }}
+          />
+          <Typography position="absolute" variant="subtitle2">
+            tempo: {tempo}
+          </Typography>
+        </Grid>
+        <Grid item sx={{ ml: '1%' }}>
+          <IconButton sx={{ p: 0 }} onClick={pitchReset}>
+            <GraphicEqIcon fontSize="medium" />
+          </IconButton>
+        </Grid>
+        <Grid item sx={{ ml: '10px', width: '5%' }}>
           <Slider
             aria-label="Pitch"
             value={pitch}
@@ -466,80 +578,108 @@ export const AudioPlayer = () => {
             min={-3.5}
             max={3.5}
             step={0.5}
+            size="small"
             color="secondary"
             data-testid="pitch-slider"
+            sx={{ py: 0.6 }}
           />
-          <Typography>Pitch: {pitch > 0 ? `+${pitch}` : pitch}</Typography>
+          <Typography position="absolute" variant="subtitle2">
+            pitch: {pitch > 0 ? `+${pitch}` : pitch}
+          </Typography>
         </Grid>
-        <Grid item sx={{ marginLeft: '3%', marginRight: '3%' }}>
+        <Grid item sx={{ mx: '1%' }}>
           <Tooltip title="Backward 10s" placement="top">
             <IconButton
-              sx={{ padding: 0 }}
+              sx={{ p: 0 }}
               data-testid="backward-10-button"
               onClick={backwardTenSeconds}
             >
-              <FastRewindIcon sx={{ fontSize: '35px' }} />
+              <FastRewindIcon fontSize="medium" />
             </IconButton>
           </Tooltip>
           {isPlaying ? (
             <IconButton
-              sx={{ padding: 0 }}
+              sx={{ p: 0 }}
               data-testid="pause-button"
               onClick={pauseSong}
             >
-              <PauseCircleIcon sx={{ fontSize: '64px' }} />
+              <PauseCircleIcon sx={{ fontSize: '42px' }} />
             </IconButton>
           ) : (
             <IconButton
-              sx={{ padding: 0 }}
+              sx={{ p: 0 }}
               data-testid="play-button"
               onClick={playSong}
             >
-              <PlayCircleIcon sx={{ fontSize: '64px' }} />
+              <PlayCircleIcon sx={{ fontSize: '42px' }} />
             </IconButton>
           )}
           <Tooltip title="Forward 10s" placement="top">
             <IconButton
-              sx={{ padding: 0 }}
+              sx={{ p: 0 }}
               data-testid="forward-10-button"
               onClick={forwardTenSeconds}
             >
-              <FastForwardIcon sx={{ fontSize: '35px' }} />
+              <FastForwardIcon fontSize="medium" />
             </IconButton>
           </Tooltip>
         </Grid>
-        <Grid item sx={{ marginRight: '1%' }}>
-          <IconButton sx={{ padding: 0 }} onClick={() => volumeZero()}>
-            <VolumeMuteIcon sx={{ fontSize: '35px' }} />
+        <Grid item>
+          <IconButton sx={{ p: 0 }} onClick={() => volumeZero()}>
+            <VolumeMuteIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginRight: '2%', width: '8%' }}>
+        <Grid item sx={{ ml: '10px', mr: '2%', width: '6%' }}>
           <Slider
             aria-label="Volume"
             value={volume}
             onChange={volumeChange}
             min={0}
             max={100}
+            size="small"
             color="secondary"
             data-testid="volume-slider"
+            sx={{ py: 0.6 }}
           />
-          <Typography>Volume: {volume}%</Typography>
+          <Typography position="absolute" variant="subtitle2">
+            volume: {volume}%
+          </Typography>
         </Grid>
-        <Grid item>
+        <Grid item sx={{ mr: '1%' }}>
+          <Grid container direction="row">
+            <AutoGraphIcon fontSize="medium" />
+            <Switch
+              checked={graphEnabled}
+              data-testid="toggle-graph-button"
+              onClick={toggleGraph}
+              size="small"
+              color="secondary"
+            />
+          </Grid>
+          <Typography
+            position="absolute"
+            variant="subtitle2"
+            sx={{ ml: '10px' }}
+          >
+            graph
+          </Typography>
+        </Grid>
+        <Grid item sx={{ mr: '2%' }}>
           <Grid
             container
             direction="row"
             alignItems="center"
             position="relative"
           >
-            <LyricsIcon sx={{ fontSize: '30px' }} />
+            <LyricsIcon fontSize="medium" />
             <Switch
               checked={lyricsEnabled}
               data-testid="toggle-lyrics-button"
               onClick={toggleLyrics}
+              size="small"
               color="secondary"
             />
-            <Box position="absolute" top="0" left="100px">
+            <Box position="absolute" left="70px" top="-6px">
               {lyricsEnabled &&
                 currentSong?.lyricsPath &&
                 window.electron.file.ifFileExists(currentSong?.lyricsPath) && (
@@ -547,7 +687,13 @@ export const AudioPlayer = () => {
                 )}
             </Box>
           </Grid>
-          <Typography align="center">lyrics</Typography>
+          <Typography
+            position="absolute"
+            variant="subtitle2"
+            sx={{ ml: '10px' }}
+          >
+            lyrics
+          </Typography>
         </Grid>
       </Grid>
     </Grid>

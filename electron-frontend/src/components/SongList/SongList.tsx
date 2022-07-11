@@ -14,12 +14,12 @@ import {
   Tooltip,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import QueuePlayNext from '@mui/icons-material/QueuePlayNext';
+import QueueIcon from '@mui/icons-material/Queue';
 import LoadingButton from '@mui/lab/LoadingButton';
 import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { SongProps, useSongDialog, useSongsStatus } from '../Song';
 import { EnqueueSong } from '../SongsQueue';
-import { useAudioStatus } from '../AudioPlayer';
+import { useAudioStatus } from '../AudioStatus.context';
 import { useConfirmation } from '../ConfirmationDialog';
 
 const SongCard = ({
@@ -39,10 +39,10 @@ const SongCard = ({
   } = useConfirmation();
 
   const isProcessed = () => {
-    return !!song.accompanimentPath;
+    return !!(song.accompanimentPath && song.graphPath);
   };
 
-  const spleeterSeparateVocalsAndMusic = () => {
+  const processSong = () => {
     if (isProcessed()) {
       setConfirmationMessage({
         heading: 'Process song',
@@ -111,13 +111,13 @@ const SongCard = ({
           </Tooltip>
           <Tooltip title="Enqueue song" placement="right">
             <IconButton aria-label="enqueue" onClick={() => EnqueueSong(song)}>
-              <QueuePlayNext />
+              <QueueIcon />
             </IconButton>
           </Tooltip>
           <LoadingButton
             size="small"
             loading={songsStatus.indexOf(song.songId) !== -1}
-            onClick={spleeterSeparateVocalsAndMusic}
+            onClick={processSong}
           >
             Process
           </LoadingButton>
@@ -193,7 +193,7 @@ const SongList = ({
           <Typography
             textAlign="center"
             sx={{
-              paddingTop: '5%',
+              pt: '5%',
             }}
           >
             No songs found

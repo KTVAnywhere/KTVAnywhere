@@ -63,6 +63,7 @@ describe('songs store', () => {
       lyricsPath: 'C:\\dir\\lyrics2.lrc',
       vocalsPath: '',
       accompanimentPath: '',
+      graphPath: '',
     };
     const { addSong } = songFunctions;
     addSong(songsStore, songSearcher, toAdd);
@@ -103,6 +104,7 @@ describe('songs store', () => {
         lyricsPath: 'C:\\dir\\lyrics2.lrc',
         vocalsPath: '',
         accompanimentPath: '',
+        graphPath: '',
       },
       {
         songId: '3',
@@ -112,12 +114,17 @@ describe('songs store', () => {
         lyricsPath: 'C:\\dir\\lyrics3.lrc',
         vocalsPath: '',
         accompanimentPath: '',
+        graphPath: '',
       },
     ];
     const { setAllSongs } = songFunctions;
     setAllSongs(songsStore, songSearcher, newsongListTestData);
     expect(mockSet).toBeCalledWith('songs', newsongListTestData);
     expect(mockIndexSet).toBeCalledWith(newsongListTestData);
+  });
+  test('get random song', () => {
+    const { getRandomSong } = songFunctions;
+    expect(songListTestData).toContain(getRandomSong(songsStore));
   });
 });
 
@@ -147,8 +154,8 @@ describe('queueItems store', () => {
       queueTestDataWithSongs012[0]
     );
   });
-  test('add queueItem to end of queueItems store', () => {
-    const toAdd: QueueItemProps = {
+  test('enqueue item to end of queueItems store', () => {
+    const toEnqueue: QueueItemProps = {
       song: {
         songId: '3',
         songName: 'Test song 3',
@@ -157,15 +164,33 @@ describe('queueItems store', () => {
         lyricsPath: 'C:\\dir\\lyrics3.lrc',
         vocalsPath: '',
         accompanimentPath: '',
+        graphPath: '',
       },
       queueItemId: '3',
     };
-    const { addQueueItem } = queueItemFunctions;
-    addQueueItem(queueItemsStore, toAdd);
+    const { enqueueItem } = queueItemFunctions;
+    enqueueItem(queueItemsStore, toEnqueue);
     expect(mockSet).toBeCalledWith('queueItems', [
       ...queueTestDataWithSongs012,
-      toAdd,
+      toEnqueue,
     ]);
+  });
+  test('dequeue item from queueItems store', () => {
+    data = [{ song: songListTestData[0], queueItemId: '0' }];
+    let songsData = songListTestData;
+    const mockGetSongs = jest.fn(() => songsData);
+    const mockSetSongs = jest.fn((_, songs: SongProps[]) => {
+      songsData = songs;
+    });
+    const songsStore = {
+      ...new ActualStore({}),
+      get: mockGetSongs,
+      set: mockSetSongs,
+    };
+    const { dequeueItem } = queueItemFunctions;
+    expect(dequeueItem(queueItemsStore, songsStore)).toEqual(
+      songListTestData[0]
+    );
   });
   test('change queueItem in queueItems store', () => {
     const newTestQueueItem: QueueItemProps = {
@@ -201,6 +226,15 @@ describe('queueItems store', () => {
     setAllQueueItems(queueItemsStore, queueTestDataWithSongs102);
     expect(mockSet).toBeCalledWith('queueItems', queueTestDataWithSongs102);
   });
+  test('shuffle queue', () => {
+    const { shuffleQueue } = queueItemFunctions;
+    expect(mockSet).not.toBeCalled();
+    shuffleQueue(queueItemsStore);
+    expect(mockSet).toBeCalled();
+    expect(data).toContain(queueTestDataWithSongs012[0]);
+    expect(data).toContain(queueTestDataWithSongs012[1]);
+    expect(data).toContain(queueTestDataWithSongs012[2]);
+  });
 });
 
 describe('config store', () => {
@@ -219,14 +253,14 @@ describe('config store', () => {
   });
 
   test('get settings for playing song', () => {
-    const { getPlayingSong } = configFunctions;
-    getPlayingSong(configStore);
+    const { getAudioStatusConfig } = configFunctions;
+    getAudioStatusConfig(configStore);
     expect(mockGet).toBeCalled();
   });
 
   test('set settings for playing song', () => {
-    const { setPlayingSong } = configFunctions;
-    const playingSong: ConfigType['playingSong'] = {
+    const { setAudioStatusConfig } = configFunctions;
+    const audioStatusConfig: ConfigType['audioStatusConfig'] = {
       songId: '1',
       currentTime: 5,
       duration: 10,
@@ -234,9 +268,18 @@ describe('config store', () => {
       pitch: 0,
       vocalsEnabled: true,
       lyricsEnabled: true,
+      graphEnabled: true,
+      audioInput1Id: 'default',
+      audioInput2Id: 'default',
+      microphone1Volume: 50,
+      microphone2Volume: 50,
+      reverb1Volume: 50,
+      reverb2Volume: 50,
+      microphone1NoiseSuppression: false,
+      microphone2NoiseSuppression: false,
     };
-    setPlayingSong(configStore, playingSong);
-    expect(mockSet).toBeCalledWith('playingSong', playingSong);
+    setAudioStatusConfig(configStore, audioStatusConfig);
+    expect(mockSet).toBeCalledWith('audioStatusConfig', audioStatusConfig);
   });
 
   test('get settings', () => {

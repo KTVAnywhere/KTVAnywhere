@@ -19,7 +19,7 @@ export interface QueueItemsType {
 }
 
 export interface ConfigType {
-  playingSong: {
+  audioStatusConfig: {
     songId: string;
     currentTime: number;
     duration: number;
@@ -27,6 +27,15 @@ export interface ConfigType {
     pitch: number;
     vocalsEnabled: boolean;
     lyricsEnabled: boolean;
+    graphEnabled: boolean;
+    audioInput1Id: string;
+    audioInput2Id: string;
+    microphone1Volume: number;
+    microphone2Volume: number;
+    reverb1Volume: number;
+    reverb2Volume: number;
+    microphone1NoiseSuppression: boolean;
+    microphone2NoiseSuppression: boolean;
   };
   settings: {
     errorMessagesTimeout: number;
@@ -46,6 +55,7 @@ const songSchema: Schema<Song> = {
       lyricsPath: { type: 'string' },
       vocalsPath: { type: 'string' },
       accompanimentPath: { type: 'string' },
+      graphPath: { type: 'string' },
     },
     required: ['songId', 'songName', 'songPath'],
   },
@@ -77,7 +87,7 @@ const queueItemsSchema: Schema<QueueItemsType> = {
 };
 
 const configSchema: Schema<ConfigType> = {
-  playingSong: {
+  audioStatusConfig: {
     type: 'object',
     properties: {
       songId: { type: 'string' },
@@ -87,6 +97,15 @@ const configSchema: Schema<ConfigType> = {
       pitch: { type: 'number' },
       vocalsEnabled: { type: 'boolean' },
       lyricsEnabled: { type: 'boolean' },
+      graphEnabled: { type: 'boolean' },
+      audioInput1Id: { type: 'string' },
+      audioInput2Id: { type: 'string' },
+      microphone1Volume: { type: 'number' },
+      microphone2Volume: { type: 'number' },
+      reverb1Volume: { type: 'number' },
+      reverb2Volume: { type: 'number' },
+      microphone1NoiseSuppression: { type: 'boolean' },
+      microphone2NoiseSuppression: { type: 'boolean' },
     },
   },
   settings: {
@@ -94,6 +113,7 @@ const configSchema: Schema<ConfigType> = {
     properties: {
       errorMessagesTimeout: { type: 'number' },
       audioBufferSize: { type: 'number' },
+      colorThemeId: { type: 'number' },
     },
   },
 };

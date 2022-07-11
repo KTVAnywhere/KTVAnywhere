@@ -11,14 +11,14 @@ import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { Runner } from 'lrc-kit';
 import { useEffect, useState } from 'react';
 import { useLyrics } from './Lyrics.context';
-import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
 import { useAlertMessage } from '../AlertMessage';
 
 const LyricsAdjust = () => {
   const { lyricsRunner, setLyricsRunner } = useLyrics();
   const { currentSong } = useAudioStatus();
   const [currentOffset, setCurrentOffset] = useState('0');
-  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const { setAlertMessage } = useAlertMessage();
 
   useEffect(() => {
     setCurrentOffset('0');
@@ -53,7 +53,6 @@ const LyricsAdjust = () => {
               message: 'Error updating lyrics file',
               severity: 'warning',
             });
-            setShowAlertMessage(true);
             return false;
           }
           setCurrentOffset('0');
@@ -61,16 +60,13 @@ const LyricsAdjust = () => {
             message: 'Successfully updated lyrics file',
             severity: 'success',
           });
-          setShowAlertMessage(true);
           return true;
         })
         .catch((error) => {
           setAlertMessage({ message: error.message, severity: 'error' });
-          setShowAlertMessage(true);
         });
     } else {
       setAlertMessage({ message: 'No lyrics file found', severity: 'info' });
-      setShowAlertMessage(true);
     }
   };
 
@@ -79,7 +75,7 @@ const LyricsAdjust = () => {
       <Stack direction="column" alignItems="center" justifyContent="center">
         <Stack
           direction="row"
-          spacing={0.5}
+          spacing={0}
           alignItems="center"
           justifyItems="center"
         >
@@ -97,7 +93,7 @@ const LyricsAdjust = () => {
             size="small"
             color="secondary"
             sx={{
-              width: '50px',
+              width: '40px',
               '& .MuiOutlinedInput-input': {
                 '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
                   WebkitAppearance: 'none',
@@ -107,7 +103,11 @@ const LyricsAdjust = () => {
             inputProps={{
               'data-testid': 'offset',
               step: '0.2',
-              style: { textAlign: 'center', paddingLeft: 0, paddingRight: 0 },
+              style: {
+                textAlign: 'center',
+                fontSize: '0.9em',
+                padding: 3,
+              },
             }}
             value={currentOffset}
             onChange={(event) => changeLyricsOffset(event.target.value)}
@@ -127,13 +127,13 @@ const LyricsAdjust = () => {
           justifyItems="center"
           sx={{ position: 'relative' }}
         >
-          <Typography>offset (s)</Typography>
+          <Typography variant="subtitle2">offset (s)</Typography>
           <Tooltip title="Save changes" placement="right">
             <IconButton
               aria-label="saveOffset"
               onClick={saveOffset}
               size="small"
-              sx={{ position: 'absolute', top: '0', left: '68px', padding: 0 }}
+              sx={{ position: 'absolute', top: '0', left: '68px', p: 0 }}
             >
               <CheckOutlinedIcon fontSize="small" color="success" />
             </IconButton>

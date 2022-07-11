@@ -4,6 +4,32 @@ import schemas, { SongsType, QueueItemsType, ConfigType } from './schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
+export const configStoreDefaults = {
+  audioStatusConfig: {
+    songId: '',
+    currentTime: 0,
+    duration: 0,
+    volume: 50,
+    pitch: 0,
+    vocalsEnabled: true,
+    lyricsEnabled: false,
+    graphEnabled: false,
+    audioInput1Id: 'default',
+    audioInput2Id: 'default',
+    microphone1Volume: 50,
+    microphone2Volume: 50,
+    reverb1Volume: 50,
+    reverb2Volume: 50,
+    microphone1NoiseSuppression: false,
+    microphone2NoiseSuppression: false,
+  },
+  settings: {
+    errorMessagesTimeout: 5,
+    audioBufferSize: 4096,
+    colorThemeId: 0,
+  },
+};
+
 export const createSongsStore = () =>
   new Store<SongsType>({
     name: 'songs',
@@ -23,22 +49,8 @@ export const createQueueItemsStore = () =>
 export const createConfigStore = () =>
   new Store<ConfigType>({
     schema: schemas.configSchema,
-    defaults: {
-      playingSong: {
-        songId: '',
-        currentTime: 0,
-        duration: 0,
-        volume: 50,
-        pitch: 0,
-        vocalsEnabled: true,
-        lyricsEnabled: true,
-      },
-      settings: {
-        errorMessagesTimeout: 5,
-        audioBufferSize: 4096,
-        colorThemeId: 0,
-      },
-    },
+    watch: true,
+    defaults: configStoreDefaults,
   });
 
 export const songFunctions = {
@@ -98,6 +110,12 @@ export const songFunctions = {
     store.set('songs', songs);
     songSearcher.setCollection(songs);
   },
+  getRandomSong: (store: Store<SongsType>) => {
+    const allSongs = store.get('songs');
+    return allSongs.length > 0
+      ? allSongs[Math.floor(Math.random() * allSongs.length)]
+      : null;
+  },
 };
 
 export const queueItemFunctions = {
@@ -113,9 +131,25 @@ export const queueItemFunctions = {
       );
     store.set('queueItems', newQueue);
   },
-  addQueueItem: (store: Store<QueueItemsType>, queueItem: QueueItemProps) => {
+  enqueueItem: (store: Store<QueueItemsType>, queueItem: QueueItemProps) => {
     const newQueue = [...store.get('queueItems'), queueItem];
     store.set('queueItems', newQueue);
+  },
+  dequeueItem: (
+    queueStore: Store<QueueItemsType>,
+    songStore: Store<SongsType>
+  ) => {
+    const queue = queueStore.get('queueItems');
+    const nextSong =
+      (queue.length > 0 &&
+        songStore
+          .get('songs')
+          .find((song) => song.songId === queue[0].song.songId)) ||
+      null;
+    if (queue.length > 0) {
+      queueStore.set('queueItems', [...queue.slice(1)]);
+    }
+    return nextSong;
   },
   deleteQueueItem: (store: Store<QueueItemsType>, queueItemId: string) => {
     store.set(
@@ -132,14 +166,41 @@ export const queueItemFunctions = {
   ) => {
     store.set('queueItems', queueItems);
   },
+  shuffleQueue: (store: Store<QueueItemsType>) => {
+    const newQueue = store.get('queueItems');
+    // Fisher-Yates algorithm
+    if (newQueue.length === 0) return;
+    let currentIndex = newQueue.length;
+    let randomIndex;
+
+    // While there remain elements to shuffle.
+    while (currentIndex !== 0) {
+      // Pick a remaining element.
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      // And swap it with the current element.
+      [newQueue[currentIndex], newQueue[randomIndex]] = [
+        newQueue[randomIndex],
+        newQueue[currentIndex],
+      ];
+    }
+
+    store.set('queueItems', newQueue);
+  },
 };
 
 export const configFunctions = {
-  getPlayingSong: (store: Store<ConfigType>) => store.get('playingSong'),
-  setPlayingSong: (
+  getAudioStatusConfig: (store: Store<ConfigType>) => {
+    return {
+      ...configStoreDefaults.audioStatusConfig,
+      ...store.get('audioStatusConfig'),
+    };
+  },
+  setAudioStatusConfig: (
     store: Store<ConfigType>,
-    playingSong: ConfigType['playingSong']
-  ) => store.set('playingSong', playingSong),
+    audioStatusConfig: ConfigType['audioStatusConfig']
+  ) => store.set('audioStatusConfig', audioStatusConfig),
   getSettings: (store: Store<ConfigType>) => store.get('settings'),
   setSettings: (store: Store<ConfigType>, settings: ConfigType['settings']) =>
     store.set('settings', settings),

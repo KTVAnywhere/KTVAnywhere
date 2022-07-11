@@ -13,6 +13,7 @@ export interface SongProps {
   lyricsPath: string;
   vocalsPath: string;
   accompanimentPath: string;
+  graphPath: string;
 }
 
 export const emptySongProps = {
@@ -23,6 +24,7 @@ export const emptySongProps = {
   lyricsPath: '',
   vocalsPath: '',
   accompanimentPath: '',
+  graphPath: '',
 };
 
 export const songPickerOptions: Electron.OpenDialogOptions = {
@@ -100,7 +102,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
   };
 
   return (
-    <Container sx={{ paddingTop: '5%', width: 1 }}>
+    <Container sx={{ pt: '5%', width: 1 }}>
       <Container disableGutters>
         <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText

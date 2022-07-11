@@ -117,11 +117,9 @@ export const GetColorTheme = () => {
 const SettingsMenu = ({
   showSettings,
   setShowSettings,
-  setCurrentTheme,
 }: {
   showSettings: boolean;
   setShowSettings: Dispatch<SetStateAction<boolean>>;
-  setCurrentTheme: Dispatch<SetStateAction<ColorThemeProps>>;
 }) => {
   const getCurrentSettings = () => window.electron.store.config.getSettings();
   const [errorMessagesTimeout, setErrorMessagesTimeout] = useState<number>(
@@ -156,14 +154,20 @@ const SettingsMenu = ({
 
   const closeDialog = () => {
     setShowSettings(false);
-    setCurrentTheme(GetColorTheme());
   };
 
   return (
-    <Dialog fullWidth maxWidth="sm" open={showSettings} onClose={closeDialog}>
+    <Dialog
+      scroll="paper"
+      fullWidth
+      maxWidth="sm"
+      open={showSettings}
+      onClose={closeDialog}
+      sx={{ top: '15%', maxHeight: '600px' }}
+    >
       <DialogTitle>Settings</DialogTitle>
       <DialogContent>
-        <Grid container>
+        <Grid container pb={2}>
           <Grid
             item
             display="flex"
@@ -174,7 +178,7 @@ const SettingsMenu = ({
           </Grid>
           <Grid
             item
-            sx={{ marginLeft: 'auto' }}
+            sx={{ ml: 'auto' }}
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -199,9 +203,7 @@ const SettingsMenu = ({
             </FormControl>
           </Grid>
         </Grid>
-      </DialogContent>
-      <DialogContent>
-        <Grid container>
+        <Grid container pb={2}>
           <Grid
             item
             display="flex"
@@ -214,7 +216,7 @@ const SettingsMenu = ({
           </Grid>
           <Grid
             item
-            sx={{ marginLeft: 'auto' }}
+            sx={{ ml: 'auto' }}
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -233,9 +235,7 @@ const SettingsMenu = ({
             </FormControl>
           </Grid>
         </Grid>
-      </DialogContent>
-      <DialogContent>
-        <Grid container>
+        <Grid container pb={2}>
           <Grid
             item
             display="flex"
@@ -254,7 +254,7 @@ const SettingsMenu = ({
           </Grid>
           <Grid
             item
-            sx={{ marginLeft: 'auto' }}
+            sx={{ ml: 'auto' }}
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -273,7 +273,9 @@ const SettingsMenu = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog}>Close</Button>
+        <Button onClick={closeDialog} data-testid="close-settings-button">
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   );

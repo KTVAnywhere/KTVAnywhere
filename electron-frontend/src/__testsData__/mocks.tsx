@@ -1,5 +1,6 @@
 import { AudioContext } from 'standardized-audio-context-mock';
 import { queueTestDataWithSongs012, songListTestData } from './testData';
+import { configStoreDefaults } from '../main/database';
 
 const mockedElectron = {
   ...window.electron,
@@ -12,31 +13,26 @@ const mockedElectron = {
       deleteSong: jest.fn(),
       getAllSongs: () => songListTestData,
       setAllSongs: jest.fn(),
+      getRandomSong: () => null,
       onChange: jest.fn().mockReturnValue(jest.fn()),
       search: jest.fn(),
     },
     queueItems: {
       getQueueItem: jest.fn(),
       setQueueItem: jest.fn(),
-      addQueueItem: jest.fn(),
+      enqueueItem: jest.fn(),
+      dequeueItem: jest.fn(),
       deleteQueueItem: jest.fn(),
       getAllQueueItems: () => queueTestDataWithSongs012,
       setAllQueueItems: jest.fn(),
+      shuffleQueue: jest.fn(),
       onChange: jest.fn().mockReturnValue(jest.fn()),
     },
     config: {
-      getPlayingSong: () => {
-        return {
-          songId: '',
-          currentTime: 0,
-          duration: 0,
-          volume: 50,
-          pitch: 0,
-          vocalsEnabled: true,
-          lyricsEnabled: true,
-        };
+      getAudioStatusConfig: () => {
+        return configStoreDefaults.audioStatusConfig;
       },
-      setPlayingSong: jest.fn(),
+      setAudioStatusConfig: jest.fn(),
       getSettings: () => {
         return {
           errorMessagesTimeout: 5,
@@ -45,18 +41,20 @@ const mockedElectron = {
         };
       },
       setSettings: jest.fn(),
+      onSettingsChange: jest.fn().mockReturnValue(jest.fn()),
     },
   },
   preprocess: {
     getSongDetails: jest.fn(),
-    spleeterProcessSong: jest.fn(),
-    spleeterProcessResult: jest.fn().mockReturnValue(jest.fn()),
+    processSong: jest.fn(),
+    processResult: jest.fn().mockReturnValue(jest.fn()),
   },
   file: {
     read: jest.fn().mockResolvedValue('lyrics'),
     readAsBuffer: jest.fn(),
     ifFileExists: jest.fn(),
     write: jest.fn(),
+    getAssetsPath: jest.fn().mockResolvedValue(''),
   },
 };
 
@@ -89,6 +87,8 @@ export const mockedAudioStatus = {
   setVolume: jest.fn(),
   pitch: 0,
   setPitch: jest.fn(),
+  tempo: 1,
+  setTempo: jest.fn(),
   currentTime: 0,
   setCurrentTime: jest.fn(),
   currentSong: null,
@@ -97,10 +97,52 @@ export const mockedAudioStatus = {
   setNextSong: jest.fn(),
   lyricsEnabled: true,
   setLyricsEnabled: jest.fn(),
+  graphEnabled: true,
+  setGraphEnabled: jest.fn(),
   audioContext: new AudioContext() as any,
   gainNode: new AudioContext().createGain() as any,
   source: new MockSource(),
   setSource: jest.fn(),
+  microphone1Enabled: false,
+  setMicrophone1Enabled: jest.fn(),
+  microphone2Enabled: false,
+  setMicrophone2Enabled: jest.fn(),
+  microphone1Media: null,
+  setMicrophone1Media: jest.fn(),
+  microphone2Media: null,
+  setMicrophone2Media: jest.fn(),
+  audioInput1Id: '',
+  setAudioInput1Id: jest.fn(),
+  audioInput2Id: '',
+  setAudioInput2Id: jest.fn(),
+  microphone1GainNode: new AudioContext().createGain() as any,
+  microphone2GainNode: new AudioContext().createGain() as any,
+  microphone1Volume: 70,
+  setMicrophone1Volume: jest.fn(),
+  microphone2Volume: 70,
+  setMicrophone2Volume: jest.fn(),
+  reverb1Enabled: false,
+  setReverb1Enabled: jest.fn(),
+  reverb2Enabled: false,
+  setReverb2Enabled: jest.fn(),
+  reverb1Media: null,
+  setReverb1Media: jest.fn(),
+  reverb2Media: null,
+  setReverb2Media: jest.fn(),
+  reverb1Node: undefined,
+  setReverb1Node: jest.fn(),
+  reverb2Node: undefined,
+  setReverb2Node: jest.fn(),
+  reverb1GainNode: new AudioContext().createGain() as any,
+  reverb2GainNode: new AudioContext().createGain() as any,
+  reverb1Volume: 70,
+  setReverb1Volume: jest.fn(),
+  reverb2Volume: 70,
+  setReverb2Volume: jest.fn(),
+  microphone1NoiseSuppression: false,
+  setMicrophone1NoiseSuppression: jest.fn(),
+  microphone2NoiseSuppression: false,
+  setMicrophone2NoiseSuppression: jest.fn(),
 };
 
 export default mockedElectron;

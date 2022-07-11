@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { useSongDialog } from './SongDialog.context';
 import { useConfirmation } from '../ConfirmationDialog';
 import Song, { SongProps } from './Song';
@@ -17,15 +17,26 @@ interface SongDialogProps {
 
 const SongDialog = ({ song, setSong }: SongDialogProps) => {
   const { open, setOpen } = useSongDialog();
-  const [changeMade, setChangeMade] = useState(false);
+  const songRef = useRef(song);
   const {
     setConfirmationMessage,
     setActions,
     setOpen: setOpenConfirmation,
   } = useConfirmation();
 
+  useEffect(() => {
+    if (open) {
+      songRef.current = song;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const changeMade = () => {
+    return JSON.stringify(songRef.current) !== JSON.stringify(song);
+  };
+
   const closeDialog = () => {
-    if (changeMade) {
+    if (changeMade()) {
       setConfirmationMessage({
         heading: 'Unsaved changes',
         message:
@@ -35,7 +46,6 @@ const SongDialog = ({ song, setSong }: SongDialogProps) => {
         {
           label: 'Confirm',
           fn: () => {
-            setChangeMade(false);
             setOpen(false);
           },
         },
@@ -49,14 +59,13 @@ const SongDialog = ({ song, setSong }: SongDialogProps) => {
   const deleteSong = () => {
     setConfirmationMessage({
       heading: 'Delete song',
-      message: `Are you sure you want to delete ${song.songName}?`,
+      message: `Are you sure you want to delete "${song.songName}"?`,
     });
     setActions([
       {
         label: 'Confirm',
         fn: () => {
           window.electron.store.songs.deleteSong(song.songId);
-          setChangeMade(false);
           setOpen(false);
         },
       },
@@ -65,7 +74,6 @@ const SongDialog = ({ song, setSong }: SongDialogProps) => {
   };
   const saveSong = () => {
     window.electron.store.songs.setSong(song);
-    setChangeMade(false);
     setOpen(false);
   };
 
@@ -77,7 +85,6 @@ const SongDialog = ({ song, setSong }: SongDialogProps) => {
           song={song}
           setSong={(state) => {
             setSong(state);
-            setChangeMade(true);
           }}
         />
       </DialogContent>

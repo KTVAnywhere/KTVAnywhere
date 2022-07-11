@@ -1,11 +1,12 @@
 import { IpcRenderer } from 'electron';
-import { ConfigType } from 'main/schema';
+import { ConfigType } from '../main/schema';
 import { SongProps } from '../components/Song';
 import { QueueItemProps } from '../components/SongsQueue';
 
 declare global {
   interface Window {
     electron: {
+      window: { closeApp(): void; minimizeApp(): void; maximizeApp(): void };
       dialog: {
         openFile(config: Electron.OpenDialogOptions): Promise<string>;
         openFiles(config: Electron.OpenDialogOptions): Promise<string[]>;
@@ -15,6 +16,7 @@ declare global {
         readAsBuffer(filePath: string): Promise<Buffer>;
         ifFileExists(filePath: string): boolean;
         write(filePath: string, data: string): Promise<{ error?: Error }>;
+        getAssetsPath(filePath?: string): string;
       };
       music: {
         getLrc(song: SongProps): Promise<{ lyricsPath: string; error?: Error }>;
@@ -28,6 +30,7 @@ declare global {
           deleteSong(songId: string): void;
           getAllSongs(): SongProps[];
           setAllSongs(songs: SongProps[]): void;
+          getRandomSong(): SongProps | null;
           onChange(
             callback: (_event: IpcRenderer, results: SongProps[]) => void
           ): () => void;
@@ -36,30 +39,41 @@ declare global {
         queueItems: {
           getQueueItem(queueItemId: string): QueueItemProps;
           setQueueItem(queueItem: QueueItemProps): void;
-          addQueueItem(queueItem: QueueItemProps): void;
+          enqueueItem(queueItem: QueueItemProps): void;
+          dequeueItem(): SongProps | null;
           deleteQueueItem(queueItemId: string): void;
           getAllQueueItems(): QueueItemProps[];
           setAllQueueItems(queueItems: QueueItemProps[]): void;
+          shuffleQueue(): void;
           onChange(
             callback: (_event: IpcRenderer, results: QueueItemProps[]) => void
           ): () => void;
         };
         config: {
-          getPlayingSong(): ConfigType['playingSong'];
-          setPlayingSong(playingSong: ConfigType['playingSong']): void;
+          getAudioStatusConfig(): ConfigType['audioStatusConfig'];
+          setAudioStatusConfig(
+            audioStatusConfig: ConfigType['audioStatusConfig']
+          ): void;
           getSettings(): ConfigType['settings'];
           setSettings(settings: ConfigType['settings']): void;
+          onSettingsChange(
+            callback: (
+              _event: IpcRenderer,
+              results: ConfigType['settings']
+            ) => void
+          ): () => void;
         };
       };
       preprocess: {
         getSongDetails(
           songPaths: string[]
         ): Promise<{ songName: string; artist: string; songPath: string }[]>;
-        spleeterProcessSong(song: SongProps): void;
-        spleeterProcessResult(
+        processSong(song: SongProps): void;
+        processResult(
           callback: (results: {
             vocalsPath: string;
             accompanimentPath: string;
+            graphPath: string;
             songId: string;
             error?: Error;
           }) => void

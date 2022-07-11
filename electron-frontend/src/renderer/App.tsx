@@ -1,8 +1,7 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  Grid,
   Container,
   CssBaseline,
   IconButton,
@@ -11,6 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import TitleBar from '../components/TitleBar';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList from '../components/SongsQueue';
 import {
@@ -32,91 +32,87 @@ import {
   useAlertMessage,
   AlertMessage,
 } from '../components/AlertMessage';
-import { AudioStatusProvider } from '../components/AudioPlayer/AudioStatus.context';
+import { AudioStatusProvider } from '../components/AudioStatus.context';
 import AudioPlayer from '../components/AudioPlayer';
+import Microphone from '../components/Microphone';
 import LyricsPlayer, { LyricsProvider } from '../components/LyricsPlayer';
 import './App.css';
 import {
   ConfirmationDialog,
   ConfirmationProvider,
 } from '../components/ConfirmationDialog';
-import SettingsMenu, {
-  ColorThemeProps,
-  GetColorTheme,
-} from '../components/Settings';
+import SettingsMenu, { GetColorTheme } from '../components/Settings';
+import PitchGraph from '../components/PitchGraph';
 
-const MainPage = ({
-  setCurrentTheme,
-}: {
-  setCurrentTheme: Dispatch<SetStateAction<ColorThemeProps>>;
-}) => {
+const MainPage = () => {
   const [openSong, setOpenSong] = useState<SongProps>(emptySongProps);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
   const { songsStatus, setSongsStatus } = useSongsStatus();
-  const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
-  const { setAlertMessage, setShowAlertMessage } = useAlertMessage();
+  const [songInProcess, setSongInProcess] = useState<string | null>(null);
+  const { setAlertMessage } = useAlertMessage();
+  const titleBarHeight = '22px';
 
   useEffect(() => {
-    const spleeterProcessSongUnsubscribe =
-      window.electron.preprocess.spleeterProcessResult(
-        ({ vocalsPath, accompanimentPath, songId, error }) => {
-          if (!error) {
-            const songProcessedSuccessfully =
-              window.electron.store.songs.getSong(songId);
-            const changedSong = {
-              ...songProcessedSuccessfully,
-              vocalsPath,
-              accompanimentPath,
-            };
-            window.electron.store.songs.setSong(changedSong);
-            setAlertMessage({
-              message: `Vocals separated successfully for ${songProcessedSuccessfully.songName}`,
-              severity: 'success',
-            });
-            setShowAlertMessage(true);
-          } else {
-            console.error(error);
-            setAlertMessage({
-              message: error.message,
-              severity: 'error',
-            });
-            setShowAlertMessage(true);
-          }
-          setSongsStatus((state) => state.slice(1));
+    const processSongUnsubscribe = window.electron.preprocess.processResult(
+      ({ vocalsPath, accompanimentPath, graphPath, songId, error }) => {
+        if (!error) {
+          const songProcessedSuccessfully =
+            window.electron.store.songs.getSong(songId);
+          const changedSong = {
+            ...songProcessedSuccessfully,
+            vocalsPath,
+            accompanimentPath,
+            graphPath,
+          };
+          window.electron.store.songs.setSong(changedSong);
+          setAlertMessage({
+            message: `${songProcessedSuccessfully.songName} successfully processed`,
+            severity: 'success',
+          });
+        } else {
+          setAlertMessage({
+            message: error.message,
+            severity: 'error',
+          });
         }
-      );
+        setSongsStatus((state) => state.slice(1));
+      }
+    );
 
     return () => {
-      spleeterProcessSongUnsubscribe();
+      processSongUnsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (songsStatus.length === 0 && songInSpleeter) {
-      setSongInSpleeter(null);
+    if (songsStatus.length === 0 && songInProcess) {
+      setSongInProcess(null);
     } else if (
       songsStatus.length !== 0 &&
-      (!songInSpleeter || songInSpleeter !== songsStatus[0])
+      (!songInProcess || songInProcess !== songsStatus[0])
     ) {
       const nextSongId = songsStatus[0];
       const toProcess = window.electron.store.songs.getSong(nextSongId);
-      setSongInSpleeter(nextSongId);
-      window.electron.preprocess.spleeterProcessSong(toProcess);
+      setSongInProcess(nextSongId);
+      window.electron.preprocess.processSong(toProcess);
     }
-  }, [songInSpleeter, songsStatus]);
+  }, [songInProcess, songsStatus]);
 
   return (
     <Container>
       <CssBaseline enableColorScheme />
+      <TitleBar />
       <Container
         maxWidth={false}
+        disableGutters
         sx={{
           position: 'fixed',
           left: 0,
           right: 0,
           bottom: '130px',
+          top: titleBarHeight,
         }}
       >
         <AlertMessage />
@@ -130,7 +126,7 @@ const MainPage = ({
               />
               <ConfirmationDialog />
               <LeftSidebar>
-                <Typography variant="h5" align="center" paddingTop="15px">
+                <Typography variant="h5" align="center" pt="15px">
                   Songs Library
                 </Typography>
                 <SongUploadButton setUploadedSongs={setUploadedSongs} />
@@ -139,21 +135,33 @@ const MainPage = ({
             </SongDialogProvider>
           </SongStagingDialogProvider>
         </ConfirmationProvider>
-        <Grid container direction="column" alignItems="center">
-          <Grid
-            item
-            sx={{
-              position: 'absolute',
-              bottom: '0',
-              left: '330px',
-              right: '330px',
-              px: '2%',
-              pb: '1%',
-            }}
+        <Container
+          key="mainDisplay"
+          disableGutters
+          maxWidth={false}
+          sx={{
+            position: 'absolute',
+            left: '330px',
+            right: '330px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: 'auto',
+            height: '100%',
+          }}
+        >
+          <Container
+            maxWidth={false}
+            disableGutters
+            sx={{ position: 'relative', height: '60%' }}
           >
+            <PitchGraph />
+          </Container>
+          <Container sx={{ position: 'absolute', bottom: 0 }}>
             <LyricsPlayer />
-          </Grid>
-        </Grid>
+          </Container>
+        </Container>
         <RightSidebar>
           <QueueList />
         </RightSidebar>
@@ -168,11 +176,14 @@ const MainPage = ({
           bottom: 0,
         }}
       >
-        <AudioPlayer />
+        <ConfirmationProvider>
+          <AudioPlayer />
+          <ConfirmationDialog />
+        </ConfirmationProvider>
       </Container>
       <Tooltip title="Settings">
         <IconButton
-          sx={{ position: 'fixed', bottom: 20, right: 20, padding: 0 }}
+          sx={{ position: 'fixed', bottom: 10, left: 20, p: 0 }}
           data-testid="settings-button"
           onClick={() => setShowSettings(true)}
         >
@@ -182,14 +193,20 @@ const MainPage = ({
       <SettingsMenu
         showSettings={showSettings}
         setShowSettings={setShowSettings}
-        setCurrentTheme={setCurrentTheme}
       />
+      <Microphone />
     </Container>
   );
 };
 
 export default function App() {
   const [currentTheme, setCurrentTheme] = useState(GetColorTheme());
+  useEffect(() => {
+    const settingsUnsubscribe = window.electron.store.config.onSettingsChange(
+      () => setCurrentTheme(GetColorTheme())
+    );
+    return () => settingsUnsubscribe();
+  });
 
   const chosenTheme = useMemo(
     () =>
@@ -206,6 +223,7 @@ export default function App() {
             default: currentTheme.mainPageBackground,
             paper: currentTheme.paperBackground,
           },
+          divider: currentTheme.secondary,
         },
         typography: {
           button: {
@@ -255,7 +273,7 @@ export default function App() {
                 <SongsStatusProvider>
                   <AudioStatusProvider>
                     <LyricsProvider>
-                      <MainPage setCurrentTheme={setCurrentTheme} />
+                      <MainPage />
                     </LyricsProvider>
                   </AudioStatusProvider>
                 </SongsStatusProvider>

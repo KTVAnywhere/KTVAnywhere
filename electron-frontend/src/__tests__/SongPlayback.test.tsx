@@ -14,8 +14,9 @@ import LyricsPlayer, {
   LyricsAdjust,
   LyricsProvider,
 } from '../components/LyricsPlayer';
-import AudioPlayer, { AudioStatusProvider } from '../components/AudioPlayer';
-import * as AudioStatusContext from '../components/AudioPlayer/AudioStatus.context';
+import AudioPlayer from '../components/AudioPlayer';
+import { AudioStatusProvider } from '../components/AudioStatus.context';
+import * as AudioStatusContext from '../components/AudioStatus.context';
 import * as LyricsContext from '../components/LyricsPlayer/Lyrics.context';
 
 describe('Lyrics player', () => {
@@ -156,7 +157,7 @@ describe('Lyrics adjust', () => {
 });
 
 describe('Audio player component tests', () => {
-  const mockGetSong = jest.fn();
+  const mockDequeueItem = jest.fn().mockReturnValue(songTestData[0]);
 
   beforeEach(() => {
     global.window.AudioContext = AudioContext as any;
@@ -164,9 +165,9 @@ describe('Audio player component tests', () => {
       ...mockedElectron,
       store: {
         ...mockedElectron.store,
-        songs: {
-          ...mockedElectron.store.songs,
-          getSong: mockGetSong,
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          dequeueItem: mockDequeueItem,
         },
       },
       file: {
@@ -194,12 +195,11 @@ describe('Audio player component tests', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-    expect(mockGetSong).not.toHaveBeenCalled();
-
+    expect(mockDequeueItem).not.toBeCalled();
     const playButton = screen.getByTestId('play-button');
     fireEvent.click(playButton);
     await waitFor(() => {
-      expect(mockGetSong).toBeCalled();
+      expect(mockDequeueItem).toBeCalled();
     });
   });
 
@@ -278,12 +278,11 @@ describe('Audio player component tests', () => {
     );
 
     const endSongButton = screen.getByTestId('end-song-button');
-
-    expect(mockGetSong).not.toBeCalled();
+    expect(mockDequeueItem).not.toBeCalled();
     // there are songs in queue
     fireEvent.click(endSongButton);
     await waitFor(() => {
-      expect(mockGetSong).toBeCalled();
+      expect(mockDequeueItem).toBeCalled();
     });
 
     // no song in queue
@@ -439,6 +438,59 @@ describe('Audio player component tests', () => {
     await waitFor(() => {
       expect(mockSetPitch).toBeCalledWith(0.5);
       expect(mockSource.pitchSemitones).toEqual(0.5);
+    });
+
+    sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+
+  test('tempo slider should change tempo', async () => {
+    const mockSetTempo = jest.fn();
+    const mockSource = {
+      tempo: 1,
+    };
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      setTempo: mockSetTempo,
+      source: mockSource,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <AudioPlayer />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    const sliderInput = screen.getByTestId('tempo-slider');
+    const originalGetBoundingClientRect = sliderInput.getBoundingClientRect;
+
+    sliderInput.getBoundingClientRect = jest.fn(() => ({
+      width: 100,
+      height: 10,
+      bottom: 10,
+      left: 0,
+      x: 0,
+      y: 0,
+      right: 0,
+      top: 0,
+      toJSON: jest.fn(),
+    }));
+
+    // set tempo to 0.8
+    fireEvent.mouseDown(sliderInput, {
+      clientX: 0,
+    });
+    await waitFor(() => {
+      expect(mockSetTempo).toBeCalledWith(0.8);
+      expect(mockSource.tempo).toEqual(0.8);
+    });
+
+    // set tempo to 1.2
+    fireEvent.mouseDown(sliderInput, {
+      clientX: 100,
+    });
+    await waitFor(() => {
+      expect(mockSetTempo).toBeCalledWith(1.2);
+      expect(mockSource.tempo).toEqual(1.2);
     });
 
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;

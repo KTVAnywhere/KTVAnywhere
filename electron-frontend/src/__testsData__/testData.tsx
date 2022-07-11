@@ -1,6 +1,7 @@
 import { SongProps } from '../components/Song';
+import { NoteEventTime } from '../components/PitchGraph';
 
-export const songTestData = [
+export const songTestData: SongProps[] = [
   {
     songId: expect.any(String),
     songName: 'bensound-energy',
@@ -9,6 +10,7 @@ export const songTestData = [
     lyricsPath: 'C:\\dir\\bensound-energy.lrc',
     vocalsPath: '',
     accompanimentPath: '',
+    graphPath: '',
   },
   {
     songId: expect.any(String),
@@ -18,6 +20,7 @@ export const songTestData = [
     lyricsPath: 'C:\\dir\\bensound-sunny.lrc',
     vocalsPath: 'C:\\dir\\bensound-sunny\\vocals.mp3',
     accompanimentPath: 'C:\\dir\\bensound-sunny\\accompaniment.mp3',
+    graphPath: 'C:\\dir\\bensound-sunny\\graph.json',
   },
   {
     songId: expect.any(String),
@@ -27,6 +30,7 @@ export const songTestData = [
     lyricsPath: '',
     vocalsPath: 'C:\\dir\\bensound-betterdays\\vocals.mp3',
     accompanimentPath: 'C:\\dir\\bensound-betterdays\\accompaniment.mp3',
+    graphPath: 'C:\\dir\\bensound-betterdays\\graph.json',
   },
 ];
 
@@ -81,3 +85,24 @@ export const testLyrics = `
 [00:05.00]${lineAt5s}
 [00:10.00]${lineAt10s}
 [00:15.00]${lineAt15s}`;
+
+export const testGraph: NoteEventTime[] = [
+  {
+    startTimeSeconds: 5,
+    durationSeconds: 1,
+    pitchMidi: 50,
+    amplitude: expect.any(Number),
+  },
+  {
+    startTimeSeconds: 7,
+    durationSeconds: 2,
+    pitchMidi: 51,
+    amplitude: expect.any(Number),
+  },
+  {
+    startTimeSeconds: 15,
+    durationSeconds: 3,
+    pitchMidi: 55,
+    amplitude: expect.any(Number),
+  },
+];

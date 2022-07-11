@@ -5,16 +5,18 @@ import {
   screen,
   within,
   waitFor,
+  act,
 } from '@testing-library/react';
 import { AudioContext } from 'standardized-audio-context-mock';
 import * as Queue from '../components/SongsQueue';
+import { QueueItemProps } from '../components/SongsQueue';
 import SongComponent, {
   SongDialog,
   SongDialogProvider,
   SongsStatusProvider,
 } from '../components/Song';
-import { AudioStatusProvider } from '../components/AudioPlayer';
-import * as AudioStatusContext from '../components/AudioPlayer/AudioStatus.context';
+import { AudioStatusProvider } from '../components/AudioStatus.context';
+import * as AudioStatusContext from '../components/AudioStatus.context';
 import {
   ConfirmationDialog,
   ConfirmationProvider,
@@ -23,6 +25,7 @@ import * as SongDialogContext from '../components/Song/SongDialog.context';
 import SongList from '../components/SongList';
 import { songTestData, songListTestData } from '../__testsData__/testData';
 import mockedElectron, { mockedAudioStatus } from '../__testsData__/mocks';
+import App from '../renderer/App';
 
 describe('SongList', () => {
   const mockGetAll = () => songListTestData;
@@ -49,7 +52,6 @@ describe('SongList', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-    jest.resetAllMocks();
     jest.clearAllMocks();
   });
   test('song library should display list of songs', async () => {
@@ -180,6 +182,10 @@ describe('Song', () => {
           setSong: mockSet,
           deleteSong: mockDelete,
         },
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          getAllQueueItems: () => [] as QueueItemProps[],
+        },
       },
       music: {
         getLrc: jest.fn().mockResolvedValue({
@@ -188,6 +194,11 @@ describe('Song', () => {
         }),
       },
     };
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
   test('song item should display song name, artist and paths', async () => {
@@ -244,6 +255,7 @@ describe('Song', () => {
         ...songTestData[1],
         vocalsPath: expect.any(String),
         accompanimentPath: expect.any(String),
+        graphPath: expect.any(String),
       })
     );
   });
@@ -270,18 +282,22 @@ describe('Song', () => {
     expect(screen.getByText(songTestData[1].lyricsPath)).toBeInTheDocument();
   });
 
-  test('click close button after making changes will show a confirmation dialog', () => {
-    jest
-      .spyOn(SongDialogContext, 'useSongDialog')
-      .mockReturnValue({ open: true, setOpen: jest.fn() });
-    render(
-      <ConfirmationProvider>
-        <SongDialogProvider>
-          <SongDialog song={songTestData[0]} setSong={jest.fn()} />
-        </SongDialogProvider>
-        <ConfirmationDialog />
-      </ConfirmationProvider>
-    );
+  test('click close button after making changes will show a confirmation dialog', async () => {
+    global.AudioContext = AudioContext as any;
+    const mediaDevicesPromise = Promise.resolve([]);
+    const mockEnumerateDevices = jest.fn(() => mediaDevicesPromise);
+
+    Object.defineProperty(global.navigator, 'mediaDevices', {
+      writable: true,
+      value: {
+        enumerateDevices: mockEnumerateDevices,
+      },
+    });
+    render(<App />);
+    const song1button = screen.getByRole('button', {
+      name: (content) => content.startsWith(songListTestData[0].songName),
+    });
+    fireEvent.click(song1button);
 
     const nameButton = screen.getByTestId('edit-name');
     fireEvent.click(nameButton);
@@ -293,6 +309,10 @@ describe('Song', () => {
     const closeButton = screen.getByRole('button', { name: /close/i });
     fireEvent.click(closeButton);
     expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
   });
 
   test('delete button will remove song from database', () => {

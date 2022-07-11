@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Grid, Typography } from '@mui/material';
 import { Lrc, Runner } from 'lrc-kit';
-import { useAudioStatus } from '../AudioPlayer/AudioStatus.context';
+import { useAudioStatus } from '../AudioStatus.context';
 import { useLyrics } from './Lyrics.context';
 
 const LyricsPlayer = () => {
@@ -12,7 +12,7 @@ const LyricsPlayer = () => {
   const { lyricsRunner, setLyricsRunner } = useLyrics();
 
   useEffect(() => {
-    if (!lyricsEnabled || currentSong == null) {
+    if (!lyricsEnabled || currentSong === null) {
       setLyricsRunner(new Runner(Lrc.parse(''), true));
     } else if (!currentSong.lyricsPath) {
       setLyrics('no lyrics file for song');
@@ -44,10 +44,10 @@ const LyricsPlayer = () => {
   }, [currentTime, lyricsRunner]);
 
   return (
-    <Grid container direction="column" alignItems="center" textAlign="center">
+    <Grid container direction="column" textAlign="center" sx={{ py: '1vh' }}>
       <Grid item>
         <Typography
-          sx={{ fontSize: '32px', fontWeight: 600 }}
+          sx={{ fontSize: '200%', fontWeight: 600 }}
           data-testid="lyrics"
         >
           {lyrics}
@@ -55,7 +55,7 @@ const LyricsPlayer = () => {
       </Grid>
       <Grid item>
         <Typography
-          sx={{ fontSize: '24px', fontWeight: 500, opacity: '40%' }}
+          sx={{ fontSize: '150%', fontWeight: 500, opacity: '40%' }}
           data-testid="next-lyrics"
         >
           {nextLyrics}
