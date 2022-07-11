@@ -50,7 +50,7 @@ const MainPage = () => {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [uploadedSongs, setUploadedSongs] = useState<SongProps[]>([]);
   const { songsStatus, setSongsStatus } = useSongsStatus();
-  const [songInSpleeter, setSongInSpleeter] = useState<string | null>(null);
+  const [songInProcess, setSongInProcess] = useState<string | null>(null);
   const { setAlertMessage } = useAlertMessage();
   const titleBarHeight = '22px';
 
@@ -88,18 +88,18 @@ const MainPage = () => {
   }, []);
 
   useEffect(() => {
-    if (songsStatus.length === 0 && songInSpleeter) {
-      setSongInSpleeter(null);
+    if (songsStatus.length === 0 && songInProcess) {
+      setSongInProcess(null);
     } else if (
       songsStatus.length !== 0 &&
-      (!songInSpleeter || songInSpleeter !== songsStatus[0])
+      (!songInProcess || songInProcess !== songsStatus[0])
     ) {
       const nextSongId = songsStatus[0];
       const toProcess = window.electron.store.songs.getSong(nextSongId);
-      setSongInSpleeter(nextSongId);
+      setSongInProcess(nextSongId);
       window.electron.preprocess.processSong(toProcess);
     }
-  }, [songInSpleeter, songsStatus]);
+  }, [songInProcess, songsStatus]);
 
   return (
     <Container>
@@ -126,7 +126,7 @@ const MainPage = () => {
               />
               <ConfirmationDialog />
               <LeftSidebar>
-                <Typography variant="h5" align="center" paddingTop="15px">
+                <Typography variant="h5" align="center" pt="15px">
                   Songs Library
                 </Typography>
                 <SongUploadButton setUploadedSongs={setUploadedSongs} />
@@ -180,7 +180,7 @@ const MainPage = () => {
       </Container>
       <Tooltip title="Settings">
         <IconButton
-          sx={{ position: 'fixed', bottom: 10, left: 20, padding: 0 }}
+          sx={{ position: 'fixed', bottom: 10, left: 20, p: 0 }}
           data-testid="settings-button"
           onClick={() => setShowSettings(true)}
         >

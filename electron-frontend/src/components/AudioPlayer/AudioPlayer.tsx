@@ -56,8 +56,8 @@ const ProgressBar = () => {
         item
         sx={{
           width: '87%',
-          paddingLeft: '1%',
-          paddingRight: '1%',
+          pl: '1%',
+          pr: '1%',
         }}
       >
         <Slider
@@ -208,9 +208,8 @@ export const AudioPlayer = () => {
     newSource.pitchSemitones = pitch;
     newSource.tempo = tempo;
     destroySource();
-    newSource.connect(gainNode);
     if (playNow) {
-      gainNode.disconnect();
+      newSource.connect(gainNode);
       gainNode.connect(audioContext.destination);
     }
     setSource(newSource);
@@ -421,7 +420,7 @@ export const AudioPlayer = () => {
   const forwardTenSeconds = () => {
     if (source && duration !== 0) {
       const nextTime =
-        currentTime + 10 >= duration ? duration : currentTime + 10;
+        currentTime + 10 >= duration ? duration - 1 : currentTime + 10;
       source.percentagePlayed = nextTime / duration;
       setCurrentTime(nextTime);
     }
@@ -486,11 +485,11 @@ export const AudioPlayer = () => {
         <ProgressBar />
         <Tooltip title="End song" placement="right">
           <IconButton
-            sx={{ padding: 0 }}
+            sx={{ p: 0 }}
             data-testid="end-song-button"
             onClick={endSong}
           >
-            <SkipNextIcon fontSize="large" />
+            <SkipNextIcon fontSize="medium" />
           </IconButton>
         </Tooltip>
       </Grid>
@@ -542,12 +541,12 @@ export const AudioPlayer = () => {
             vocals
           </Typography>
         </Grid>
-        <Grid item sx={{ marginLeft: '1%' }}>
-          <IconButton sx={{ padding: 0 }} onClick={tempoReset}>
+        <Grid item sx={{ ml: '1%' }}>
+          <IconButton sx={{ p: 0 }} onClick={tempoReset}>
             <SpeedIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginLeft: '10px', width: '5%' }}>
+        <Grid item sx={{ ml: '10px', width: '5%' }}>
           <Slider
             aria-label="Tempo"
             value={tempo}
@@ -565,12 +564,12 @@ export const AudioPlayer = () => {
             tempo: {tempo}
           </Typography>
         </Grid>
-        <Grid item sx={{ marginLeft: '1%' }}>
-          <IconButton sx={{ padding: 0 }} onClick={pitchReset}>
+        <Grid item sx={{ ml: '1%' }}>
+          <IconButton sx={{ p: 0 }} onClick={pitchReset}>
             <GraphicEqIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginLeft: '10px', width: '5%' }}>
+        <Grid item sx={{ ml: '10px', width: '5%' }}>
           <Slider
             aria-label="Pitch"
             value={pitch}
@@ -588,10 +587,10 @@ export const AudioPlayer = () => {
             pitch: {pitch > 0 ? `+${pitch}` : pitch}
           </Typography>
         </Grid>
-        <Grid item sx={{ marginLeft: '1%', marginRight: '1%' }}>
+        <Grid item sx={{ mx: '1%' }}>
           <Tooltip title="Backward 10s" placement="top">
             <IconButton
-              sx={{ padding: 0 }}
+              sx={{ p: 0 }}
               data-testid="backward-10-button"
               onClick={backwardTenSeconds}
             >
@@ -600,7 +599,7 @@ export const AudioPlayer = () => {
           </Tooltip>
           {isPlaying ? (
             <IconButton
-              sx={{ padding: 0 }}
+              sx={{ p: 0 }}
               data-testid="pause-button"
               onClick={pauseSong}
             >
@@ -608,7 +607,7 @@ export const AudioPlayer = () => {
             </IconButton>
           ) : (
             <IconButton
-              sx={{ padding: 0 }}
+              sx={{ p: 0 }}
               data-testid="play-button"
               onClick={playSong}
             >
@@ -617,7 +616,7 @@ export const AudioPlayer = () => {
           )}
           <Tooltip title="Forward 10s" placement="top">
             <IconButton
-              sx={{ padding: 0 }}
+              sx={{ p: 0 }}
               data-testid="forward-10-button"
               onClick={forwardTenSeconds}
             >
@@ -626,11 +625,11 @@ export const AudioPlayer = () => {
           </Tooltip>
         </Grid>
         <Grid item>
-          <IconButton sx={{ padding: 0 }} onClick={() => volumeZero()}>
+          <IconButton sx={{ p: 0 }} onClick={() => volumeZero()}>
             <VolumeMuteIcon fontSize="medium" />
           </IconButton>
         </Grid>
-        <Grid item sx={{ marginLeft: '10px', marginRight: '2%', width: '6%' }}>
+        <Grid item sx={{ ml: '10px', mr: '2%', width: '6%' }}>
           <Slider
             aria-label="Volume"
             value={volume}
@@ -646,7 +645,7 @@ export const AudioPlayer = () => {
             volume: {volume}%
           </Typography>
         </Grid>
-        <Grid item sx={{ marginRight: '1%' }}>
+        <Grid item sx={{ mr: '1%' }}>
           <Grid container direction="row">
             <AutoGraphIcon fontSize="medium" />
             <Switch
@@ -665,7 +664,7 @@ export const AudioPlayer = () => {
             graph
           </Typography>
         </Grid>
-        <Grid item sx={{ marginRight: '2%' }}>
+        <Grid item sx={{ mr: '2%' }}>
           <Grid
             container
             direction="row"

@@ -193,7 +193,7 @@ const SongList = ({
           <Typography
             textAlign="center"
             sx={{
-              paddingTop: '5%',
+              pt: '5%',
             }}
           >
             No songs found

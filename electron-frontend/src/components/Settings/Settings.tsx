@@ -167,7 +167,7 @@ const SettingsMenu = ({
     >
       <DialogTitle>Settings</DialogTitle>
       <DialogContent>
-        <Grid container paddingBottom={2}>
+        <Grid container pb={2}>
           <Grid
             item
             display="flex"
@@ -178,7 +178,7 @@ const SettingsMenu = ({
           </Grid>
           <Grid
             item
-            sx={{ marginLeft: 'auto' }}
+            sx={{ ml: 'auto' }}
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -203,7 +203,7 @@ const SettingsMenu = ({
             </FormControl>
           </Grid>
         </Grid>
-        <Grid container paddingBottom={2}>
+        <Grid container pb={2}>
           <Grid
             item
             display="flex"
@@ -216,7 +216,7 @@ const SettingsMenu = ({
           </Grid>
           <Grid
             item
-            sx={{ marginLeft: 'auto' }}
+            sx={{ ml: 'auto' }}
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -235,7 +235,7 @@ const SettingsMenu = ({
             </FormControl>
           </Grid>
         </Grid>
-        <Grid container paddingBottom={2}>
+        <Grid container pb={2}>
           <Grid
             item
             display="flex"
@@ -254,7 +254,7 @@ const SettingsMenu = ({
           </Grid>
           <Grid
             item
-            sx={{ marginLeft: 'auto' }}
+            sx={{ ml: 'auto' }}
             display="flex"
             flexDirection="column"
             justifyContent="center"

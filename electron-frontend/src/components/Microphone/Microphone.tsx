@@ -277,10 +277,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
           })}
         </Select>
       </FormControl>
-      <Stack
-        direction="row"
-        sx={{ padding: '5px', width: '280px', paddingBottom: '0px' }}
-      >
+      <Stack direction="row" sx={{ p: '5px', width: '280px', pb: '0px' }}>
         <Typography>microphone</Typography>
         <Switch
           checked={microphoneEnabled}
@@ -300,7 +297,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
           data-testid={`toggle-reverb-${micNo}-switch`}
         />
       </Stack>
-      <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
+      <Stack direction="row" sx={{ p: '5px', width: '280px' }}>
         <Typography>noise suppression</Typography>
         <Switch
           checked={microphoneNoiseSuppression}
@@ -314,7 +311,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
           data-testid={`toggle-microphone-${micNo}-noise-suppression-switch`}
         />
       </Stack>
-      <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
+      <Stack direction="row" sx={{ p: '5px', width: '280px' }}>
         <Typography sx={{ width: '230px' }}>
           volume: {microphoneVolume}%
         </Typography>
@@ -329,7 +326,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
           data-testid={`microphone-${micNo}-volume-slider`}
         />
       </Stack>
-      <Stack direction="row" sx={{ padding: '5px', width: '280px' }}>
+      <Stack direction="row" sx={{ p: '5px', width: '280px' }}>
         <Typography sx={{ width: '230px' }}>reverb: {reverbVolume}%</Typography>
         <Slider
           aria-label="Volume"
@@ -345,7 +342,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
       <Tooltip title="restore defaults" placement="right">
         <IconButton
           onClick={restoreDefaults}
-          sx={{ padding: 0 }}
+          sx={{ p: 0 }}
           data-testid={`restore-microphone-${micNo}-defaults-button`}
         >
           <RestoreIcon fontSize="medium" />
@@ -494,7 +491,7 @@ const MicrophoneMenu = ({
     <Popper open={open} anchorEl={anchorEl} placement="top">
       <Paper
         sx={{
-          padding: '20px',
+          p: '20px',
         }}
       >
         <Tooltip
@@ -503,7 +500,7 @@ const MicrophoneMenu = ({
         >
           <IconButton
             onClick={refreshAudioInputDevices}
-            sx={{ padding: 0 }}
+            sx={{ p: 0 }}
             data-testid="refresh-audio-input-devices-button"
           >
             <RefreshIcon fontSize="medium" />
@@ -595,7 +592,7 @@ const Microphone = () => {
       >
         <IconButton
           onClick={clickToggleMenu}
-          sx={{ position: 'fixed', bottom: 10, left: 60, padding: 0 }}
+          sx={{ position: 'fixed', bottom: 10, left: 60, p: 0 }}
           data-testid="toggle-mic-settings-menu"
         >
           <MicIcon fontSize="medium" />

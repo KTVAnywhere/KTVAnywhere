@@ -192,20 +192,20 @@ app
         if (!fs.existsSync(songFolder)) {
           fs.mkdirSync(songFolder, { recursive: true });
         }
-        const spleeterPath = app.isPackaged
+        const songProcessorPath = app.isPackaged
           ? path.join(process.resourcesPath, 'assets', 'process_song')
           : path.join(__dirname, '../python_scripts/process_song.py');
 
-        const spleeterProcess = app.isPackaged
-          ? spawn(spleeterPath, [song.songPath, songFolder, song.songId])
+        const processSongProcess = app.isPackaged
+          ? spawn(songProcessorPath, [song.songPath, songFolder, song.songId])
           : spawn('python', [
-              spleeterPath,
+              songProcessorPath,
               song.songPath,
               songFolder,
               song.songId,
             ]);
 
-        spleeterProcess?.stdout.on('data', (message: string) => {
+        processSongProcess?.stdout.on('data', (message: string) => {
           if (`${message}` === `done processing ${song.songId}`) {
             mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: path.join(songFolder, 'vocals.mp3'),
@@ -244,8 +244,8 @@ app
           }
         });
 
-        spleeterProcess.once('close', () => {
-          spleeterProcess.removeAllListeners();
+        processSongProcess.once('close', () => {
+          processSongProcess.removeAllListeners();
         });
       } catch (error) {
         event.reply('preprocess:processResult', {

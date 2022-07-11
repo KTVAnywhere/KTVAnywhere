@@ -2,7 +2,7 @@ import { ButtonGroup, Container, IconButton, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SquareOutlinedIcon from '@mui/icons-material/SquareOutlined';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
-import { GetColorTheme } from './Settings';
+import { GetColorTheme } from '../Settings';
 
 const TitleBar = () => {
   const height = '22px';

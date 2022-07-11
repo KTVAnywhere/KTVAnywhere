@@ -133,7 +133,7 @@ const LyricsAdjust = () => {
               aria-label="saveOffset"
               onClick={saveOffset}
               size="small"
-              sx={{ position: 'absolute', top: '0', left: '68px', padding: 0 }}
+              sx={{ position: 'absolute', top: '0', left: '68px', p: 0 }}
             >
               <CheckOutlinedIcon fontSize="small" color="success" />
             </IconButton>

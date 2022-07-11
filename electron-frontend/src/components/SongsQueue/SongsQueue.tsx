@@ -128,7 +128,7 @@ export const QueueList = () => {
         align="center"
         gutterBottom
         sx={{
-          paddingTop: '5%',
+          pt: '5%',
         }}
       >
         Songs Queue
@@ -276,7 +276,7 @@ export const QueueList = () => {
         <Typography
           textAlign="center"
           sx={{
-            paddingTop: '5%',
+            pt: '5%',
           }}
         >
           No songs in queue
