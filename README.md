@@ -15,8 +15,10 @@ While karaoke has been around for many years, casual singers usually go to karao
 - A queue system to manage songs
 - Vocal separation from user-provided tracks
 - Lyrics retrieval from NetEase Cloud Music
-- Audio player with key shifting functionality
+- Audio player with key shifting and tempo adjustment functionality
 - Lyrics player with basic adjustments with offset
+- Automatic pitch graph generation and display
+- Up to 2 microphones supported with reverb and noise suppression
 
 ### Proposed features
 
@@ -30,6 +32,8 @@ KTV Anywhere uses the following technlogies:
 - [ReactJS] - For the application's frontend
 - [spleeter] - For the vocal separation feature
 - [SoundTouchJS] - For the pitch shifting functionality
+- [Basic Pitch] - For audio to pitch conversion
+- [RNNoise] - For microphone noise suppression
 
 ## Installation
 
@@ -86,5 +90,7 @@ Spotted a bug? Please create a post on the [issues page]
 [reactjs]: https://reactjs.org/
 [spleeter]: https://github.com/deezer/spleeter
 [soundtouchjs]: https://github.com/cutterbl/SoundTouchJS
+[basic pitch]: https://github.com/spotify/basic-pitch
+[rrnoise]: https://github.com/xiph/rnnoise
 [nodejs]: https://nodejs.org/en/
 [python]: https://www.python.org/
