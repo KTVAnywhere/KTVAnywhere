@@ -91,6 +91,6 @@ Spotted a bug? Please create a post on the [issues page]
 [spleeter]: https://github.com/deezer/spleeter
 [soundtouchjs]: https://github.com/cutterbl/SoundTouchJS
 [basic pitch]: https://github.com/spotify/basic-pitch
-[rrnoise]: https://github.com/xiph/rnnoise
+[rnnoise]: https://github.com/xiph/rnnoise
 [nodejs]: https://nodejs.org/en/
 [python]: https://www.python.org/
