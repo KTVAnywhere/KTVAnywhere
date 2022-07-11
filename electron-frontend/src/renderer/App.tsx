@@ -107,6 +107,7 @@ const MainPage = () => {
       <TitleBar />
       <Container
         maxWidth={false}
+        disableGutters
         sx={{
           position: 'fixed',
           left: 0,
@@ -135,30 +136,33 @@ const MainPage = () => {
             </SongDialogProvider>
           </SongStagingDialogProvider>
         </ConfirmationProvider>
-        <Grid
-          container
-          direction="column"
+        <Container
+          key="mainDisplay"
+          disableGutters
+          maxWidth={false}
           sx={{
-            position: 'relative',
-            height: '100%',
+            position: 'absolute',
+            left: '330px',
+            right: '330px',
+            display: 'flex',
+            flexDirection: 'column',
             justifyContent: 'center',
+            alignItems: 'center',
+            width: 'auto',
+            height: '100%',
           }}
         >
-          <Grid item sx={{ height: '60%' }}>
-            <PitchGraph />
-          </Grid>
-          <Grid
-            item
-            sx={{
-              position: 'absolute',
-              bottom: '0',
-              left: '330px',
-              right: '330px',
-            }}
+          <Container
+            maxWidth={false}
+            disableGutters
+            sx={{ position: 'relative', height: '60%' }}
           >
+            <PitchGraph />
+          </Container>
+          <Container sx={{ position: 'absolute', bottom: 0 }}>
             <LyricsPlayer />
-          </Grid>
-        </Grid>
+          </Container>
+        </Container>
         <RightSidebar>
           <QueueList />
         </RightSidebar>

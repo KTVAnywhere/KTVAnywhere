@@ -44,16 +44,10 @@ const LyricsPlayer = () => {
   }, [currentTime, lyricsRunner]);
 
   return (
-    <Grid
-      container
-      direction="column"
-      alignContent="center"
-      textAlign="center"
-      sx={{ py: '1vh' }}
-    >
+    <Grid container direction="column" textAlign="center" sx={{ py: '1vh' }}>
       <Grid item>
         <Typography
-          sx={{ fontSize: '1.8vw', fontWeight: 600 }}
+          sx={{ fontSize: '200%', fontWeight: 600 }}
           data-testid="lyrics"
         >
           {lyrics}
@@ -61,7 +55,7 @@ const LyricsPlayer = () => {
       </Grid>
       <Grid item>
         <Typography
-          sx={{ fontSize: '1.5vw', fontWeight: 500, opacity: '40%' }}
+          sx={{ fontSize: '150%', fontWeight: 500, opacity: '40%' }}
           data-testid="next-lyrics"
         >
           {nextLyrics}

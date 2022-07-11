@@ -80,11 +80,10 @@ const PitchGraph = () => {
     <>
       {graphEnabled && (
         <Container
+          maxWidth={false}
+          disableGutters
           data-testid="pitch-graph"
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
             position: 'relative',
             height: '100%',
             width: '100%',
@@ -109,13 +108,14 @@ const PitchGraph = () => {
                 position: 'absolute',
                 bottom: `calc(${index} * ${TRACK_HEIGHT})`,
                 opacity: '20%',
-                left: '-5%',
                 height: '1px',
-                width: '110%',
+                width: '100%',
               }}
             />
           ))}
           <Container
+            maxWidth={false}
+            disableGutters
             sx={{
               position: 'relative',
               height: '100%',
