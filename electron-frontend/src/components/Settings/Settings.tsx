@@ -249,7 +249,8 @@ const SettingsMenu = ({
               sx={{ opacity: '70%' }}
             >
               Increase if audio has static noise / crackles, but audio controls
-              responsiveness may decrease. Requires restart.
+              responsiveness may decrease and may affect graph timing. Requires
+              restart.
             </Typography>
           </Grid>
           <Grid
