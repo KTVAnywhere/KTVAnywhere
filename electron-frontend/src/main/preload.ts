@@ -5,6 +5,9 @@ import { ConfigType } from './schema';
 
 contextBridge.exposeInMainWorld('electron', {
   window: {
+    reloadApp() {
+      ipcRenderer.invoke('window:reloadApp');
+    },
     closeApp() {
       ipcRenderer.invoke('window:closeApp');
     },

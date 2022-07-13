@@ -3,7 +3,6 @@ import {
   CardActions,
   CardContent,
   Container,
-  List,
   ListItem,
   Typography,
   Card,
@@ -13,12 +12,15 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
+import { FixedSizeList } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import QueueIcon from '@mui/icons-material/Queue';
 import LoadingButton from '@mui/lab/LoadingButton';
 import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { SongProps, useSongDialog, useSongsStatus } from '../Song';
-import { EnqueueSong } from '../SongsQueue';
+import { EnqueueSong, GetQueueLength, maxQueueLength } from '../SongsQueue';
+import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
 import { useConfirmation } from '../ConfirmationDialog';
 
@@ -32,6 +34,7 @@ const SongCard = ({
   const { setOpen: setOpenSongDialog } = useSongDialog();
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const { setNextSong } = useAudioStatus();
+  const { setAlertMessage } = useAlertMessage();
   const {
     setOpen: setOpenConfirmation,
     setConfirmationMessage,
@@ -62,6 +65,18 @@ const SongCard = ({
       setSongsStatus([...songsStatus, song.songId]);
     }
   };
+
+  const enqueueSong = () => {
+    if (GetQueueLength() <= maxQueueLength) {
+      EnqueueSong(song);
+    } else {
+      setAlertMessage({
+        message: `Max queue length of ${maxQueueLength}`,
+        severity: 'warning',
+      });
+    }
+  };
+
   return (
     <Card sx={{ width: 1, display: 'flex' }}>
       <CardActionArea
@@ -110,7 +125,7 @@ const SongCard = ({
             </IconButton>
           </Tooltip>
           <Tooltip title="Enqueue song" placement="right">
-            <IconButton aria-label="enqueue" onClick={() => EnqueueSong(song)}>
+            <IconButton aria-label="enqueue" onClick={enqueueSong}>
               <QueueIcon />
             </IconButton>
           </Tooltip>
@@ -134,9 +149,7 @@ const SongList = ({
 }) => {
   const [songList, setSongList] = useState<SongProps[]>([]);
   const [query, setQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SongProps[] | undefined>(
-    []
-  );
+  const [searchResults, setSearchResults] = useState<SongProps[]>([]);
 
   useEffect(() => {
     setSongList(window.electron.store.songs.getAllSongs() ?? []);
@@ -164,42 +177,64 @@ const SongList = ({
   const changeQuery = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
   };
+
+  const listItems = ({
+    data,
+    index,
+    style,
+  }: {
+    data: SongProps[];
+    index: number;
+    style: React.CSSProperties;
+  }) => {
+    const song = data[index];
+
+    return (
+      <ListItem key={song.songId} sx={{ pl: 0, pr: 1 }} style={style}>
+        <SongCard song={song} setOpenSong={setOpenSong} />
+      </ListItem>
+    );
+  };
+
   return (
-    <Container>
+    <Container sx={{ height: 'calc(100vh - 305px)' }}>
       <TextField
         aria-label="searchbox"
         size="small"
         variant="outlined"
-        placeholder="Search songs"
+        placeholder={`Search from ${songList.length} songs`}
         fullWidth
         value={query}
         onChange={changeQuery}
+        sx={{ mb: 1 }}
       />
-      <List
-        aria-label="data"
-        sx={{
-          width: '280px',
-          flexDirection: 'column',
-        }}
-      >
-        {searchResults === undefined
-          ? 'Loading...'
-          : searchResults.map((song) => (
-              <ListItem key={song.songId} sx={{ px: 0 }}>
-                <SongCard song={song} setOpenSong={setOpenSong} />
-              </ListItem>
-            ))}
-        {searchResults && searchResults.length === 0 && (
-          <Typography
-            textAlign="center"
-            sx={{
-              pt: '5%',
-            }}
-          >
-            No songs found
-          </Typography>
-        )}
-      </List>
+      {searchResults.length === 0 ? (
+        <Typography
+          textAlign="center"
+          sx={{
+            width: '305px',
+            mt: '5%',
+          }}
+        >
+          No songs found
+        </Typography>
+      ) : (
+        <AutoSizer>
+          {({ height }) => {
+            return (
+              <FixedSizeList
+                height={height}
+                width="305px"
+                itemSize={140}
+                itemData={searchResults}
+                itemCount={searchResults.length}
+              >
+                {listItems}
+              </FixedSizeList>
+            );
+          }}
+        </AutoSizer>
+      )}
     </Container>
   );
 };

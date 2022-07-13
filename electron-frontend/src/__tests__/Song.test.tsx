@@ -3,7 +3,6 @@ import {
   render,
   fireEvent,
   screen,
-  within,
   waitFor,
   act,
 } from '@testing-library/react';
@@ -32,6 +31,39 @@ describe('SongList', () => {
   const mockDelete = jest.fn();
   const mockSearch = jest.fn();
   const mockSetOpenSong = jest.fn();
+
+  // mock AutoSizer start
+  const originalOffsetHeight: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetWidth'
+  );
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 50,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 50,
+    });
+  });
+  afterAll(() => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth
+    );
+  });
+  // mock AutoSizer end
 
   beforeEach(() => {
     global.AudioContext = AudioContext as any;
@@ -62,11 +94,8 @@ describe('SongList', () => {
         </SongsStatusProvider>
       </AudioStatusProvider>
     );
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
 
-    expect(getAllByRole('listitem').length).toEqual(2);
+    expect(screen.getAllByRole('listitem').length).toEqual(2);
   });
 
   test('click play button should call setNextSong with the song clicked', async () => {
@@ -81,10 +110,7 @@ describe('SongList', () => {
         </SongsStatusProvider>
       </AudioStatusProvider>
     );
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
-    const firstPlayButton = getAllByRole('button', {
+    const firstPlayButton = screen.getAllByRole('button', {
       name: /Play/i,
     })[0];
     fireEvent.click(firstPlayButton);
@@ -101,10 +127,7 @@ describe('SongList', () => {
         </SongsStatusProvider>
       </AudioStatusProvider>
     );
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
-    const firstEnqueueButton = getAllByRole('button', {
+    const firstEnqueueButton = screen.getAllByRole('button', {
       name: /Enqueue/i,
     })[0];
     fireEvent.click(firstEnqueueButton);
@@ -165,6 +188,40 @@ describe('SongList', () => {
 describe('Song', () => {
   const mockSet = jest.fn();
   const mockDelete = jest.fn();
+
+  // mock AutoSizer start
+  const originalOffsetHeight: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetWidth'
+  );
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 50,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 50,
+    });
+  });
+  afterAll(() => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth
+    );
+  });
+  // mock AutoSizer end
+
   beforeEach(() => {
     global.window.electron = {
       ...mockedElectron,

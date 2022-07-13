@@ -84,6 +84,8 @@ const MicrophoneMenuElementsForEachMicrophone = ({
 }) => {
   const { audioContext } = useAudioStatus();
   const { setAlertMessage } = useAlertMessage();
+  const [audioInputIdDidChange, setAudioInputIdDidChange] =
+    useState<boolean>(false);
   const [callToReconnect, setCallToReconnect] = useState<boolean>(false);
   const [callToEnableMicrophone, setCallToEnableMicrophone] =
     useState<boolean>(false);
@@ -216,10 +218,15 @@ const MicrophoneMenuElementsForEachMicrophone = ({
 
   const audioInputIdChange = (event: SelectChangeEvent<string>) => {
     setAudioInputId(event.target.value);
+    setAudioInputIdDidChange(true);
   };
 
   useEffect(() => {
-    setCallToReconnect(true);
+    // boolean to prevent reconnection every time microphone menu is closed and reopened
+    if (audioInputIdDidChange) {
+      setCallToReconnect(true);
+      setAudioInputIdDidChange(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioInputId]);
 

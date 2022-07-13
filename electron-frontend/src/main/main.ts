@@ -89,6 +89,9 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+ipcMain.handle('window:reloadApp', () => {
+  mainWindow?.reload();
+});
 ipcMain.handle('window:closeApp', () => {
   mainWindow?.close();
 });
@@ -126,7 +129,7 @@ const createWindow = async () => {
     minHeight: 728,
     autoHideMenuBar: true,
     icon: getAssetPath('icon.png'),
-    frame: !app.isPackaged,
+    frame: false,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
