@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { cyan } from '@mui/material/colors';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useConfirmation } from '../ConfirmationDialog';
 
 export interface ColorThemeProps {
   colorThemeId: number;
@@ -131,6 +132,7 @@ const SettingsMenu = ({
   const [colorThemeId, setColorThemeId] = useState(
     getCurrentSettings().colorThemeId ?? 0
   );
+  const { setConfirmationMessage, setActions, setOpen } = useConfirmation();
 
   useEffect(() => {
     window.electron.store.config.setSettings({
@@ -150,6 +152,23 @@ const SettingsMenu = ({
 
   const colorThemeChange = (event: SelectChangeEvent<number>) => {
     setColorThemeId(event.target.value as number);
+  };
+
+  const reloadApplication = () => {
+    setConfirmationMessage({
+      heading: 'Reload application',
+      message: 'Confirm reload?',
+    });
+    setActions([
+      {
+        label: 'Confirm',
+        fn: () => {
+          window.electron.window.reloadApp();
+          setOpen(false);
+        },
+      },
+    ]);
+    setOpen(true);
   };
 
   const closeDialog = () => {
@@ -274,6 +293,13 @@ const SettingsMenu = ({
         </Grid>
       </DialogContent>
       <DialogActions>
+        <Button
+          onClick={reloadApplication}
+          color="warning"
+          data-testid="reload-application-button"
+        >
+          Reload application
+        </Button>
         <Button onClick={closeDialog} data-testid="close-settings-button">
           Close
         </Button>

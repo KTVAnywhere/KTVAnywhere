@@ -10,6 +10,7 @@ describe('Title bar component test', () => {
   global.window.electron = {
     ...mockedElectron,
     window: {
+      reloadApp: jest.fn(),
       closeApp: mockCloseApp,
       minimizeApp: mockMinimizeApp,
       maximizeApp: mockMaximizeApp,

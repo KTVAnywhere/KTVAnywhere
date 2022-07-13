@@ -190,10 +190,13 @@ const MainPage = () => {
           <SettingsIcon fontSize="medium" />
         </IconButton>
       </Tooltip>
-      <SettingsMenu
-        showSettings={showSettings}
-        setShowSettings={setShowSettings}
-      />
+      <ConfirmationProvider>
+        <SettingsMenu
+          showSettings={showSettings}
+          setShowSettings={setShowSettings}
+        />
+        <ConfirmationDialog />
+      </ConfirmationProvider>
       <Microphone />
     </Container>
   );

@@ -89,6 +89,9 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+ipcMain.handle('window:reloadApp', () => {
+  mainWindow?.reload();
+});
 ipcMain.handle('window:closeApp', () => {
   mainWindow?.close();
 });

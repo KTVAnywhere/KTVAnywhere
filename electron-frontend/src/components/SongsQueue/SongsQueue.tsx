@@ -27,26 +27,36 @@ import {
 import uniqid from 'uniqid';
 import { SongProps } from '../Song';
 import { useAudioStatus } from '../AudioStatus.context';
+import { useAlertMessage } from '../AlertMessage';
 
 export interface QueueItemProps {
   song: SongProps;
   queueItemId: string;
 }
 
-const setQueue = (queueList: QueueItemProps[]) =>
-  window.electron.store.queueItems.setAllQueueItems(queueList);
-
-export const EnqueueSong = (song: SongProps) =>
-  window.electron.store.queueItems.enqueueItem({ song, queueItemId: uniqid() });
-
-export const DequeueSong = () => window.electron.store.queueItems.dequeueItem();
+export const maxQueueLength = 30;
 
 export const GetQueueLength = () =>
   window.electron.store.queueItems.getAllQueueItems().length;
 
+const setQueue = (queueList: QueueItemProps[]) =>
+  window.electron.store.queueItems.setAllQueueItems(queueList);
+
+export const EnqueueSong = (song: SongProps) => {
+  if (GetQueueLength() <= maxQueueLength) {
+    window.electron.store.queueItems.enqueueItem({
+      song,
+      queueItemId: uniqid(),
+    });
+  }
+};
+
+export const DequeueSong = () => window.electron.store.queueItems.dequeueItem();
+
 export const QueueList = () => {
   const [queueItems, setQueueItems] = useState<QueueItemProps[]>([]);
   const { setNextSong } = useAudioStatus();
+  const { setAlertMessage } = useAlertMessage();
 
   useEffect(() => {
     setQueueItems(window.electron.store.queueItems.getAllQueueItems() ?? []);
@@ -72,7 +82,14 @@ export const QueueList = () => {
   const addRandomSong = () => {
     const randomSong = window.electron.store.songs.getRandomSong();
     if (randomSong !== null) {
-      EnqueueSong(randomSong);
+      if (GetQueueLength() <= maxQueueLength) {
+        EnqueueSong(randomSong);
+      } else {
+        setAlertMessage({
+          message: `Max queue length of ${maxQueueLength}`,
+          severity: 'warning',
+        });
+      }
     }
   };
 

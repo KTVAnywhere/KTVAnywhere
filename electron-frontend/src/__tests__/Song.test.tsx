@@ -3,7 +3,6 @@ import {
   render,
   fireEvent,
   screen,
-  within,
   waitFor,
   act,
 } from '@testing-library/react';
@@ -62,11 +61,8 @@ describe('SongList', () => {
         </SongsStatusProvider>
       </AudioStatusProvider>
     );
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
 
-    expect(getAllByRole('listitem').length).toEqual(2);
+    expect(screen.getAllByRole('listitem').length).toEqual(2);
   });
 
   test('click play button should call setNextSong with the song clicked', async () => {
@@ -81,10 +77,7 @@ describe('SongList', () => {
         </SongsStatusProvider>
       </AudioStatusProvider>
     );
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
-    const firstPlayButton = getAllByRole('button', {
+    const firstPlayButton = screen.getAllByRole('button', {
       name: /Play/i,
     })[0];
     fireEvent.click(firstPlayButton);
@@ -101,10 +94,7 @@ describe('SongList', () => {
         </SongsStatusProvider>
       </AudioStatusProvider>
     );
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
-    const firstEnqueueButton = getAllByRole('button', {
+    const firstEnqueueButton = screen.getAllByRole('button', {
       name: /Enqueue/i,
     })[0];
     fireEvent.click(firstEnqueueButton);

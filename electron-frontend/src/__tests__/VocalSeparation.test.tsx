@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import mockedElectron from '../__testsData__/mocks';
 import { SongDialogProvider, SongsStatusProvider } from '../components/Song';
 import * as SongsStatusContext from '../components/Song/SongsStatus.context';
@@ -36,11 +36,7 @@ describe('Process song with spleeter', () => {
       </SongsStatusProvider>
     );
 
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
-
-    const firstProcessButton = getAllByRole('button', {
+    const firstProcessButton = screen.getAllByRole('button', {
       name: /Process/i,
     })[0];
 
@@ -68,11 +64,7 @@ describe('Process song with spleeter', () => {
       </ConfirmationProvider>
     );
 
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
-
-    const secondProcessButton = getAllByRole('button', {
+    const secondProcessButton = screen.getAllByRole('button', {
       name: /Process/i,
     })[1];
 
