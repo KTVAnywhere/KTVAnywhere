@@ -13,9 +13,9 @@ interface ActionType {
 }
 
 interface ContextState {
-  confirmationMessage: { heading: string; message: string };
+  confirmationMessage: { heading: string; message: string | JSX.Element };
   setConfirmationMessage: Dispatch<
-    SetStateAction<{ heading: string; message: string }>
+    SetStateAction<{ heading: string; message: string | JSX.Element }>
   >;
   actions: ActionType[];
   setActions: Dispatch<SetStateAction<ActionType[]>>;
@@ -26,7 +26,10 @@ interface ContextState {
 const ConfirmationContext = createContext({} as ContextState);
 
 export const ConfirmationProvider = ({ children }: { children: ReactNode }) => {
-  const [confirmationMessage, setConfirmationMessage] = useState({
+  const [confirmationMessage, setConfirmationMessage] = useState<{
+    heading: string;
+    message: string | JSX.Element;
+  }>({
     heading: '',
     message: '',
   });

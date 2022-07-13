@@ -8,6 +8,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { PitchShifter } from 'soundtouchjs';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
@@ -20,7 +21,7 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import SpeedIcon from '@mui/icons-material/Speed';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
@@ -87,6 +88,15 @@ const ProgressBar = () => {
 };
 
 export const AudioPlayer = () => {
+  const MAX_VOLUME = 100;
+  const MIN_VOLUME = 0;
+  const MAX_PITCH = 3.5;
+  const MIN_PITCH = -3.5;
+  const PITCH_STEP = 0.5;
+  const MAX_TEMPO = 1.2;
+  const MIN_TEMPO = 0.8;
+  const TEMPO_STEP = 0.1;
+
   const {
     duration,
     setDuration,
@@ -129,6 +139,7 @@ export const AudioPlayer = () => {
   } = useAudioStatus();
   const { setAlertMessage } = useAlertMessage();
   const { setConfirmationMessage, setActions, setOpen } = useConfirmation();
+  const [previousVolume, setPreviousVolume] = useState(volume);
 
   const filePathMissingDeleteSong = (song: SongProps, filePath: string) => {
     setConfirmationMessage({
@@ -267,17 +278,33 @@ export const AudioPlayer = () => {
     }
   };
 
-  const volumeChange = (_event: Event, newValue: number | number[]) => {
-    setVolume(newValue as number);
-    gainNode.gain.value = (newValue as number) / 100;
+  const volumeChange = (_event: Event, value: number | number[]) => {
+    let newValue = value as number;
+    if (value < MIN_VOLUME) {
+      newValue = MIN_VOLUME;
+    } else if (value > MAX_VOLUME) {
+      newValue = MAX_VOLUME;
+    }
+    setVolume(newValue);
+    gainNode.gain.value = newValue / 100;
   };
 
   const volumeZero = () => {
-    setVolume(0);
-    gainNode.gain.value = 0;
+    if (volume) {
+      setPreviousVolume(volume);
+      volumeChange({} as Event, 0);
+    } else {
+      volumeChange({} as Event, previousVolume);
+    }
   };
 
-  const pitchChange = (_event: Event, newValue: number | number[]) => {
+  const pitchChange = (_event: Event, value: number | number[]) => {
+    let newValue = value as number;
+    if (value < MIN_PITCH) {
+      newValue = MIN_PITCH;
+    } else if (value > MAX_PITCH) {
+      newValue = MAX_PITCH;
+    }
     if (source) {
       source.pitchSemitones = newValue as number;
     }
@@ -285,13 +312,16 @@ export const AudioPlayer = () => {
   };
 
   const pitchReset = () => {
-    if (source) {
-      source.pitchSemitones = 0;
-    }
-    setPitch(0);
+    pitchChange({} as Event, 0);
   };
 
-  const tempoChange = (_event: Event, newValue: number | number[]) => {
+  const tempoChange = (_event: Event, value: number | number[]) => {
+    let newValue = value as number;
+    if (value < MIN_TEMPO) {
+      newValue = MIN_TEMPO;
+    } else if (value > MAX_TEMPO) {
+      newValue = MAX_TEMPO;
+    }
     if (source) {
       source.tempo = newValue as number;
     }
@@ -299,10 +329,7 @@ export const AudioPlayer = () => {
   };
 
   const tempoReset = () => {
-    if (source) {
-      source.tempo = 1;
-    }
-    setTempo(1);
+    tempoChange({} as Event, 1);
   };
 
   const playSong = () => {
@@ -389,13 +416,15 @@ export const AudioPlayer = () => {
 
   const endSong = () => {
     if (GetQueueLength() > 0) {
-      const song = DequeueSong();
-      if (song) {
-        loadSong(song, song.songPath, false, isPlaying, () => {
-          setCurrentSong(song);
-          setCurrentTime(0);
-          setIsPlayingVocals(true);
-        });
+      if (!isLoading) {
+        const song = DequeueSong();
+        if (song) {
+          loadSong(song, song.songPath, false, isPlaying, () => {
+            setCurrentSong(song);
+            setCurrentTime(0);
+            setIsPlayingVocals(true);
+          });
+        }
       }
     } else {
       gainNode.disconnect();
@@ -409,18 +438,21 @@ export const AudioPlayer = () => {
     setSongEnded(false);
   };
 
-  const backwardTenSeconds = () => {
+  const backwardSeconds = (numSeconds: number) => {
     if (source && duration !== 0) {
-      const nextTime = currentTime <= 10 ? 0.01 : currentTime - 10;
+      const nextTime =
+        currentTime <= numSeconds ? 0.01 : currentTime - numSeconds;
       source.percentagePlayed = nextTime / duration;
       setCurrentTime(nextTime);
     }
   };
 
-  const forwardTenSeconds = () => {
+  const forwardSeconds = (numSeconds: number) => {
     if (source && duration !== 0) {
       const nextTime =
-        currentTime + 10 >= duration ? duration - 1 : currentTime + 10;
+        currentTime + numSeconds >= duration
+          ? duration - 1
+          : currentTime + numSeconds;
       source.percentagePlayed = nextTime / duration;
       setCurrentTime(nextTime);
     }
@@ -434,6 +466,9 @@ export const AudioPlayer = () => {
       setIsPlayingVocals(true);
       if (!nextSong.lyricsPath) {
         setLyricsEnabled(false);
+      }
+      if (!nextSong.graphPath) {
+        setGraphEnabled(false);
       }
     });
     setNextSong(null);
@@ -454,8 +489,7 @@ export const AudioPlayer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveConfig = () => {
-    window.removeEventListener('beforeunload', saveConfig);
+  const saveConfig = useCallback(() => {
     window.electron.store.config.setAudioStatusConfig({
       songId: currentSong ? currentSong.songId : '',
       currentTime,
@@ -474,13 +508,142 @@ export const AudioPlayer = () => {
       microphone1NoiseSuppression,
       microphone2NoiseSuppression,
     });
-    destroySource();
-  };
+  }, [
+    audioInput1Id,
+    audioInput2Id,
+    currentSong,
+    currentTime,
+    duration,
+    graphEnabled,
+    isPlayingVocals,
+    lyricsEnabled,
+    microphone1NoiseSuppression,
+    microphone1Volume,
+    microphone2NoiseSuppression,
+    microphone2Volume,
+    pitch,
+    reverb1Volume,
+    reverb2Volume,
+    volume,
+  ]);
 
-  window.addEventListener('beforeunload', saveConfig);
+  useEffect(() => {
+    window.addEventListener('beforeunload', saveConfig);
+    return () => {
+      window.removeEventListener('beforeunload', saveConfig);
+    };
+  }, [saveConfig]);
+
+  useHotkeys(
+    'space',
+    (e) => {
+      e.preventDefault();
+      if (isPlaying) pauseSong();
+      else playSong();
+    },
+    { keyup: true },
+    [isPlaying, currentSong, source, gainNode, isLoading]
+  );
+
+  useHotkeys(
+    'up',
+    (e) => {
+      e.preventDefault();
+      volumeChange(e, volume + 5);
+    },
+    [volume, gainNode]
+  );
+  useHotkeys(
+    'down',
+    (e) => {
+      e.preventDefault();
+      volumeChange(e, volume - 5);
+    },
+    [volume, gainNode]
+  );
+
+  useHotkeys(
+    'left',
+    (e) => {
+      e.preventDefault();
+      backwardSeconds(1);
+    },
+    [source, duration, currentTime]
+  );
+  useHotkeys(
+    'right',
+    (e) => {
+      e.preventDefault();
+      forwardSeconds(1);
+    },
+    [source, duration, currentTime]
+  );
+
+  useHotkeys(
+    'shift+down',
+    (e) => {
+      e.preventDefault();
+      pitchChange(e, pitch - PITCH_STEP);
+    },
+    [pitch, source]
+  );
+  useHotkeys(
+    'shift+up',
+    (e) => {
+      e.preventDefault();
+      pitchChange(e, pitch + PITCH_STEP);
+    },
+    [pitch, source]
+  );
+
+  useHotkeys(
+    'shift+left',
+    (e) => {
+      e.preventDefault();
+      tempoChange(e, tempo - TEMPO_STEP);
+    },
+    [tempo, source]
+  );
+  useHotkeys(
+    'shift+right',
+    (e) => {
+      e.preventDefault();
+      tempoChange(e, tempo + TEMPO_STEP);
+    },
+    [tempo, source]
+  );
+
+  useHotkeys(
+    'v',
+    () => {
+      if (isPlayingVocals) disableVocals();
+      else enableVocals();
+    },
+    { keyup: true },
+    [isPlayingVocals, isPlaying, currentSong, source, gainNode, isLoading]
+  );
+
+  useHotkeys('m', volumeZero, { keyup: true }, [
+    previousVolume,
+    volume,
+    gainNode,
+  ]);
+
+  useHotkeys('g', toggleGraph, { keyup: true }, [graphEnabled, currentSong]);
+  useHotkeys('l', toggleLyrics, { keyup: true }, [lyricsEnabled, currentSong]);
+  useHotkeys(
+    'n',
+    (e) => {
+      e.preventDefault();
+      console.log('1');
+      endSong();
+    },
+    { keyup: true },
+    [isPlaying, currentSong, source, gainNode, isLoading]
+  );
 
   return (
-    <Grid container direction="column">
+    <Grid container direction="column" data-testid="audio-player">
       <Grid item container sx={{ justifyContent: 'center' }}>
         <ProgressBar />
         <Tooltip title="End song" placement="right">
@@ -552,16 +715,16 @@ export const AudioPlayer = () => {
             value={tempo}
             onChange={tempoChange}
             marks
-            min={0.8}
-            max={1.2}
-            step={0.1}
+            min={MIN_TEMPO}
+            max={MAX_TEMPO}
+            step={TEMPO_STEP}
             size="small"
             color="secondary"
             data-testid="tempo-slider"
             sx={{ py: 0.6 }}
           />
           <Typography position="absolute" variant="subtitle2">
-            tempo: {tempo}
+            tempo: {+tempo.toFixed(1)}
           </Typography>
         </Grid>
         <Grid item sx={{ ml: '1%' }}>
@@ -575,9 +738,9 @@ export const AudioPlayer = () => {
             value={pitch}
             onChange={pitchChange}
             marks
-            min={-3.5}
-            max={3.5}
-            step={0.5}
+            min={MIN_PITCH}
+            max={MAX_PITCH}
+            step={PITCH_STEP}
             size="small"
             color="secondary"
             data-testid="pitch-slider"
@@ -592,7 +755,7 @@ export const AudioPlayer = () => {
             <IconButton
               sx={{ p: 0 }}
               data-testid="backward-10-button"
-              onClick={backwardTenSeconds}
+              onClick={() => backwardSeconds(10)}
             >
               <FastRewindIcon fontSize="medium" />
             </IconButton>
@@ -618,7 +781,7 @@ export const AudioPlayer = () => {
             <IconButton
               sx={{ p: 0 }}
               data-testid="forward-10-button"
-              onClick={forwardTenSeconds}
+              onClick={() => forwardSeconds(10)}
             >
               <FastForwardIcon fontSize="medium" />
             </IconButton>

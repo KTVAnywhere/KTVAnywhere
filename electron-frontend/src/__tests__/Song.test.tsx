@@ -370,7 +370,7 @@ describe('Song', () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;
     });
-  });
+  }, 10000);
 
   test('delete button will remove song from database', () => {
     jest

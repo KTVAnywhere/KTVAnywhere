@@ -122,7 +122,7 @@ const createWindow = async () => {
   };
 
   mainWindow = new BrowserWindow({
-    show: false,
+    show: !app.isPackaged,
     width: 1024,
     height: 728,
     minWidth: 1024,

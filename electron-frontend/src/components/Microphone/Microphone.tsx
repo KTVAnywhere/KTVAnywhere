@@ -594,12 +594,11 @@ const Microphone = () => {
   return (
     <>
       <Tooltip
-        title={openMicrophoneMenu ? 'close mic settings' : 'open mic settings'}
-        placement="right"
+        title={openMicrophoneMenu ? 'Close mic settings' : 'Open mic settings'}
+        placement="top"
       >
         <IconButton
           onClick={clickToggleMenu}
-          sx={{ position: 'fixed', bottom: 10, left: 60, p: 0 }}
           data-testid="toggle-mic-settings-menu"
         >
           <MicIcon fontSize="medium" />

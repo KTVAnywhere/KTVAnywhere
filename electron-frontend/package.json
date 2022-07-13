@@ -122,6 +122,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^18.1.0",
     "react-edit-text": "^4.4.0",
+    "react-hotkeys-hook": "^3.4.6",
     "react-router-dom": "^6.3.0",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.7",

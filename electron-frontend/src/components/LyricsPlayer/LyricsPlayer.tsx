@@ -14,18 +14,21 @@ const LyricsPlayer = () => {
   useEffect(() => {
     if (!lyricsEnabled || currentSong === null) {
       setLyricsRunner(new Runner(Lrc.parse(''), true));
-    } else if (!currentSong.lyricsPath) {
+      setLyricsEnabled(false);
+    } else if (
+      !currentSong.lyricsPath ||
+      !window.electron.file.ifFileExists(currentSong.lyricsPath)
+    ) {
       setLyrics('no lyrics file for song');
       setLyricsRunner(new Runner(Lrc.parse(''), true));
-    } else if (window.electron.file.ifFileExists(currentSong.lyricsPath)) {
+      setLyricsEnabled(false);
+    } else {
       window.electron.file
         .read(currentSong.lyricsPath)
         .then((lyricsData) =>
           setLyricsRunner(new Runner(Lrc.parse(lyricsData), true))
         )
         .catch((err) => console.log(err));
-    } else {
-      setLyricsEnabled(false);
     }
   }, [currentSong, lyricsEnabled, setLyricsRunner, setLyricsEnabled]);
 
