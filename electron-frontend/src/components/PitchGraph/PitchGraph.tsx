@@ -55,18 +55,23 @@ const PitchGraph = () => {
   const TRACK_HEIGHT = `calc(100% / ${NUM_TRACKS - 1})`;
   const BAR_HEIGHT = '50%';
   const [pitchArray, setPitchArray] = useState<NoteEventTime[]>([]);
-  const { currentSong, currentTime, graphEnabled, pitch } = useAudioStatus();
+  const { currentSong, currentTime, graphEnabled, setGraphEnabled, pitch } =
+    useAudioStatus();
   useEffect(() => {
     if (!graphEnabled || currentSong === null) {
       setPitchArray([]);
-    } else if (!currentSong.graphPath) {
+    } else if (
+      !currentSong.graphPath ||
+      !window.electron.file.ifFileExists(currentSong.graphPath)
+    ) {
       setPitchArray([]);
-    } else if (window.electron.file.ifFileExists(currentSong.graphPath)) {
+      setGraphEnabled(false);
+    } else {
       readGraphData(currentSong.graphPath)
         .then((data) => setPitchArray(data))
         .catch(console.error);
     }
-  }, [currentSong, graphEnabled]);
+  }, [currentSong, graphEnabled, setGraphEnabled]);
 
   const time = useRef(currentTime);
   useEffect(() => {
@@ -116,17 +121,16 @@ const PitchGraph = () => {
           <Container
             maxWidth={false}
             disableGutters
-            sx={{
+            style={{
               position: 'relative',
               height: '100%',
               width: '100%',
               left: `calc(${STEP} * ${BEFORE})`,
               transform: `translateX(calc(-${currentTime + 0.25} * ${STEP}))`,
               transition:
-                Math.abs(time.current - currentTime) < 2
+                Math.abs(time.current - currentTime) < 0.5
                   ? 'transform 0.5s linear'
                   : 'transform 33ms linear',
-              willChange: 'transform, transition',
             }}
           >
             {pitchArray.map(

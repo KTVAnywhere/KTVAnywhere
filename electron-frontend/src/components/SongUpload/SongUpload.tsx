@@ -47,7 +47,7 @@ const SongUploadButton = ({ setUploadedSongs }: SongUploadProps) => {
   };
   return (
     <Button
-      sx={{ alignSelf: 'flex-end', margin: '3%' }}
+      sx={{ alignSelf: 'flex-end', my: '3%', right: 25 }}
       onClick={() => chooseSongs(songUploadOptions)}
     >
       Upload

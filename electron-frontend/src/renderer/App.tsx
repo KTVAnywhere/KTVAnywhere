@@ -6,6 +6,7 @@ import {
   CssBaseline,
   IconButton,
   PaletteMode,
+  Stack,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -35,6 +36,7 @@ import {
 import { AudioStatusProvider } from '../components/AudioStatus.context';
 import AudioPlayer from '../components/AudioPlayer';
 import Microphone from '../components/Microphone';
+import HelpMenuButton from '../components/HelpMenu';
 import LyricsPlayer, { LyricsProvider } from '../components/LyricsPlayer';
 import './App.css';
 import {
@@ -104,19 +106,19 @@ const MainPage = () => {
     <Container>
       <CssBaseline enableColorScheme />
       <TitleBar />
-      <Container
-        maxWidth={false}
-        disableGutters
-        sx={{
-          position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: '130px',
-          top: titleBarHeight,
-        }}
-      >
-        <AlertMessage />
-        <ConfirmationProvider>
+      <ConfirmationProvider>
+        <Container
+          maxWidth={false}
+          disableGutters
+          sx={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: '130px',
+            top: titleBarHeight,
+          }}
+        >
+          <AlertMessage />
           <SongStagingDialogProvider>
             <SongDialogProvider>
               <SongDialog song={openSong} setSong={setOpenSong} />
@@ -124,7 +126,6 @@ const MainPage = () => {
                 uploadedSongs={uploadedSongs}
                 setUploadedSongs={setUploadedSongs}
               />
-              <ConfirmationDialog />
               <LeftSidebar>
                 <Typography variant="h5" align="center" pt="15px">
                   Songs Library
@@ -134,67 +135,71 @@ const MainPage = () => {
               </LeftSidebar>
             </SongDialogProvider>
           </SongStagingDialogProvider>
-        </ConfirmationProvider>
+          <Container
+            key="mainDisplay"
+            disableGutters
+            maxWidth={false}
+            sx={{
+              position: 'absolute',
+              left: '330px',
+              right: '330px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: 'auto',
+              height: '100%',
+            }}
+          >
+            <Container
+              maxWidth={false}
+              disableGutters
+              sx={{ position: 'relative', height: '60%' }}
+            >
+              <PitchGraph />
+            </Container>
+            <Container sx={{ position: 'absolute', bottom: 0 }}>
+              <LyricsPlayer />
+            </Container>
+          </Container>
+          <RightSidebar>
+            <QueueList />
+          </RightSidebar>
+        </Container>
         <Container
-          key="mainDisplay"
-          disableGutters
           maxWidth={false}
           sx={{
-            position: 'absolute',
-            left: '330px',
-            right: '330px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: 'auto',
-            height: '100%',
+            bgcolor: GetColorTheme().audioPlayerBackground,
+            height: '130px',
+            position: 'fixed',
+            left: 0,
+            bottom: 0,
           }}
         >
-          <Container
-            maxWidth={false}
-            disableGutters
-            sx={{ position: 'relative', height: '60%' }}
-          >
-            <PitchGraph />
-          </Container>
-          <Container sx={{ position: 'absolute', bottom: 0 }}>
-            <LyricsPlayer />
-          </Container>
-        </Container>
-        <RightSidebar>
-          <QueueList />
-        </RightSidebar>
-      </Container>
-      <Container
-        maxWidth={false}
-        sx={{
-          bgcolor: GetColorTheme().audioPlayerBackground,
-          height: '130px',
-          position: 'fixed',
-          left: 0,
-          bottom: 0,
-        }}
-      >
-        <ConfirmationProvider>
           <AudioPlayer />
-          <ConfirmationDialog />
-        </ConfirmationProvider>
-      </Container>
-      <Tooltip title="Settings">
-        <IconButton
+        </Container>
+        <Stack
+          direction="row"
+          spacing={-1}
           sx={{ position: 'fixed', bottom: 10, left: 20, p: 0 }}
-          data-testid="settings-button"
-          onClick={() => setShowSettings(true)}
         >
-          <SettingsIcon fontSize="medium" />
-        </IconButton>
-      </Tooltip>
-      <SettingsMenu
-        showSettings={showSettings}
-        setShowSettings={setShowSettings}
-      />
-      <Microphone />
+          <Tooltip title="Settings">
+            <IconButton
+              data-testid="settings-button"
+              onClick={() => setShowSettings(true)}
+            >
+              <SettingsIcon fontSize="medium" />
+            </IconButton>
+          </Tooltip>
+          <Microphone />
+          <HelpMenuButton />
+        </Stack>
+        <SettingsMenu
+          showSettings={showSettings}
+          setShowSettings={setShowSettings}
+        />
+        <ConfirmationDialog />
+      </ConfirmationProvider>
     </Container>
   );
 };

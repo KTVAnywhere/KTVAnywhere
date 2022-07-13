@@ -19,7 +19,12 @@ const ConfirmationDialog = () => {
         <></>
       )}
       <DialogContent>
-        <Typography>{confirmationMessage.message}</Typography>
+        {typeof confirmationMessage.message === 'string' && (
+          <Typography>{confirmationMessage.message}</Typography>
+        )}
+        {typeof confirmationMessage.message === 'object' && (
+          <Typography>{confirmationMessage.message}</Typography>
+        )}
       </DialogContent>
       <DialogActions>
         <Button aria-label="Cancel" onClick={() => setOpen(false)}>

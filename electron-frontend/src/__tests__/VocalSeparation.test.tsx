@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import mockedElectron from '../__testsData__/mocks';
 import { SongDialogProvider, SongsStatusProvider } from '../components/Song';
 import * as SongsStatusContext from '../components/Song/SongsStatus.context';
@@ -14,6 +14,39 @@ describe('Process song with spleeter', () => {
   const mockSetOpenSong = jest.fn();
   const mockSongsStatus: string[] = [];
   const mockSetSongsStatus = jest.fn();
+
+  // mock AutoSizer start
+  const originalOffsetHeight: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetWidth'
+  );
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 50,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 50,
+    });
+  });
+  afterAll(() => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth
+    );
+  });
+  // mock AutoSizer end
 
   beforeEach(() => {
     global.window.electron = {
@@ -36,11 +69,7 @@ describe('Process song with spleeter', () => {
       </SongsStatusProvider>
     );
 
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
-
-    const firstProcessButton = getAllByRole('button', {
+    const firstProcessButton = screen.getAllByRole('button', {
       name: /Process/i,
     })[0];
 
@@ -68,11 +97,7 @@ describe('Process song with spleeter', () => {
       </ConfirmationProvider>
     );
 
-    const { getAllByRole } = within(
-      screen.getByRole('list', { name: /data/i })
-    );
-
-    const secondProcessButton = getAllByRole('button', {
+    const secondProcessButton = screen.getAllByRole('button', {
       name: /Process/i,
     })[1];
 
