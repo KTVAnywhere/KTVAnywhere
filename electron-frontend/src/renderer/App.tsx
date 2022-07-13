@@ -199,7 +199,6 @@ const MainPage = () => {
           setShowSettings={setShowSettings}
         />
         <ConfirmationDialog />
-        <Microphone />
       </ConfirmationProvider>
     </Container>
   );
