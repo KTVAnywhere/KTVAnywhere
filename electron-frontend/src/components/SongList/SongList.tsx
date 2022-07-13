@@ -78,7 +78,7 @@ const SongCard = ({
   };
 
   return (
-    <Card sx={{ width: 1, display: 'flex' }}>
+    <Card sx={{ width: '280px', display: 'flex' }}>
       <CardActionArea
         sx={{
           width: '200px',
