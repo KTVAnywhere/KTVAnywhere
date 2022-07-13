@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { FixedSizeList } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import QueueIcon from '@mui/icons-material/Queue';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -196,7 +197,7 @@ const SongList = ({
   };
 
   return (
-    <Container>
+    <Container sx={{ height: 'calc(100vh - 305px)' }}>
       <TextField
         aria-label="searchbox"
         size="small"
@@ -211,22 +212,28 @@ const SongList = ({
         <Typography
           textAlign="center"
           sx={{
-            width: '300px',
+            width: '305px',
             mt: '5%',
           }}
         >
           No songs found
         </Typography>
       ) : (
-        <FixedSizeList
-          height={window.screen.height - 345}
-          width="300px"
-          itemSize={140}
-          itemData={searchResults}
-          itemCount={searchResults.length}
-        >
-          {listItems}
-        </FixedSizeList>
+        <AutoSizer>
+          {({ height }) => {
+            return (
+              <FixedSizeList
+                height={height}
+                width="305px"
+                itemSize={140}
+                itemData={searchResults}
+                itemCount={searchResults.length}
+              >
+                {listItems}
+              </FixedSizeList>
+            );
+          }}
+        </AutoSizer>
       )}
     </Container>
   );

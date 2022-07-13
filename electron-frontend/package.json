@@ -123,6 +123,7 @@
     "react-dom": "^18.1.0",
     "react-edit-text": "^4.4.0",
     "react-router-dom": "^6.3.0",
+    "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.7",
     "simple-netease-cloud-music": "^0.5.2",
     "soundtouchjs": "^0.1.30",

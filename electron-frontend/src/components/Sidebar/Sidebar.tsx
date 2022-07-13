@@ -15,7 +15,7 @@ export const LeftSidebar = ({ children }: SidebarProps) => {
     <Drawer
       sx={{
         '& .MuiDrawer-paper': {
-          minWidth: '330px',
+          width: '330px',
           height: drawerHeight,
           boxSizing: 'border-box',
           background: backgroundColor,
