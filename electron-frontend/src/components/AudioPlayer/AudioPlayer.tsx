@@ -566,7 +566,7 @@ export const AudioPlayer = () => {
     'left',
     (e) => {
       e.preventDefault();
-      backwardSeconds(1);
+      backwardSeconds(10);
     },
     [source, duration, currentTime]
   );
@@ -574,7 +574,7 @@ export const AudioPlayer = () => {
     'right',
     (e) => {
       e.preventDefault();
-      forwardSeconds(1);
+      forwardSeconds(10);
     },
     [source, duration, currentTime]
   );
@@ -635,7 +635,6 @@ export const AudioPlayer = () => {
     'n',
     (e) => {
       e.preventDefault();
-      console.log('1');
       endSong();
     },
     { keyup: true },
