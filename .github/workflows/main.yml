@@ -54,6 +54,12 @@ jobs:
           npm test
         working-directory: electron-frontend
 
+      - name: pytest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pytest
+        working-directory: electron-frontend
+
       - name: Publish releases
         env:
           # These values are used for auto updates signing

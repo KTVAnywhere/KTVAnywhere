@@ -1,4 +1,5 @@
 def spleeter(source, output):
+    from spleeter.separator import Separator
     separator = Separator('spleeter:2stems')
     naming_format = "{instrument}.{codec}"
     separator.separate_to_file('{}'.format(source), '{}'.format(
@@ -6,6 +7,10 @@ def spleeter(source, output):
 
 
 def basicpitch(source, output):
+    from basic_pitch.inference import predict
+    from basic_pitch import ICASSP_2022_MODEL_PATH
+    from os import path
+    from json import dump
     _, _, noteEvents = predict(
         source, ICASSP_2022_MODEL_PATH, 0.95, 0.3, 58, 80, 800, True)
     result = [{'startTimeSeconds': startTimeSeconds, 'durationSeconds': endTimeSeconds - startTimeSeconds, 'pitchMidi': int(pitchMidi),
@@ -17,6 +22,8 @@ def basicpitch(source, output):
 
 
 def process_song(source, output, songId):
+    import sys
+    from os import path
     try:
         spleeter(source, output)
         basicpitch(path.join(output, 'vocals.mp3'), output)
@@ -39,10 +46,5 @@ def process_song(source, output, songId):
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
-    from spleeter.separator import Separator
-    from basic_pitch.inference import predict
-    from basic_pitch import ICASSP_2022_MODEL_PATH
     import sys
-    from os import path
-    from json import dump
     process_song(sys.argv[1], sys.argv[2], sys.argv[3])
