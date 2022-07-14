@@ -23,7 +23,8 @@ def test_basicpitch() -> None:
             output_data = json.loads(output_file.read())
             with open(join(DATA_PATH, 'graph.json'), 'r') as expected_file:
                 expected_data = json.loads(expected_file.read())
-                assert expected_data == approx(output_data, abs=1e-4)
+                for i in range(len(output_data)):
+                    assert expected_data[i] == approx(output_data[i], abs=1e-4)
 
 
 def test_process_song() -> None:
