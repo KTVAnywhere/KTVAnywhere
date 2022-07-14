@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
-import TitleBar from '../components/TitleBar';
+import TitleBar, { TITLE_BAR_HEIGHT } from '../components/TitleBar';
 import { LeftSidebar, RightSidebar } from '../components/Sidebar';
 import QueueList from '../components/SongsQueue';
 import {
@@ -53,7 +53,6 @@ const MainPage = () => {
   const { songsStatus, setSongsStatus } = useSongsStatus();
   const [songInProcess, setSongInProcess] = useState<string | null>(null);
   const { setAlertMessage } = useAlertMessage();
-  const titleBarHeight = '22px';
 
   useEffect(() => {
     const processSongUnsubscribe = window.electron.preprocess.processResult(
@@ -115,7 +114,7 @@ const MainPage = () => {
             left: 0,
             right: 0,
             bottom: '130px',
-            top: titleBarHeight,
+            top: TITLE_BAR_HEIGHT,
           }}
         >
           <AlertMessage />

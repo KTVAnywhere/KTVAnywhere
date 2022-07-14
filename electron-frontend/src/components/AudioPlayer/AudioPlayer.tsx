@@ -21,7 +21,7 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import SpeedIcon from '@mui/icons-material/Speed';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
@@ -489,7 +489,8 @@ export const AudioPlayer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveConfig = useCallback(() => {
+  const saveConfig = () => {
+    window.removeEventListener('beforeunload', saveConfig);
     window.electron.store.config.setAudioStatusConfig({
       songId: currentSong ? currentSong.songId : '',
       currentTime,
@@ -508,31 +509,9 @@ export const AudioPlayer = () => {
       microphone1NoiseSuppression,
       microphone2NoiseSuppression,
     });
-  }, [
-    audioInput1Id,
-    audioInput2Id,
-    currentSong,
-    currentTime,
-    duration,
-    graphEnabled,
-    isPlayingVocals,
-    lyricsEnabled,
-    microphone1NoiseSuppression,
-    microphone1Volume,
-    microphone2NoiseSuppression,
-    microphone2Volume,
-    pitch,
-    reverb1Volume,
-    reverb2Volume,
-    volume,
-  ]);
+  };
 
-  useEffect(() => {
-    window.addEventListener('beforeunload', saveConfig);
-    return () => {
-      window.removeEventListener('beforeunload', saveConfig);
-    };
-  }, [saveConfig]);
+  window.addEventListener('beforeunload', saveConfig);
 
   useHotkeys(
     'space',

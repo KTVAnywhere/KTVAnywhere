@@ -222,7 +222,7 @@ const MicrophoneMenuElementsForEachMicrophone = ({
   };
 
   useEffect(() => {
-    // boolean to prevent reconnection every time microphone menu is closed and reopened
+    // boolean to prevent reconnection every time microphone menu is rerendered
     if (audioInputIdDidChange) {
       setCallToReconnect(true);
       setAudioInputIdDidChange(false);
