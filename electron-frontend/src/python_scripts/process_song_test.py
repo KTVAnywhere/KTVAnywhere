@@ -2,6 +2,8 @@ import pathlib
 from process_song import spleeter, basicpitch, process_song
 from tempfile import TemporaryDirectory
 from os.path import exists, join
+import json
+from pytest import approx
 
 DATA_PATH = pathlib.Path(__file__).parent / 'data'
 
@@ -18,8 +20,10 @@ def test_basicpitch() -> None:
         basicpitch(DATA_PATH / 'audio.wav', output_path)
         assert exists(join(output_path, 'graph.json'))
         with open(join(output_path, 'graph.json'), 'r') as output_file:
+            output_data = json.loads(output_file.read())
             with open(join(DATA_PATH, 'graph.json'), 'r') as expected_file:
-                assert output_file.read() == expected_file.read()
+                expected_data = json.loads(expected_file.read())
+                assert expected_data == approx(output_data, abs=1e-4)
 
 
 def test_process_song() -> None:
