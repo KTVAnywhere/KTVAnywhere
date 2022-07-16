@@ -33,6 +33,12 @@ jobs:
       - name: Install FFMPEG
         uses: FedericoCarboni/setup-ffmpeg@v1
 
+      - name: Copy FFMPEG to directory
+        run: |
+          copy ${{ ffmpeg-path }} .
+          copy ${{ ffprobe-path }} .
+        working-directory: electron-frontend
+
       - name: Install python
         uses: actions/setup-python@v4
         with:
@@ -52,12 +58,6 @@ jobs:
           npm run lint
           npm exec tsc
           npm test
-        working-directory: electron-frontend
-
-      - name: pytest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pytest
         working-directory: electron-frontend
 
       - name: Publish releases
