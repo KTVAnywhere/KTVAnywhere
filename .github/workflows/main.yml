@@ -31,12 +31,13 @@ jobs:
         working-directory: electron-frontend
 
       - name: Install FFMPEG
+        id: install-ffmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
 
       - name: Copy FFMPEG to directory
         run: |
-          copy ${{ ffmpeg-path }} .
-          copy ${{ ffprobe-path }} .
+          copy ${{ steps.install-ffmpeg.outputs.ffmpeg-path }} .
+          copy ${{ steps.install-ffmpeg.outputs.ffprobe-path }} .
         working-directory: electron-frontend
 
       - name: Install python
