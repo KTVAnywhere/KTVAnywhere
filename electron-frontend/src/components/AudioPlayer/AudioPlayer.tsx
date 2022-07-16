@@ -630,7 +630,7 @@ export const AudioPlayer = () => {
             data-testid="end-song-button"
             onClick={endSong}
           >
-            <SkipNextIcon fontSize="medium" />
+            <SkipNextIcon color="secondary" fontSize="medium" />
           </IconButton>
         </Tooltip>
       </Grid>
@@ -663,7 +663,7 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item>
           <Grid container direction="row" alignItems="center">
-            <RecordVoiceOverIcon fontSize="medium" />
+            <RecordVoiceOverIcon color="secondary" fontSize="medium" />
             <Switch
               checked={isPlayingVocals}
               onClick={() =>
@@ -684,7 +684,7 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item sx={{ ml: '1%' }}>
           <IconButton sx={{ p: 0 }} onClick={tempoReset}>
-            <SpeedIcon fontSize="medium" />
+            <SpeedIcon color="secondary" fontSize="medium" />
           </IconButton>
         </Grid>
         <Grid item sx={{ ml: '10px', width: '5%' }}>
@@ -707,7 +707,7 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item sx={{ ml: '1%' }}>
           <IconButton sx={{ p: 0 }} onClick={pitchReset}>
-            <GraphicEqIcon fontSize="medium" />
+            <GraphicEqIcon color="secondary" fontSize="medium" />
           </IconButton>
         </Grid>
         <Grid item sx={{ ml: '10px', width: '5%' }}>
@@ -735,7 +735,7 @@ export const AudioPlayer = () => {
               data-testid="backward-10-button"
               onClick={() => backwardSeconds(10)}
             >
-              <FastRewindIcon fontSize="medium" />
+              <FastRewindIcon color="secondary" fontSize="medium" />
             </IconButton>
           </Tooltip>
           {isPlaying ? (
@@ -744,7 +744,7 @@ export const AudioPlayer = () => {
               data-testid="pause-button"
               onClick={pauseSong}
             >
-              <PauseCircleIcon sx={{ fontSize: '42px' }} />
+              <PauseCircleIcon color="secondary" sx={{ fontSize: '42px' }} />
             </IconButton>
           ) : (
             <IconButton
@@ -752,7 +752,7 @@ export const AudioPlayer = () => {
               data-testid="play-button"
               onClick={playSong}
             >
-              <PlayCircleIcon sx={{ fontSize: '42px' }} />
+              <PlayCircleIcon color="secondary" sx={{ fontSize: '42px' }} />
             </IconButton>
           )}
           <Tooltip title="Forward 10s" placement="top">
@@ -761,13 +761,13 @@ export const AudioPlayer = () => {
               data-testid="forward-10-button"
               onClick={() => forwardSeconds(10)}
             >
-              <FastForwardIcon fontSize="medium" />
+              <FastForwardIcon color="secondary" fontSize="medium" />
             </IconButton>
           </Tooltip>
         </Grid>
         <Grid item>
           <IconButton sx={{ p: 0 }} onClick={() => volumeZero()}>
-            <VolumeMuteIcon fontSize="medium" />
+            <VolumeMuteIcon color="secondary" fontSize="medium" />
           </IconButton>
         </Grid>
         <Grid item sx={{ ml: '10px', mr: '2%', width: '6%' }}>
@@ -788,7 +788,7 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item sx={{ mr: '1%' }}>
           <Grid container direction="row">
-            <AutoGraphIcon fontSize="medium" />
+            <AutoGraphIcon color="secondary" fontSize="medium" />
             <Switch
               checked={graphEnabled}
               data-testid="toggle-graph-button"
@@ -812,7 +812,7 @@ export const AudioPlayer = () => {
             alignItems="center"
             position="relative"
           >
-            <LyricsIcon fontSize="medium" />
+            <LyricsIcon color="secondary" fontSize="medium" />
             <Switch
               checked={lyricsEnabled}
               data-testid="toggle-lyrics-button"
