@@ -238,13 +238,16 @@ export default function App() {
           MuiCssBaseline: {
             styleOverrides: {
               body: {
-                scrollbarColor: `${currentTheme.scrollbarThumb} ${currentTheme.scrollbarTrack}`,
+                scrollbarColor: `${currentTheme.scrollbarThumb}`,
                 '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
-                  backgroundColor: currentTheme.scrollbarTrack,
+                  backgroundColor: 'transparent',
+                  width: '1em',
                 },
                 '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
                   backgroundColor: currentTheme.scrollbarThumb,
-                  border: `2px solid ${currentTheme.scrollbarTrack}`,
+                  borderRadius: 999,
+                  border: '0.3em solid transparent',
+                  backgroundClip: 'padding-box',
                 },
                 '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
                   {
