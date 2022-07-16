@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Grid, Typography } from '@mui/material';
 import { Lrc, Runner } from 'lrc-kit';
 import { useAudioStatus } from '../AudioStatus.context';
+import { useAlertMessage } from '../AlertMessage';
 import { useLyrics } from './Lyrics.context';
 
 const LyricsPlayer = () => {
@@ -9,6 +10,7 @@ const LyricsPlayer = () => {
   const [nextLyrics, setNextLyrics] = useState('');
   const { currentSong, currentTime, lyricsEnabled, setLyricsEnabled } =
     useAudioStatus();
+  const { setAlertMessage } = useAlertMessage();
   const { lyricsRunner, setLyricsRunner } = useLyrics();
 
   useEffect(() => {
@@ -28,8 +30,14 @@ const LyricsPlayer = () => {
         .then((lyricsData) =>
           setLyricsRunner(new Runner(Lrc.parse(lyricsData), true))
         )
-        .catch((err) => console.log(err));
+        .catch((error) =>
+          setAlertMessage({
+            message: `error loading lyrics file: ${error}`,
+            severity: 'error',
+          })
+        );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSong, lyricsEnabled, setLyricsRunner, setLyricsEnabled]);
 
   useEffect(() => {

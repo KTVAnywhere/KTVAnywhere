@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction } from 'react';
 import uniqid from 'uniqid';
 import { SongProps, emptySongProps } from '../Song';
 import { useSongStagingDialog } from './SongStagingDialog.context';
+import { useAlertMessage } from '../AlertMessage';
 import './SongUpload.module.css';
 
 interface SongUploadProps {
@@ -24,6 +25,7 @@ const songUploadOptions: Electron.OpenDialogOptions = {
 
 const SongUploadButton = ({ setUploadedSongs }: SongUploadProps) => {
   const { setOpen: setOpenUploadDialog } = useSongStagingDialog();
+  const { setAlertMessage } = useAlertMessage();
   const getFileName = (str: string) =>
     str.replace(/^.*(\\|\/|:)/, '').replace(/\.[^/.]+$/, '');
   const chooseSongs = (options: Electron.OpenDialogOptions) => {
@@ -43,7 +45,12 @@ const SongUploadButton = ({ setUploadedSongs }: SongUploadProps) => {
         setUploadedSongs(results);
         return setOpenUploadDialog(true);
       })
-      .catch((error) => console.log(error));
+      .catch((error) =>
+        setAlertMessage({
+          message: `Upload error: ${error}`,
+          severity: 'error',
+        })
+      );
   };
   return (
     <Button

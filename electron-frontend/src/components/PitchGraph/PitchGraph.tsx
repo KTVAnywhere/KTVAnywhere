@@ -1,6 +1,7 @@
 import { Box, Container } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useAudioStatus } from '../AudioStatus.context';
+import { useAlertMessage } from '../AlertMessage';
 
 export interface NoteEventTime {
   startTimeSeconds: number;
@@ -57,6 +58,7 @@ const PitchGraph = () => {
   const [pitchArray, setPitchArray] = useState<NoteEventTime[]>([]);
   const { currentSong, currentTime, graphEnabled, setGraphEnabled, pitch } =
     useAudioStatus();
+  const { setAlertMessage } = useAlertMessage();
   useEffect(() => {
     if (!graphEnabled || currentSong === null) {
       setPitchArray([]);
@@ -69,8 +71,14 @@ const PitchGraph = () => {
     } else {
       readGraphData(currentSong.graphPath)
         .then((data) => setPitchArray(data))
-        .catch(console.error);
+        .catch((error) =>
+          setAlertMessage({
+            message: `Error reading graph data: ${error}`,
+            severity: 'error',
+          })
+        );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSong, graphEnabled, setGraphEnabled]);
 
   const time = useRef(currentTime);

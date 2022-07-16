@@ -253,7 +253,7 @@ export const AudioPlayer = () => {
           })
           .catch((error) => {
             setAlertMessage({
-              message: `${error}`,
+              message: `Error loading song: ${error}`,
               severity: 'error',
             });
             setIsLoading(false);
@@ -271,7 +271,7 @@ export const AudioPlayer = () => {
       }
     } catch (error) {
       setAlertMessage({
-        message: `${error}`,
+        message: `Error loading song: ${error}`,
         severity: 'error',
       });
       setIsLoading(false);
@@ -362,7 +362,7 @@ export const AudioPlayer = () => {
     ) {
       setAlertMessage({
         message:
-          'Lyrics file not found, please fetch lyrics or upload lyrics file in song details',
+          'No lyrics found, go to song details to fetch lyrics or upload lyrics file',
         severity: 'info',
       });
     } else {
@@ -791,7 +791,7 @@ export const AudioPlayer = () => {
             <AutoGraphIcon fontSize="medium" />
             <Switch
               checked={graphEnabled}
-              data-testid="toggle-graph-button"
+              data-testid="toggle-graph-switch"
               onClick={toggleGraph}
               size="small"
               color="secondary"
@@ -815,7 +815,7 @@ export const AudioPlayer = () => {
             <LyricsIcon fontSize="medium" />
             <Switch
               checked={lyricsEnabled}
-              data-testid="toggle-lyrics-button"
+              data-testid="toggle-lyrics-switch"
               onClick={toggleLyrics}
               size="small"
               color="secondary"

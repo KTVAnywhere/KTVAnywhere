@@ -2,7 +2,10 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Lrc, Runner } from 'lrc-kit';
 import { AudioContext, AudioBuffer } from 'standardized-audio-context-mock';
-import mockedElectron, { mockedAudioStatus } from '../__testsData__/mocks';
+import mockedElectron, {
+  mockAlertMessage,
+  mockedAudioStatus,
+} from '../__testsData__/mocks';
 import {
   songTestData,
   testLyrics,
@@ -10,6 +13,7 @@ import {
   lineAt10s,
 } from '../__testsData__/testData';
 import { AlertMessageProvider } from '../components/AlertMessage';
+import * as AlertContext from '../components/AlertMessage';
 import LyricsPlayer, {
   LyricsAdjust,
   LyricsProvider,
@@ -114,11 +118,9 @@ describe('Lyrics adjust', () => {
         <LyricsAdjust />
       </LyricsProvider>
     );
-
     const offsetField = screen.getByTestId('offset');
     const minusButton = screen.getByRole('button', { name: /stepDown/i });
     const plusButton = screen.getByRole('button', { name: /stepUp/i });
-
     expect(offsetField).toHaveValue(0);
     fireEvent.click(minusButton);
     expect(offsetField).toHaveValue(-0.2);
@@ -156,7 +158,7 @@ describe('Lyrics adjust', () => {
   });
 });
 
-describe('Audio player component tests', () => {
+describe('Audio player', () => {
   const mockDequeueItem = jest.fn().mockReturnValue(songTestData[0]);
 
   beforeEach(() => {
@@ -217,7 +219,6 @@ describe('Audio player component tests', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     expect(mockSetIsPlaying).toHaveBeenCalledTimes(0);
     const playButton = screen.getByTestId('play-button');
     fireEvent.click(playButton);
@@ -247,13 +248,10 @@ describe('Audio player component tests', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     expect(mockSetIsPlaying).toHaveBeenCalledTimes(0);
     expect(mockDisconnect).not.toHaveBeenCalled();
-
     const pauseButton = screen.getByTestId('pause-button');
     fireEvent.click(pauseButton);
-
     await waitFor(() => {
       expect(mockDisconnect).toHaveBeenCalled();
       expect(mockSetIsPlaying).toHaveBeenCalledTimes(1);
@@ -276,7 +274,6 @@ describe('Audio player component tests', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     const endSongButton = screen.getByTestId('end-song-button');
     expect(mockDequeueItem).not.toBeCalled();
     // there are songs in queue
@@ -284,12 +281,10 @@ describe('Audio player component tests', () => {
     await waitFor(() => {
       expect(mockDequeueItem).toBeCalled();
     });
-
     // no song in queue
     const mockGetAllQueueItems = () => {
       return [];
     };
-
     global.window.electron = {
       ...mockedElectron,
       store: {
@@ -300,7 +295,6 @@ describe('Audio player component tests', () => {
         },
       },
     };
-
     fireEvent.click(endSongButton);
     await waitFor(() => {
       expect(mockSetCurrentSong.mock.calls[0][0]).toEqual(null);
@@ -329,7 +323,6 @@ describe('Audio player component tests', () => {
     );
     const sliderInput = screen.getByTestId('volume-slider');
     const originalGetBoundingClientRect = sliderInput.getBoundingClientRect;
-
     sliderInput.getBoundingClientRect = jest.fn(() => ({
       width: 100,
       height: 10,
@@ -350,7 +343,6 @@ describe('Audio player component tests', () => {
       expect(mockSetVolume).toBeCalledWith(40);
       expect(mockGain.value).toEqual(0.4);
     });
-
     // set volume to 100
     fireEvent.mouseDown(sliderInput, {
       clientX: 100,
@@ -359,7 +351,6 @@ describe('Audio player component tests', () => {
       expect(mockSetVolume).toBeCalledWith(100);
       expect(mockGain.value).toEqual(1);
     });
-
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
   });
 
@@ -379,7 +370,6 @@ describe('Audio player component tests', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     const toggleVocalsSwitch = screen.getByTestId('toggle-vocals-switch');
     expect(mockIfFileExists).toHaveBeenCalledTimes(1);
     expect(mockReadAsBuffer).toHaveBeenCalledTimes(1);
@@ -409,7 +399,6 @@ describe('Audio player component tests', () => {
     );
     const sliderInput = screen.getByTestId('pitch-slider');
     const originalGetBoundingClientRect = sliderInput.getBoundingClientRect;
-
     sliderInput.getBoundingClientRect = jest.fn(() => ({
       width: 140,
       height: 10,
@@ -421,7 +410,6 @@ describe('Audio player component tests', () => {
       top: 0,
       toJSON: jest.fn(),
     }));
-
     // set pitch to -3.5
     fireEvent.mouseDown(sliderInput, {
       clientX: 0,
@@ -430,7 +418,6 @@ describe('Audio player component tests', () => {
       expect(mockSetPitch).toBeCalledWith(-3.5);
       expect(mockSource.pitchSemitones).toEqual(-3.5);
     });
-
     // set pitch to 0.5
     fireEvent.mouseDown(sliderInput, {
       clientX: 80,
@@ -439,7 +426,6 @@ describe('Audio player component tests', () => {
       expect(mockSetPitch).toBeCalledWith(0.5);
       expect(mockSource.pitchSemitones).toEqual(0.5);
     });
-
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
   });
 
@@ -462,7 +448,6 @@ describe('Audio player component tests', () => {
     );
     const sliderInput = screen.getByTestId('tempo-slider');
     const originalGetBoundingClientRect = sliderInput.getBoundingClientRect;
-
     sliderInput.getBoundingClientRect = jest.fn(() => ({
       width: 100,
       height: 10,
@@ -474,7 +459,6 @@ describe('Audio player component tests', () => {
       top: 0,
       toJSON: jest.fn(),
     }));
-
     // set tempo to 0.8
     fireEvent.mouseDown(sliderInput, {
       clientX: 0,
@@ -483,7 +467,6 @@ describe('Audio player component tests', () => {
       expect(mockSetTempo).toBeCalledWith(0.8);
       expect(mockSource.tempo).toEqual(0.8);
     });
-
     // set tempo to 1.2
     fireEvent.mouseDown(sliderInput, {
       clientX: 100,
@@ -492,7 +475,118 @@ describe('Audio player component tests', () => {
       expect(mockSetTempo).toBeCalledWith(1.2);
       expect(mockSource.tempo).toEqual(1.2);
     });
-
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+});
+
+describe('Audio player exceptions', () => {
+  beforeEach(() => {
+    global.window.AudioContext = AudioContext as any;
+    global.window.electron = {
+      ...mockedElectron,
+    };
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+  test('disable vocals when song not processed', async () => {
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+    });
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <AudioPlayer />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    const toggleVocalsSwitch = screen.getByTestId('toggle-vocals-switch');
+    fireEvent.click(toggleVocalsSwitch);
+    expect(mockSetAlertMessage).toBeCalledWith({
+      message: 'Song must be processed for vocals to be turned off',
+      severity: 'info',
+    });
+  });
+  test('switch on graph display when song not processed', async () => {
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+      graphEnabled: false,
+    });
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <AudioPlayer />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    const toggleGraphSwitch = screen.getByTestId('toggle-graph-switch');
+    fireEvent.click(toggleGraphSwitch);
+    expect(mockSetAlertMessage).toBeCalledWith({
+      message: 'Song must be processed for graph to be displayed',
+      severity: 'info',
+    });
+  });
+  test('switch on lyrics display when song does not have lyrics file', async () => {
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+      lyricsEnabled: false,
+    });
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <AudioPlayer />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    const toggleLyricsSwitch = screen.getByTestId('toggle-lyrics-switch');
+    fireEvent.click(toggleLyricsSwitch);
+    expect(mockSetAlertMessage).toBeCalledWith({
+      message:
+        'No lyrics found, go to song details to fetch lyrics or upload lyrics file',
+      severity: 'info',
+    });
+  });
+  test('load song with missing song file', async () => {
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+    });
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <AudioPlayer />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    expect(mockSetAlertMessage).toBeCalledWith({
+      message: `${songTestData[0].songPath} does not exist`,
+      severity: 'error',
+    });
   });
 });

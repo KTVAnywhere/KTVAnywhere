@@ -36,7 +36,8 @@ const SongStagingDialog = ({
   const uploadSongs = () => {
     setConfirmationMessage({
       heading: 'Upload songs',
-      message: 'Do you want to start processing the songs after upload?',
+      message:
+        'Start processing songs after upload for pitch graph and vocals to be turned on/off?',
     });
     setActions([
       {

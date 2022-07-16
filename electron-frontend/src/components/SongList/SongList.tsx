@@ -150,6 +150,7 @@ const SongList = ({
   const [songList, setSongList] = useState<SongProps[]>([]);
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SongProps[]>([]);
+  const { setAlertMessage } = useAlertMessage();
 
   useEffect(() => {
     setSongList(window.electron.store.songs.getAllSongs() ?? []);
@@ -168,10 +169,16 @@ const SongList = ({
       window.electron.store.songs
         .search(query)
         .then((results) => setSearchResults(results))
-        .catch(console.error);
+        .catch((error) =>
+          setAlertMessage({
+            message: `Searching error: ${error}`,
+            severity: 'error',
+          })
+        );
     } else {
       setSearchResults(songList);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, songList]);
 
   const changeQuery = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -422,10 +422,20 @@ const MicrophoneMenu = ({
     return audioDevices;
   };
 
-  useEffect(() => {
+  const refreshAudioInputDevices = () => {
     getAudioInputDevices()
       .then((devices) => setAudioInputDevices(devices))
-      .catch((err) => console.log(err));
+      .catch((error) =>
+        setAlertMessage({
+          message: `cannot detect audio input devices: ${error}`,
+          severity: 'error',
+        })
+      );
+  };
+
+  useEffect(() => {
+    refreshAudioInputDevices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMicrophoneMedia = async (audioInputId: string) => {
@@ -486,12 +496,6 @@ const MicrophoneMenu = ({
       view[i] = buffer[i];
     }
     return ab;
-  };
-
-  const refreshAudioInputDevices = () => {
-    getAudioInputDevices()
-      .then((devices) => setAudioInputDevices(devices))
-      .catch((err) => console.log(err));
   };
 
   return (
