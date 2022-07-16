@@ -34,7 +34,7 @@ export interface QueueItemProps {
   queueItemId: string;
 }
 
-export const maxQueueLength = 30;
+export const MAX_QUEUE_LENGTH = 30;
 
 export const GetQueueLength = () =>
   window.electron.store.queueItems.getAllQueueItems().length;
@@ -43,7 +43,7 @@ const setQueue = (queueList: QueueItemProps[]) =>
   window.electron.store.queueItems.setAllQueueItems(queueList);
 
 export const EnqueueSong = (song: SongProps) => {
-  if (GetQueueLength() <= maxQueueLength) {
+  if (GetQueueLength() <= MAX_QUEUE_LENGTH) {
     window.electron.store.queueItems.enqueueItem({
       song,
       queueItemId: uniqid(),
@@ -82,11 +82,11 @@ export const QueueList = () => {
   const addRandomSong = () => {
     const randomSong = window.electron.store.songs.getRandomSong();
     if (randomSong !== null) {
-      if (GetQueueLength() <= maxQueueLength) {
+      if (GetQueueLength() <= MAX_QUEUE_LENGTH) {
         EnqueueSong(randomSong);
       } else {
         setAlertMessage({
-          message: `Max queue length of ${maxQueueLength}`,
+          message: `Max queue length of ${MAX_QUEUE_LENGTH}`,
           severity: 'warning',
         });
       }
@@ -293,7 +293,7 @@ export const QueueList = () => {
         <Typography
           textAlign="center"
           sx={{
-            pt: '5%',
+            mt: '5%',
           }}
         >
           No songs in queue

@@ -39,18 +39,19 @@ KTV Anywhere uses the following technlogies:
 
 Download and install the latest release from the [releases page].
 
-> Note: The vocal separation feature requires FFMPEG to be installed and added to path. You can skip this step if you already have FFMPEG or do not intend to use the vocal separation feature
-
 #### FFMPEG installation instructions (Windows)
 
-[wiki page: ffmpeg installation instructions]
 
-## Installation for development
+
+### Installation for development
 
 This project requires:
 
 - [NodeJS]
 - [Python] > 3.8
+- [FFMPEG]
+
+> [wiki page: ffmpeg installation instructions]
 
 Setup
 
@@ -80,8 +81,9 @@ Spotted a bug? Please create a post on the [issues page]
 
 ### Acknowledgement
 
-> (Hennequin et al. 2020)<br><br>
-> Hennequin, Romain, Anis Khlif, Felix Voituret, and Manuel Moussallam. 2020. “Spleeter: A Fast and Efficient Music Source Separation Tool with Pre-Trained Models.” Journal of Open Source Software 5 (50). The Open Journal: 2154. doi:10.21105/joss.02154.
+>[1] Rachel M. Bittner, Juan José Bosch, David Rubinstein, Gabriel Meseguer-Brocal, and Sebastian Ewert. *A Lightweight Instrument-Agnostic Model for Polyphonic Note Transcription and Multipitch Estimation.* Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP), 2022. 
+<br/><br/>
+>[2] Romain Hennequin, Anis Khlif, Felix Voituret, and Manuel Moussallam. *[Spleeter: a fast and efficient music source separation tool with pre-trained models.]* Journal of Open Source Software, 5, pp. 2154, 2020
 
 [releases page]: https://github.com/weiquany/KTVAnywhere/releases
 [issues page]: https://github.com/weiquany/KTVAnywhere/issues
@@ -94,3 +96,5 @@ Spotted a bug? Please create a post on the [issues page]
 [rnnoise]: https://github.com/xiph/rnnoise
 [nodejs]: https://nodejs.org/en/
 [python]: https://www.python.org/
+[ffmpeg]: https://ffmpeg.org/
+[Spleeter: a fast and efficient music source separation tool with pre-trained models.]: https://joss.theoj.org/papers/10.21105/joss.02154

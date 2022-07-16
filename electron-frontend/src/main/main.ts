@@ -34,36 +34,6 @@ import { SongProps } from '../components/Song';
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.handle('file:read', async (_, filePath: string) => {
-  const data = await fs.promises.readFile(filePath, 'utf-8');
-  return data;
-});
-
-ipcMain.handle('file:readAsBuffer', async (_, filePath: string) => {
-  const data = await fs.promises.readFile(filePath, null);
-  return data;
-});
-
-ipcMain.on('file:ifFileExists', (event, filePath) => {
-  event.returnValue = fs.existsSync(filePath);
-});
-
-ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
-  const result = await writeFile(filePath, data);
-  return result;
-});
-
-ipcMain.on('file:getAssetsPath', async (event, fileName?: string) => {
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-  event.returnValue = fileName ? getAssetPath(fileName) : RESOURCES_PATH;
-});
-
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -269,6 +239,35 @@ app
   })
   .then(() => {
     ipcMain.handle('music:getLrc', (_, song) => getLrcFile(song));
+    ipcMain.handle('file:read', async (_, filePath: string) => {
+      const data = await fs.promises.readFile(filePath, 'utf-8');
+      return data;
+    });
+
+    ipcMain.handle('file:readAsBuffer', async (_, filePath: string) => {
+      const data = await fs.promises.readFile(filePath, null);
+      return data;
+    });
+
+    ipcMain.on('file:ifFileExists', (event, filePath) => {
+      event.returnValue = fs.existsSync(filePath);
+    });
+
+    ipcMain.handle('file:write', async (_, filePath: string, data: string) => {
+      const result = await writeFile(filePath, data);
+      return result;
+    });
+
+    ipcMain.on('file:getAssetsPath', async (event, fileName?: string) => {
+      const RESOURCES_PATH = app.isPackaged
+        ? path.join(process.resourcesPath, 'assets')
+        : path.join(__dirname, '../../assets');
+
+      const getAssetPath = (...paths: string[]): string => {
+        return path.join(RESOURCES_PATH, ...paths);
+      };
+      event.returnValue = fileName ? getAssetPath(fileName) : RESOURCES_PATH;
+    });
   })
   .then(() => {
     // Database

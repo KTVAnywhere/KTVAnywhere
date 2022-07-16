@@ -4,6 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import 'react-edit-text/dist/index.css';
 import { Button, Container, Typography } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { useAlertMessage } from '../AlertMessage';
 
 export interface SongProps {
   songId: string;
@@ -55,6 +56,7 @@ interface SongComponentProps {
 const Song = ({ song, setSong }: SongComponentProps) => {
   const [currSong, setCurrSong] = useState(song);
   const [isFetchingLyrics, setIsFetchingLyrics] = useState(false);
+  const { setAlertMessage } = useAlertMessage();
 
   const changeSong = (changedSong: SongProps) => {
     setCurrSong(changedSong);
@@ -75,7 +77,12 @@ const Song = ({ song, setSong }: SongComponentProps) => {
         setCurrSong(result);
         return setSong(result);
       })
-      .catch((err) => console.log(err));
+      .catch((error) =>
+        setAlertMessage({
+          message: `Error uploading file: ${error}`,
+          severity: 'error',
+        })
+      );
   };
 
   const getLyrics = async () => {
@@ -90,12 +97,18 @@ const Song = ({ song, setSong }: SongComponentProps) => {
           setIsFetchingLyrics(false);
           return true;
         }
-        console.error(error);
+        setAlertMessage({
+          message: `Unable to fetch lyrics from online, possible fix: ensure internet connection and retry with different song/artist name`,
+          severity: 'warning',
+        });
         setIsFetchingLyrics(false);
         return false;
       })
       .catch((error) => {
-        console.error(error);
+        setAlertMessage({
+          message: `Error fetching lyrics from online: ${error}`,
+          severity: 'error',
+        });
         setIsFetchingLyrics(false);
         return false;
       });

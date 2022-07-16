@@ -4,8 +4,9 @@ import SquareOutlinedIcon from '@mui/icons-material/SquareOutlined';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import { GetColorTheme } from '../Settings';
 
+export const TITLE_BAR_HEIGHT = '22px';
+
 const TitleBar = () => {
-  const height = '22px';
   const backgroundColor = GetColorTheme().audioPlayerBackground;
 
   const minimizeApp = () => {
@@ -28,21 +29,26 @@ const TitleBar = () => {
         width: '100%',
         top: 0,
         left: 0,
-        height,
+        height: TITLE_BAR_HEIGHT,
         backgroundColor,
         WebkitAppRegion: 'drag',
       }}
     >
       <Typography
         fontSize={12}
-        sx={{ position: 'absolute', height, top: 3, left: 10 }}
+        sx={{
+          position: 'absolute',
+          height: TITLE_BAR_HEIGHT,
+          top: 3,
+          left: 10,
+        }}
       >
         KTVAnywhere
       </Typography>
       <ButtonGroup
         sx={{
           position: 'absolute',
-          height,
+          height: TITLE_BAR_HEIGHT,
           right: 0,
           WebkitAppRegion: 'no-drag',
         }}

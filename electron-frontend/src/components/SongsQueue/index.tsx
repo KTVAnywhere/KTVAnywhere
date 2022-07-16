@@ -4,7 +4,7 @@ import {
   EnqueueSong,
   DequeueSong,
   GetQueueLength,
-  maxQueueLength,
+  MAX_QUEUE_LENGTH,
 } from './SongsQueue';
 
 export default QueueList;
@@ -13,5 +13,5 @@ export {
   EnqueueSong,
   DequeueSong,
   GetQueueLength,
-  maxQueueLength,
+  MAX_QUEUE_LENGTH,
 };

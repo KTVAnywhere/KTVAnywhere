@@ -19,7 +19,7 @@ import QueueIcon from '@mui/icons-material/Queue';
 import LoadingButton from '@mui/lab/LoadingButton';
 import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { SongProps, useSongDialog, useSongsStatus } from '../Song';
-import { EnqueueSong, GetQueueLength, maxQueueLength } from '../SongsQueue';
+import { EnqueueSong, GetQueueLength, MAX_QUEUE_LENGTH } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
 import { useConfirmation } from '../ConfirmationDialog';
@@ -67,11 +67,11 @@ const SongCard = ({
   };
 
   const enqueueSong = () => {
-    if (GetQueueLength() <= maxQueueLength) {
+    if (GetQueueLength() <= MAX_QUEUE_LENGTH) {
       EnqueueSong(song);
     } else {
       setAlertMessage({
-        message: `Max queue length of ${maxQueueLength}`,
+        message: `Max queue length of ${MAX_QUEUE_LENGTH}`,
         severity: 'warning',
       });
     }
@@ -150,6 +150,7 @@ const SongList = ({
   const [songList, setSongList] = useState<SongProps[]>([]);
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SongProps[]>([]);
+  const { setAlertMessage } = useAlertMessage();
 
   useEffect(() => {
     setSongList(window.electron.store.songs.getAllSongs() ?? []);
@@ -168,10 +169,16 @@ const SongList = ({
       window.electron.store.songs
         .search(query)
         .then((results) => setSearchResults(results))
-        .catch(console.error);
+        .catch((error) =>
+          setAlertMessage({
+            message: `Searching error: ${error}`,
+            severity: 'error',
+          })
+        );
     } else {
       setSearchResults(songList);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, songList]);
 
   const changeQuery = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -265,6 +265,10 @@
     "extraResources": [
       "./assets/**"
     ],
+    "extraFiles": [
+      "./ffmpeg.exe",
+      "./ffprobe.exe"
+    ],
     "publish": {
       "provider": "github",
       "owner": "weiquany",

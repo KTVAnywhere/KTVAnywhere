@@ -1,4 +1,5 @@
 PyInstaller==5.1
+pytest==7.1.2
 setuptools==56.0.0
 spleeter==2.3.0
 git+https://github.com/spotify/basic-pitch@main

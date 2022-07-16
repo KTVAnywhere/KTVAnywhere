@@ -1,4 +1,5 @@
 import { AudioContext } from 'standardized-audio-context-mock';
+import { AlertColor } from '@mui/material';
 import { queueTestDataWithSongs012, songListTestData } from './testData';
 import { configStoreDefaults } from '../main/database';
 
@@ -71,6 +72,13 @@ class MockSource {
 
   off = () => {};
 }
+
+export const mockAlertMessage = {
+  alertMessage: { message: '', severity: 'info' as AlertColor },
+  setAlertMessage: jest.fn(),
+  showAlertMessage: false,
+  setShowAlertMessage: jest.fn(),
+};
 
 export const mockedAudioStatus = {
   duration: 0,

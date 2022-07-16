@@ -21,7 +21,7 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import SpeedIcon from '@mui/icons-material/Speed';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DequeueSong, GetQueueLength } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
@@ -253,7 +253,7 @@ export const AudioPlayer = () => {
           })
           .catch((error) => {
             setAlertMessage({
-              message: `${error}`,
+              message: `Error loading song: ${error}`,
               severity: 'error',
             });
             setIsLoading(false);
@@ -271,7 +271,7 @@ export const AudioPlayer = () => {
       }
     } catch (error) {
       setAlertMessage({
-        message: `${error}`,
+        message: `Error loading song: ${error}`,
         severity: 'error',
       });
       setIsLoading(false);
@@ -362,7 +362,7 @@ export const AudioPlayer = () => {
     ) {
       setAlertMessage({
         message:
-          'Lyrics file not found, please fetch lyrics or upload lyrics file in song details',
+          'No lyrics found, go to song details to fetch lyrics or upload lyrics file',
         severity: 'info',
       });
     } else {
@@ -489,7 +489,8 @@ export const AudioPlayer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveConfig = useCallback(() => {
+  const saveConfig = () => {
+    window.removeEventListener('beforeunload', saveConfig);
     window.electron.store.config.setAudioStatusConfig({
       songId: currentSong ? currentSong.songId : '',
       currentTime,
@@ -508,31 +509,9 @@ export const AudioPlayer = () => {
       microphone1NoiseSuppression,
       microphone2NoiseSuppression,
     });
-  }, [
-    audioInput1Id,
-    audioInput2Id,
-    currentSong,
-    currentTime,
-    duration,
-    graphEnabled,
-    isPlayingVocals,
-    lyricsEnabled,
-    microphone1NoiseSuppression,
-    microphone1Volume,
-    microphone2NoiseSuppression,
-    microphone2Volume,
-    pitch,
-    reverb1Volume,
-    reverb2Volume,
-    volume,
-  ]);
+  };
 
-  useEffect(() => {
-    window.addEventListener('beforeunload', saveConfig);
-    return () => {
-      window.removeEventListener('beforeunload', saveConfig);
-    };
-  }, [saveConfig]);
+  window.addEventListener('beforeunload', saveConfig);
 
   useHotkeys(
     'space',
@@ -651,7 +630,7 @@ export const AudioPlayer = () => {
             data-testid="end-song-button"
             onClick={endSong}
           >
-            <SkipNextIcon fontSize="medium" />
+            <SkipNextIcon color="secondary" fontSize="medium" />
           </IconButton>
         </Tooltip>
       </Grid>
@@ -684,7 +663,7 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item>
           <Grid container direction="row" alignItems="center">
-            <RecordVoiceOverIcon fontSize="medium" />
+            <RecordVoiceOverIcon color="secondary" fontSize="medium" />
             <Switch
               checked={isPlayingVocals}
               onClick={() =>
@@ -705,7 +684,7 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item sx={{ ml: '1%' }}>
           <IconButton sx={{ p: 0 }} onClick={tempoReset}>
-            <SpeedIcon fontSize="medium" />
+            <SpeedIcon color="secondary" fontSize="medium" />
           </IconButton>
         </Grid>
         <Grid item sx={{ ml: '10px', width: '5%' }}>
@@ -728,7 +707,7 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item sx={{ ml: '1%' }}>
           <IconButton sx={{ p: 0 }} onClick={pitchReset}>
-            <GraphicEqIcon fontSize="medium" />
+            <GraphicEqIcon color="secondary" fontSize="medium" />
           </IconButton>
         </Grid>
         <Grid item sx={{ ml: '10px', width: '5%' }}>
@@ -756,7 +735,7 @@ export const AudioPlayer = () => {
               data-testid="backward-10-button"
               onClick={() => backwardSeconds(10)}
             >
-              <FastRewindIcon fontSize="medium" />
+              <FastRewindIcon color="secondary" fontSize="medium" />
             </IconButton>
           </Tooltip>
           {isPlaying ? (
@@ -765,7 +744,7 @@ export const AudioPlayer = () => {
               data-testid="pause-button"
               onClick={pauseSong}
             >
-              <PauseCircleIcon sx={{ fontSize: '42px' }} />
+              <PauseCircleIcon color="secondary" sx={{ fontSize: '42px' }} />
             </IconButton>
           ) : (
             <IconButton
@@ -773,7 +752,7 @@ export const AudioPlayer = () => {
               data-testid="play-button"
               onClick={playSong}
             >
-              <PlayCircleIcon sx={{ fontSize: '42px' }} />
+              <PlayCircleIcon color="secondary" sx={{ fontSize: '42px' }} />
             </IconButton>
           )}
           <Tooltip title="Forward 10s" placement="top">
@@ -782,13 +761,13 @@ export const AudioPlayer = () => {
               data-testid="forward-10-button"
               onClick={() => forwardSeconds(10)}
             >
-              <FastForwardIcon fontSize="medium" />
+              <FastForwardIcon color="secondary" fontSize="medium" />
             </IconButton>
           </Tooltip>
         </Grid>
         <Grid item>
           <IconButton sx={{ p: 0 }} onClick={() => volumeZero()}>
-            <VolumeMuteIcon fontSize="medium" />
+            <VolumeMuteIcon color="secondary" fontSize="medium" />
           </IconButton>
         </Grid>
         <Grid item sx={{ ml: '10px', mr: '2%', width: '6%' }}>
@@ -809,10 +788,10 @@ export const AudioPlayer = () => {
         </Grid>
         <Grid item sx={{ mr: '1%' }}>
           <Grid container direction="row">
-            <AutoGraphIcon fontSize="medium" />
+            <AutoGraphIcon color="secondary" fontSize="medium" />
             <Switch
               checked={graphEnabled}
-              data-testid="toggle-graph-button"
+              data-testid="toggle-graph-switch"
               onClick={toggleGraph}
               size="small"
               color="secondary"
@@ -833,10 +812,10 @@ export const AudioPlayer = () => {
             alignItems="center"
             position="relative"
           >
-            <LyricsIcon fontSize="medium" />
+            <LyricsIcon color="secondary" fontSize="medium" />
             <Switch
               checked={lyricsEnabled}
-              data-testid="toggle-lyrics-button"
+              data-testid="toggle-lyrics-switch"
               onClick={toggleLyrics}
               size="small"
               color="secondary"

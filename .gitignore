@@ -28,6 +28,6 @@ electron-frontend/*.scss.d.ts
 electron-frontend/build
 electron-frontend/dist
 electron-frontend/*.spec
-electron-frontend/pretrained_models
+electron-frontend/src/python_scripts/__pycache__
 electron-frontend/src/python_scripts/extra-hooks/__pycache__
 electron-frontend/assets/spleeter_stems.*
