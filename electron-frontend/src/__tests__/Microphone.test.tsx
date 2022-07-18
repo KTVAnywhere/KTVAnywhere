@@ -8,13 +8,17 @@ import {
   within,
 } from '@testing-library/react';
 import { AudioContext } from 'standardized-audio-context-mock';
-import mockedElectron, { mockedAudioStatus } from '../__testsData__/mocks';
+import mockedElectron, {
+  mockedAudioStatus,
+  mockedAlertMessage,
+} from '../__testsData__/mocks';
 import { AudioStatusProvider } from '../components/AudioStatus.context';
 import Microphone from '../components/Microphone';
 import { AlertMessageProvider } from '../components/AlertMessage';
+import * as AlertContext from '../components/AlertMessage';
 import * as AudioStatusContext from '../components/AudioStatus.context';
 
-describe('Microphone component test', () => {
+describe('Microphone', () => {
   global.window.electron = mockedElectron;
   global.window.AudioContext = AudioContext as any;
   const mediaDevicesPromise = Promise.resolve([]);
@@ -28,6 +32,12 @@ describe('Microphone component test', () => {
         enumerateDevices: mockEnumerateDevices,
       },
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   test('click microphone button should show microphone settings', async () => {
@@ -433,5 +443,139 @@ describe('Microphone component test', () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;
     });
+  });
+});
+
+describe('Microphone exceptions', () => {
+  global.window.electron = mockedElectron;
+  global.window.AudioContext = AudioContext as any;
+  const mediaDevicesPromise = Promise.resolve([]);
+
+  beforeEach(() => {
+    const mockEnumerateDevices = jest.fn(() => mediaDevicesPromise);
+
+    Object.defineProperty(global.navigator, 'mediaDevices', {
+      writable: true,
+      value: {
+        enumerateDevices: mockEnumerateDevices,
+      },
+    });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+
+  test('toggle reverb switch on (initially off) without reverb file', async () => {
+    global.window.electron = {
+      ...mockedElectron,
+      file: {
+        ...mockedElectron.file,
+        getAssetsPath: jest.fn().mockReturnValue(undefined),
+      },
+    };
+    const mockSetReverb1Enabled = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      microphone1Enabled: true,
+      reverb1Enabled: false,
+      microphone1Media: {} as MediaStreamAudioSourceNode,
+      setReverb1Enabled: mockSetReverb1Enabled,
+    });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+    // switch on
+    const reverb1ToggleSwitch = screen.getByTestId('toggle-reverb-1-switch');
+    fireEvent.click(reverb1ToggleSwitch);
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message:
+          'reverb error: impulses_impulse_rev.wav not found, reinstall application to restore file',
+        severity: 'error',
+      })
+    );
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
+  });
+  test('cannot detect audio input devices', async () => {
+    const exampleErrorMessage = 'enumerate devices failure';
+    Object.defineProperty(global.navigator, 'mediaDevices', {
+      writable: true,
+      value: {
+        enumerateDevices: jest.fn().mockRejectedValue(exampleErrorMessage),
+      },
+    });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `cannot detect audio input devices: ${exampleErrorMessage}`,
+        severity: 'error',
+      })
+    );
+  });
+  test('cannot connect to microphone', async () => {
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      microphone1Enabled: false,
+    });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
+    // switch on
+    const microphone1ToggleSwitch = screen.getByTestId(
+      'toggle-microphone-1-switch'
+    );
+    fireEvent.click(microphone1ToggleSwitch);
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message:
+          'Cannot connect to selected microphone, please change input in settings',
+        severity: 'error',
+      })
+    );
   });
 });

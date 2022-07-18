@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Lrc, Runner } from 'lrc-kit';
 import { AudioContext, AudioBuffer } from 'standardized-audio-context-mock';
 import mockedElectron, {
-  mockAlertMessage,
+  mockedAlertMessage,
   mockedAudioStatus,
 } from '../__testsData__/mocks';
 import {
@@ -44,7 +44,6 @@ describe('Lyrics player', () => {
     jest.resetAllMocks();
     jest.clearAllMocks();
   });
-
   test('should load the lyrics of song currently playing', async () => {
     jest
       .spyOn(AudioStatusContext, 'useAudioStatus')
@@ -60,7 +59,6 @@ describe('Lyrics player', () => {
       expect(mockRead).toBeCalledWith(songTestData[0].lyricsPath)
     );
   });
-
   test('should display lyric line based on time', async () => {
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
       ...mockedAudioStatus,
@@ -79,7 +77,6 @@ describe('Lyrics player', () => {
     await waitFor(() => expect(line).toHaveTextContent(lineAt5s));
     await waitFor(() => expect(nextLine).toHaveTextContent(lineAt10s));
   });
-
   test('lyrics should not be displayed if disabled', async () => {
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
       ...mockedAudioStatus,
@@ -98,6 +95,45 @@ describe('Lyrics player', () => {
     const nextLine = screen.getByTestId('next-lyrics');
     await waitFor(() => expect(line).toHaveTextContent(''));
     await waitFor(() => expect(nextLine).toHaveTextContent(''));
+  });
+});
+
+describe('Lyrics player exceptions', () => {
+  global.window.AudioContext = AudioContext as any;
+  test('load non-existent lyrics file', async () => {
+    const exampleErrorMessage = 'cannot read file';
+    global.window.electron = {
+      ...mockedElectron,
+      file: {
+        ...mockedElectron.file,
+        read: jest.fn().mockRejectedValue(exampleErrorMessage),
+        ifFileExists: jest.fn().mockReturnValue(true),
+      },
+    };
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <LyricsProvider>
+            <LyricsPlayer />
+          </LyricsProvider>
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `error loading lyrics file: ${exampleErrorMessage}`,
+        severity: 'error',
+      })
+    );
   });
 });
 
@@ -158,6 +194,51 @@ describe('Lyrics adjust', () => {
   });
 });
 
+describe('Lyrics adjust exceptions', () => {
+  afterAll(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+  test('update lyrics file failure', async () => {
+    const mockWrite = jest.fn().mockResolvedValue({ error: new Error() });
+    global.window.electron = {
+      ...mockedElectron,
+      file: {
+        ...mockedElectron.file,
+        write: mockWrite,
+      },
+    };
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+    });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+
+    render(
+      <AlertMessageProvider>
+        <LyricsProvider>
+          <LyricsAdjust />
+        </LyricsProvider>
+      </AlertMessageProvider>
+    );
+
+    const tickButton = screen.getByRole('button', { name: /saveOffset/i });
+    fireEvent.click(tickButton);
+
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: 'Error updating lyrics file',
+        severity: 'warning',
+      })
+    );
+  });
+});
+
 describe('Audio player', () => {
   const mockDequeueItem = jest.fn().mockReturnValue(songTestData[0]);
 
@@ -170,6 +251,7 @@ describe('Audio player', () => {
         queueItems: {
           ...mockedElectron.store.queueItems,
           dequeueItem: mockDequeueItem,
+          getQueueLength: () => 1,
         },
       },
       file: {
@@ -182,7 +264,6 @@ describe('Audio player', () => {
       },
     };
   });
-
   afterEach(() => {
     jest.restoreAllMocks();
     jest.resetAllMocks();
@@ -204,7 +285,6 @@ describe('Audio player', () => {
       expect(mockDequeueItem).toBeCalled();
     });
   });
-
   test('should play currently paused song when play song button is clicked', async () => {
     const mockSetIsPlaying = jest.fn();
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
@@ -227,7 +307,6 @@ describe('Audio player', () => {
       expect(mockSetIsPlaying).toHaveBeenCalledWith(true);
     });
   });
-
   test('should pause current song when pause song button is clicked', async () => {
     const mockSetIsPlaying = jest.fn();
     const mockDisconnect = jest.fn();
@@ -258,7 +337,6 @@ describe('Audio player', () => {
       expect(mockSetIsPlaying).toBeCalledWith(false);
     });
   });
-
   test('should end current song when end song button is clicked and load next song in queue if available', async () => {
     const mockSetCurrentSong = jest.fn();
     const mockSetCurrentTime = jest.fn();
@@ -301,7 +379,6 @@ describe('Audio player', () => {
       expect(mockSetCurrentTime).toBeCalledWith(0);
     });
   });
-
   test('volume slider should change volume', async () => {
     const mockGain = { value: 70 };
     const mockSetVolume = jest.fn();
@@ -334,7 +411,6 @@ describe('Audio player', () => {
       top: 0,
       toJSON: jest.fn(),
     }));
-
     // set volume to 40
     fireEvent.mouseDown(sliderInput, {
       clientX: 40,
@@ -353,7 +429,6 @@ describe('Audio player', () => {
     });
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
   });
-
   test('toggle vocals button should turn off vocals when clicked and when song accompanimentPath exist', async () => {
     const mockIfFileExists = jest.fn().mockReturnValue(true);
     window.electron.file.ifFileExists = mockIfFileExists;
@@ -379,7 +454,6 @@ describe('Audio player', () => {
       expect(mockReadAsBuffer).toHaveBeenCalledTimes(2);
     });
   });
-
   test('pitch slider should change pitch', async () => {
     const mockSetPitch = jest.fn();
     const mockSource = {
@@ -428,7 +502,6 @@ describe('Audio player', () => {
     });
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
   });
-
   test('tempo slider should change tempo', async () => {
     const mockSetTempo = jest.fn();
     const mockSource = {
@@ -499,7 +572,7 @@ describe('Audio player exceptions', () => {
       currentSong: songTestData[0],
     });
     jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
-      ...mockAlertMessage,
+      ...mockedAlertMessage,
       setAlertMessage: mockSetAlertMessage,
     });
     render(
@@ -524,7 +597,7 @@ describe('Audio player exceptions', () => {
       graphEnabled: false,
     });
     jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
-      ...mockAlertMessage,
+      ...mockedAlertMessage,
       setAlertMessage: mockSetAlertMessage,
     });
     render(
@@ -549,7 +622,7 @@ describe('Audio player exceptions', () => {
       lyricsEnabled: false,
     });
     jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
-      ...mockAlertMessage,
+      ...mockedAlertMessage,
       setAlertMessage: mockSetAlertMessage,
     });
     render(
@@ -574,7 +647,7 @@ describe('Audio player exceptions', () => {
       currentSong: songTestData[0],
     });
     jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
-      ...mockAlertMessage,
+      ...mockedAlertMessage,
       setAlertMessage: mockSetAlertMessage,
     });
     render(

@@ -27,6 +27,7 @@ const mockedElectron = {
       getAllQueueItems: () => queueTestDataWithSongs012,
       setAllQueueItems: jest.fn(),
       shuffleQueue: jest.fn(),
+      getQueueLength: jest.fn(),
       onChange: jest.fn().mockReturnValue(jest.fn()),
     },
     config: {
@@ -73,7 +74,7 @@ class MockSource {
   off = () => {};
 }
 
-export const mockAlertMessage = {
+export const mockedAlertMessage = {
   alertMessage: { message: '', severity: 'info' as AlertColor },
   setAlertMessage: jest.fn(),
   showAlertMessage: false,

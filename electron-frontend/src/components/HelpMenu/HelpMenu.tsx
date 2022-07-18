@@ -118,7 +118,7 @@ const HelpMenuButton = () => {
 
   return (
     <Tooltip title="Help">
-      <IconButton onClick={openHelp}>
+      <IconButton onClick={openHelp} sx={{ p: 0 }}>
         <QuestionMark fontSize="medium" />
       </IconButton>
     </Tooltip>

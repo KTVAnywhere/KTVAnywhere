@@ -8,7 +8,7 @@ import {
 } from '@testing-library/react';
 import { AudioContext } from 'standardized-audio-context-mock';
 import * as Queue from '../components/SongsQueue';
-import { QueueItemProps } from '../components/SongsQueue';
+import { QueueItemProps, MAX_QUEUE_LENGTH } from '../components/SongsQueue';
 import SongComponent, {
   SongDialog,
   SongDialogProvider,
@@ -16,6 +16,8 @@ import SongComponent, {
 } from '../components/Song';
 import { AudioStatusProvider } from '../components/AudioStatus.context';
 import * as AudioStatusContext from '../components/AudioStatus.context';
+import { AlertMessageProvider } from '../components/AlertMessage';
+import * as AlertContext from '../components/AlertMessage';
 import {
   ConfirmationDialog,
   ConfirmationProvider,
@@ -23,7 +25,10 @@ import {
 import * as SongDialogContext from '../components/Song/SongDialog.context';
 import SongList from '../components/SongList';
 import { songTestData, songListTestData } from '../__testsData__/testData';
-import mockedElectron, { mockedAudioStatus } from '../__testsData__/mocks';
+import mockedElectron, {
+  mockedAudioStatus,
+  mockedAlertMessage,
+} from '../__testsData__/mocks';
 import App from '../renderer/App';
 
 describe('SongList', () => {
@@ -77,6 +82,10 @@ describe('SongList', () => {
           deleteSong: mockDelete,
           onChange: jest.fn().mockReturnValue(jest.fn()),
           search: mockSearch.mockResolvedValue(''),
+        },
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          getQueueLength: () => 0,
         },
       },
     };
@@ -182,6 +191,128 @@ describe('SongList', () => {
     await waitFor(() =>
       expect(mockSearch).toBeCalledWith(songListTestData[1].songName)
     );
+  });
+});
+
+describe('SongList exceptions', () => {
+  global.window.AudioContext = AudioContext as any;
+  global.window.electron = mockedElectron;
+
+  // mock AutoSizer start
+  const originalOffsetHeight: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetWidth'
+  );
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 50,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 50,
+    });
+  });
+  afterAll(() => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth
+    );
+  });
+  // mock AutoSizer end
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.clearAllMocks();
+  });
+
+  test('search song failure', async () => {
+    const exampleErrorMessage = 'something failed when searching song';
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        songs: {
+          ...mockedElectron.store.songs,
+          search: jest.fn().mockRejectedValue(exampleErrorMessage),
+        },
+      },
+    };
+    jest
+      .spyOn(SongDialogContext, 'useSongDialog')
+      .mockReturnValue({ open: false, setOpen: jest.fn() });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AlertMessageProvider>
+        <AudioStatusProvider>
+          <SongDialogProvider>
+            <SongsStatusProvider>
+              <SongList setOpenSong={jest.fn()} />
+            </SongsStatusProvider>
+          </SongDialogProvider>
+        </AudioStatusProvider>
+      </AlertMessageProvider>
+    );
+    const searchBox = screen.getByRole('textbox');
+    fireEvent.change(searchBox, {
+      target: { value: songListTestData[1].songName },
+    });
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `Searching error: ${exampleErrorMessage}`,
+        severity: 'error',
+      })
+    );
+  });
+  test('add song to queue but queue is full', () => {
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          getQueueLength: () => MAX_QUEUE_LENGTH,
+        },
+      },
+    };
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AlertMessageProvider>
+        <AudioStatusProvider>
+          <SongDialogProvider>
+            <SongsStatusProvider>
+              <SongList setOpenSong={jest.fn()} />
+            </SongsStatusProvider>
+          </SongDialogProvider>
+        </AudioStatusProvider>
+      </AlertMessageProvider>
+    );
+    const firstEnqueueButton = screen.getAllByRole('button', {
+      name: /Enqueue/i,
+    })[0];
+    fireEvent.click(firstEnqueueButton);
+    expect(mockSetAlertMessage).toBeCalledWith({
+      message: `Max queue length of ${MAX_QUEUE_LENGTH}`,
+      severity: 'warning',
+    });
   });
 });
 
@@ -404,5 +535,131 @@ describe('Song', () => {
     fireEvent.click(saveButton);
 
     expect(mockSet).toBeCalledWith(songTestData[0]);
+  });
+});
+
+describe('Song exceptions', () => {
+  global.window.AudioContext = AudioContext as any;
+  global.window.electron = mockedElectron;
+  afterAll(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+
+  test('no lyrics file fetched', async () => {
+    global.window.electron = {
+      ...mockedElectron,
+      music: {
+        getLrc: jest.fn().mockResolvedValue({
+          lyricsPath: '',
+          error: 'No lyrics for the song was found',
+        }),
+      },
+    };
+    jest
+      .spyOn(SongDialogContext, 'useSongDialog')
+      .mockReturnValue({ open: true, setOpen: jest.fn() });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AlertMessageProvider>
+        <SongDialogProvider>
+          <SongDialog song={songTestData[0]} setSong={jest.fn()} />
+        </SongDialogProvider>
+      </AlertMessageProvider>
+    );
+
+    const fetchLyricsButton = screen.getByTestId('fetch-lyrics');
+    fireEvent.click(fetchLyricsButton);
+
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `Unable to fetch lyrics from online, possible fix: ensure internet connection and retry with different song/artist name`,
+        severity: 'warning',
+      })
+    );
+  });
+  test('fetch lyrics file failure', async () => {
+    const exampleErrorMessage = 'something failed';
+    global.window.electron = {
+      ...mockedElectron,
+      music: {
+        getLrc: jest.fn().mockRejectedValue(exampleErrorMessage),
+      },
+    };
+    jest
+      .spyOn(SongDialogContext, 'useSongDialog')
+      .mockReturnValue({ open: true, setOpen: jest.fn() });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AlertMessageProvider>
+        <SongDialogProvider>
+          <SongDialog song={songTestData[0]} setSong={jest.fn()} />
+        </SongDialogProvider>
+      </AlertMessageProvider>
+    );
+
+    const fetchLyricsButton = screen.getByTestId('fetch-lyrics');
+    fireEvent.click(fetchLyricsButton);
+
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `Error fetching lyrics from online: ${exampleErrorMessage}`,
+        severity: 'error',
+      })
+    );
+  });
+  test('Error uploading song and lyrics file from song details', async () => {
+    const exampleErrorMessage0 = 'something failed when uploading song file';
+    const exampleErrorMessage1 = 'something failed when uploading lyrics file';
+    global.window.electron = {
+      ...mockedElectron,
+      dialog: {
+        openFiles: jest.fn(),
+        openFile: jest
+          .fn()
+          .mockRejectedValueOnce(exampleErrorMessage0)
+          .mockRejectedValueOnce(exampleErrorMessage1),
+      },
+    };
+    jest
+      .spyOn(SongDialogContext, 'useSongDialog')
+      .mockReturnValue({ open: true, setOpen: jest.fn() });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AlertMessageProvider>
+        <SongDialogProvider>
+          <SongDialog song={songTestData[0]} setSong={jest.fn()} />
+        </SongDialogProvider>
+      </AlertMessageProvider>
+    );
+    const songPickerButton = screen.getByTestId('song-picker-button');
+    fireEvent.click(songPickerButton);
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `Error uploading file: ${exampleErrorMessage0}`,
+        severity: 'error',
+      })
+    );
+    const lyricsPickerButton = screen.getByTestId('lyrics-picker-button');
+    fireEvent.click(lyricsPickerButton);
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `Error uploading file: ${exampleErrorMessage1}`,
+        severity: 'error',
+      })
+    );
   });
 });

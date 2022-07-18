@@ -603,6 +603,7 @@ const Microphone = () => {
       >
         <IconButton
           onClick={clickToggleMenu}
+          sx={{ p: 0 }}
           data-testid="toggle-mic-settings-menu"
         >
           <MicIcon fontSize="medium" />

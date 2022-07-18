@@ -7,7 +7,13 @@ import {
   mockGetComputedStyle,
   DND_DRAGGABLE_DATA_ATTR,
 } from 'react-beautiful-dnd-test-utils';
-import QueueList, { DequeueSong, EnqueueSong } from '../components/SongsQueue';
+import QueueList, {
+  DequeueSong,
+  EnqueueSong,
+  MAX_QUEUE_LENGTH,
+} from '../components/SongsQueue';
+import { AlertMessageProvider } from '../components/AlertMessage';
+import * as AlertContext from '../components/AlertMessage';
 import {
   queueTestDataWithSongs012,
   queueTestDataWithSongs102,
@@ -15,12 +21,13 @@ import {
   queueTestDataWithSongs02,
   songTestData,
 } from '../__testsData__/testData';
-import mockedElectron from '../__testsData__/mocks';
+import mockedElectron, { mockedAlertMessage } from '../__testsData__/mocks';
 
-describe('QueueList component buttons tests', () => {
+describe('QueueList buttons', () => {
   const mockGetAllQueueItems = () => queueTestDataWithSongs012;
   const mockSetAllQueueItems = jest.fn();
   const mockShuffleQueue = jest.fn();
+  const mockGetQueueLength = () => queueTestDataWithSongs012.length;
 
   beforeEach(() => {
     global.window.electron = {
@@ -32,6 +39,7 @@ describe('QueueList component buttons tests', () => {
           getAllQueueItems: mockGetAllQueueItems,
           setAllQueueItems: mockSetAllQueueItems,
           shuffleQueue: mockShuffleQueue,
+          getQueueLength: mockGetQueueLength,
           onChange: jest.fn().mockReturnValue(jest.fn()),
         },
       },
@@ -68,6 +76,7 @@ describe('QueueList component buttons tests', () => {
           getAllQueueItems: mockGetAllQueueItems,
           setAllQueueItems: mockSetAllQueueItems,
           shuffleQueue: mockShuffleQueue,
+          getQueueLength: mockGetQueueLength,
           onChange: jest.fn().mockReturnValue(jest.fn()),
         },
       },
@@ -121,7 +130,7 @@ describe('QueueList component buttons tests', () => {
   });
 });
 
-describe('Drag and Drop tests on QueueList component', () => {
+describe('QueueList drag and drop song in queue', () => {
   const mockGetAllQueueItems = () => queueTestDataWithSongs012;
   const mockSetAllQueueItems = jest.fn();
 
@@ -176,6 +185,7 @@ describe('Enqueue and Dequeue tests', () => {
           ...mockedElectron.store.queueItems,
           enqueueItem: mockEnqueueItem,
           dequeueItem: mockDequeueItem,
+          getQueueLength: () => 1,
         },
       },
     };
@@ -212,5 +222,63 @@ describe('Enqueue and Dequeue tests', () => {
       },
     };
     expect(DequeueSong()).toBeNull();
+  });
+});
+
+describe('QueueList exceptions', () => {
+  const mockGetRandomSong = jest.fn().mockReturnValue(songTestData[0]);
+  const mockGetAllQueueItems = () => {
+    const array = new Array(MAX_QUEUE_LENGTH);
+    for (let i = 0; i < MAX_QUEUE_LENGTH; i += 1) {
+      array[i] = { song: songTestData[0], queueItemId: `${i}` };
+    }
+    return array;
+  };
+  const mockGetQueueLength = () => MAX_QUEUE_LENGTH;
+  const mockSetAllQueueItems = jest.fn();
+
+  beforeEach(() => {
+    global.window.electron = {
+      ...mockedElectron,
+      store: {
+        ...mockedElectron.store,
+        songs: {
+          ...mockedElectron.store.songs,
+          getRandomSong: mockGetRandomSong,
+        },
+        queueItems: {
+          ...mockedElectron.store.queueItems,
+          getAllQueueItems: mockGetAllQueueItems,
+          setAllQueueItems: mockSetAllQueueItems,
+          getQueueLength: mockGetQueueLength,
+          onChange: jest.fn().mockReturnValue(jest.fn()),
+        },
+      },
+    };
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+
+  test('add random song but queue is full', () => {
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AlertMessageProvider>
+        <QueueList />
+      </AlertMessageProvider>
+    );
+    const addRandomSongButton = screen.getByTestId('add-random-song-button');
+    fireEvent.click(addRandomSongButton);
+    expect(mockSetAlertMessage).toBeCalledWith({
+      message: `Max queue length of ${MAX_QUEUE_LENGTH}`,
+      severity: 'warning',
+    });
   });
 });

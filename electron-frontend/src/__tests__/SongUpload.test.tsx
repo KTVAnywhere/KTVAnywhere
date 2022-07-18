@@ -12,13 +12,15 @@ import {
   SongStagingDialogProvider,
   SongUploadButton,
 } from '../components/SongUpload';
+import { AlertMessageProvider } from '../components/AlertMessage';
+import * as AlertContext from '../components/AlertMessage';
 import * as SongStagingDialogContext from '../components/SongUpload/SongStagingDialog.context';
 import {
   ConfirmationDialog,
   ConfirmationProvider,
 } from '../components/ConfirmationDialog';
 import { songListTestData, songTestData } from '../__testsData__/testData';
-import mockedElectron from '../__testsData__/mocks';
+import mockedElectron, { mockedAlertMessage } from '../__testsData__/mocks';
 
 describe('SongUploadButton', () => {
   const mockAdd = jest.fn();
@@ -222,5 +224,51 @@ describe('SongStagingDialog', () => {
       screen.queryByText(songListTestData[0].songName)
     ).not.toBeInTheDocument();
     expect(screen.queryByText(songTestData[2].songName)).toBeInTheDocument();
+  });
+});
+
+describe('SongUploadButton exceptions', () => {
+  beforeEach(() => {
+    global.window.electron = mockedElectron;
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+
+  test('upload songs failed', async () => {
+    const exampleErrorMessage = 'something failed when uploading songs';
+    global.window.electron = {
+      ...mockedElectron,
+      dialog: {
+        openFiles: jest.fn().mockRejectedValue(exampleErrorMessage),
+        openFile: jest.fn(),
+      },
+    };
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AlertMessageProvider>
+        <SongsStatusProvider>
+          <SongStagingDialogProvider>
+            <SongUploadButton setUploadedSongs={jest.fn()} />
+          </SongStagingDialogProvider>
+        </SongsStatusProvider>
+      </AlertMessageProvider>
+    );
+    const songUploadButton = screen.getByRole('button');
+    fireEvent.click(songUploadButton);
+
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `Upload error: ${exampleErrorMessage}`,
+        severity: 'error',
+      })
+    );
   });
 });

@@ -36,14 +36,14 @@ export interface QueueItemProps {
 
 export const MAX_QUEUE_LENGTH = 30;
 
-export const GetQueueLength = () =>
-  window.electron.store.queueItems.getAllQueueItems().length;
+export const QueueNotFull = () =>
+  window.electron.store.queueItems.getQueueLength() < MAX_QUEUE_LENGTH;
 
 const setQueue = (queueList: QueueItemProps[]) =>
   window.electron.store.queueItems.setAllQueueItems(queueList);
 
 export const EnqueueSong = (song: SongProps) => {
-  if (GetQueueLength() <= MAX_QUEUE_LENGTH) {
+  if (QueueNotFull()) {
     window.electron.store.queueItems.enqueueItem({
       song,
       queueItemId: uniqid(),
@@ -64,9 +64,7 @@ export const QueueList = () => {
       (_, results) => setQueueItems(results)
     );
 
-    return () => {
-      queueItemsUnsubscribe();
-    };
+    return () => queueItemsUnsubscribe();
   }, []);
 
   const deleteSongFromQueue = (index: number) => {
@@ -82,7 +80,7 @@ export const QueueList = () => {
   const addRandomSong = () => {
     const randomSong = window.electron.store.songs.getRandomSong();
     if (randomSong !== null) {
-      if (GetQueueLength() <= MAX_QUEUE_LENGTH) {
+      if (QueueNotFull()) {
         EnqueueSong(randomSong);
       } else {
         setAlertMessage({
