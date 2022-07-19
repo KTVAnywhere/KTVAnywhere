@@ -24,6 +24,39 @@ import {
 import mockedElectron, { mockedAlertMessage } from '../__testsData__/mocks';
 
 describe('QueueList buttons', () => {
+  // mock AutoSizer start
+  const originalOffsetHeight: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetWidth'
+  );
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 50,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 50,
+    });
+  });
+  afterAll(() => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth
+    );
+  });
+  // mock AutoSizer end
+
   const mockGetAllQueueItems = () => queueTestDataWithSongs012;
   const mockSetAllQueueItems = jest.fn();
   const mockShuffleQueue = jest.fn();
@@ -131,6 +164,39 @@ describe('QueueList buttons', () => {
 });
 
 describe('QueueList drag and drop song in queue', () => {
+  // mock AutoSizer start
+  const originalOffsetHeight: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
+  const originalOffsetWidth: any = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetWidth'
+  );
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      value: 50,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      value: 50,
+    });
+  });
+  afterAll(() => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetHeight',
+      originalOffsetHeight
+    );
+    Object.defineProperty(
+      HTMLElement.prototype,
+      'offsetWidth',
+      originalOffsetWidth
+    );
+  });
+  // mock AutoSizer end
+
   const mockGetAllQueueItems = () => queueTestDataWithSongs012;
   const mockSetAllQueueItems = jest.fn();
 

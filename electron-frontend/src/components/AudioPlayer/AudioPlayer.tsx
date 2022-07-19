@@ -57,8 +57,7 @@ const ProgressBar = () => {
         item
         sx={{
           width: '87%',
-          pl: '1%',
-          pr: '1%',
+          px: '1%',
         }}
       >
         <Slider

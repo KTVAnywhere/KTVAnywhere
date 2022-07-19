@@ -225,19 +225,17 @@ const SongList = ({
         </Typography>
       ) : (
         <AutoSizer>
-          {({ height }) => {
-            return (
-              <FixedSizeList
-                height={height}
-                width="305px"
-                itemSize={140}
-                itemData={searchResults}
-                itemCount={searchResults.length}
-              >
-                {listItems}
-              </FixedSizeList>
-            );
-          }}
+          {({ height }) => (
+            <FixedSizeList
+              height={height}
+              width="305px"
+              itemSize={140}
+              itemData={searchResults}
+              itemCount={searchResults.length}
+            >
+              {listItems}
+            </FixedSizeList>
+          )}
         </AutoSizer>
       )}
     </Container>

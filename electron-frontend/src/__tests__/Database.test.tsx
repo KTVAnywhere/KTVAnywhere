@@ -235,18 +235,20 @@ describe('queueItems store', () => {
     expect(data).toContain(queueTestDataWithSongs012[1]);
     expect(data).toContain(queueTestDataWithSongs012[2]);
   });
+  test('get queue length', () => {
+    const { getQueueLength } = queueItemFunctions;
+    expect(getQueueLength(queueItemsStore)).toEqual(data.length);
+  });
 });
 
 describe('config store', () => {
   const mockGet = jest.fn();
   const mockSet = jest.fn();
-
   const configStore = {
     ...new ActualStore({}),
     get: mockGet,
     set: mockSet,
   };
-
   afterEach(() => {
     mockGet.mockClear();
     mockSet.mockClear();
@@ -257,7 +259,6 @@ describe('config store', () => {
     getAudioStatusConfig(configStore);
     expect(mockGet).toBeCalled();
   });
-
   test('set settings for playing song', () => {
     const { setAudioStatusConfig } = configFunctions;
     const audioStatusConfig: ConfigType['audioStatusConfig'] = {
@@ -281,13 +282,11 @@ describe('config store', () => {
     setAudioStatusConfig(configStore, audioStatusConfig);
     expect(mockSet).toBeCalledWith('audioStatusConfig', audioStatusConfig);
   });
-
   test('get settings', () => {
     const { getSettings } = configFunctions;
     getSettings(configStore);
     expect(mockGet).toBeCalled();
   });
-
   test('set settings', () => {
     const { setSettings } = configFunctions;
     const updatedSettings: ConfigType['settings'] = {

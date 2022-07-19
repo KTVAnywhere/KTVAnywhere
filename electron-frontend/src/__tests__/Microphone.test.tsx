@@ -48,18 +48,15 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     expect(screen.getAllByText('microphone')[0]).toBeInTheDocument();
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;
     });
   });
-
   test('change microphone input', async () => {
     const mockDevice0: MediaDeviceInfo = {
       deviceId: 'default',
@@ -77,7 +74,6 @@ describe('Microphone', () => {
     };
     const mediaDevicesPromise1 = Promise.resolve([mockDevice0, mockDevice1]);
     const mockEnumerateDevices1 = jest.fn(() => mediaDevicesPromise1);
-
     Object.defineProperty(global.navigator, 'mediaDevices', {
       writable: true,
       value: {
@@ -96,24 +92,18 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise1;
     });
-
     const microphone1Options = screen.getAllByRole('button')[2];
     fireEvent.mouseDown(microphone1Options);
-
     fireEvent.click(within(screen.getByRole('listbox')).getByText(/mic1/));
-
     expect(mockSetAudioInput1Id).toBeCalledWith(mockDevice1.deviceId);
   });
-
   test('toggle microphone switch off (initially on) should disable microphone', async () => {
     const mockSetMicrophone1Enabled = jest.fn();
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
@@ -128,24 +118,20 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     // switch off
     const microphone1ToggleSwitch = screen.getByTestId(
       'toggle-microphone-1-switch'
     );
     fireEvent.click(microphone1ToggleSwitch);
-
     expect(mockSetMicrophone1Enabled).toHaveBeenCalledWith(false);
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;
     });
   });
-
   test('toggle reverb switch off (initially on) should disable reverb', async () => {
     const mockSetReverb1Enabled = jest.fn();
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
@@ -160,22 +146,18 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     // switch off
     const reverb1ToggleSwitch = screen.getByTestId('toggle-reverb-1-switch');
     fireEvent.click(reverb1ToggleSwitch);
-
     expect(mockSetReverb1Enabled).toHaveBeenCalledWith(false);
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;
     });
   });
-
   test('toggle noise suppression switch on (initially off) enable noise suppression', async () => {
     const mockSetMicrophoneNoiseSuppression = jest.fn();
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
@@ -190,24 +172,20 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     // switch on
     const microphone1NoiseSuppressionToggleSwitch = screen.getByTestId(
       'toggle-microphone-1-noise-suppression-switch'
     );
     fireEvent.click(microphone1NoiseSuppressionToggleSwitch);
-
     expect(mockSetMicrophoneNoiseSuppression).toHaveBeenCalledWith(true);
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;
     });
   });
-
   test('toggle noise suppression switch off (initially on) disable noise suppression', async () => {
     const mockSetMicrophoneNoiseSuppression = jest.fn();
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
@@ -222,24 +200,20 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     // switch off
     const microphone1NoiseSuppressionToggleSwitch = screen.getByTestId(
       'toggle-microphone-1-noise-suppression-switch'
     );
     fireEvent.click(microphone1NoiseSuppressionToggleSwitch);
-
     expect(mockSetMicrophoneNoiseSuppression).toHaveBeenCalledWith(false);
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;
     });
   });
-
   test('microphone volume slider should change microphone volume', async () => {
     const mockGain = { value: 70 };
     const mockSetMicrophoneVolume = jest.fn();
@@ -259,15 +233,12 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     // get microphone 1 volume slider
     const sliderInput = screen.getByTestId('microphone-1-volume-slider');
     const originalGetBoundingClientRect = sliderInput.getBoundingClientRect;
-
     sliderInput.getBoundingClientRect = jest.fn(() => ({
       width: 100,
       height: 10,
@@ -279,7 +250,6 @@ describe('Microphone', () => {
       top: 0,
       toJSON: jest.fn(),
     }));
-
     // set microphone 1 volume to 40
     fireEvent.mouseDown(sliderInput, {
       clientX: 40,
@@ -288,7 +258,6 @@ describe('Microphone', () => {
       expect(mockSetMicrophoneVolume).toBeCalledWith(40);
       expect(mockGain.value).toEqual(0.4);
     });
-
     // set microphone 1 volume to 100
     fireEvent.mouseDown(sliderInput, {
       clientX: 100,
@@ -297,7 +266,6 @@ describe('Microphone', () => {
       expect(mockSetMicrophoneVolume).toBeCalledWith(100);
       expect(mockGain.value).toEqual(1);
     });
-
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -324,15 +292,12 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     // get microphone 1 reverb slider
     const sliderInput = screen.getByTestId('microphone-1-reverb-slider');
     const originalGetBoundingClientRect = sliderInput.getBoundingClientRect;
-
     sliderInput.getBoundingClientRect = jest.fn(() => ({
       width: 100,
       height: 10,
@@ -344,7 +309,6 @@ describe('Microphone', () => {
       top: 0,
       toJSON: jest.fn(),
     }));
-
     // set microphone 1 reverb to 40
     fireEvent.mouseDown(sliderInput, {
       clientX: 40,
@@ -353,7 +317,6 @@ describe('Microphone', () => {
       expect(mockSetReverbVolume).toBeCalledWith(40);
       expect(mockGain.value).toEqual(0.4);
     });
-
     // set microphone 1 reverb to 100
     fireEvent.mouseDown(sliderInput, {
       clientX: 100,
@@ -362,14 +325,12 @@ describe('Microphone', () => {
       expect(mockSetReverbVolume).toBeCalledWith(100);
       expect(mockGain.value).toEqual(1);
     });
-
     sliderInput.getBoundingClientRect = originalGetBoundingClientRect;
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       mediaDevicesPromise;
     });
   });
-
   test('click restore microphone defaults button should restore defaults', async () => {
     const mockSetAudioInputId = jest.fn();
     const mockSetMicrophoneVolume = jest.fn();
@@ -390,17 +351,14 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
-
     // click restore defaults for mic 1
     const restoreMicrophone1Defaults = screen.getByTestId(
       'restore-microphone-1-defaults-button'
     );
     fireEvent.click(restoreMicrophone1Defaults);
-
     expect(mockSetAudioInputId).toHaveBeenCalledWith('default');
     expect(mockSetMicrophoneVolume).toHaveBeenCalledWith(50);
     expect(mockSetReverbVolume).toHaveBeenCalledWith(50);
@@ -409,10 +367,8 @@ describe('Microphone', () => {
       mediaDevicesPromise;
     });
   });
-
   test('click refresh audio input devices button should call to obtain all audio input devices', async () => {
     const mockEnumerateDevices = jest.fn(() => mediaDevicesPromise);
-
     Object.defineProperty(global.navigator, 'mediaDevices', {
       writable: true,
       value: {
@@ -426,18 +382,15 @@ describe('Microphone', () => {
         </AlertMessageProvider>
       </AudioStatusProvider>
     );
-
     // open microphone settings menu
     const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
     fireEvent.click(micSettingsButton);
     expect(mockEnumerateDevices).toHaveBeenCalledTimes(1);
-
     // click restore defaults for mic 1
     const refreshAudioInputDevicesButton = screen.getByTestId(
       'refresh-audio-input-devices-button'
     );
     fireEvent.click(refreshAudioInputDevicesButton);
-
     expect(mockEnumerateDevices).toHaveBeenCalledTimes(2);
     await act(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -574,6 +527,44 @@ describe('Microphone exceptions', () => {
       expect(mockSetAlertMessage).toBeCalledWith({
         message:
           'Cannot connect to selected microphone, please change input in settings',
+        severity: 'error',
+      })
+    );
+  });
+  test('cannot connect to microphone with noise suppression enabled', async () => {
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      microphone1Enabled: false,
+      microphone1NoiseSuppression: true,
+    });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <Microphone />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    // open microphone settings menu
+    const micSettingsButton = screen.getByTestId('toggle-mic-settings-menu');
+    fireEvent.click(micSettingsButton);
+    await act(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      mediaDevicesPromise;
+    });
+    // switch on
+    const microphone1ToggleSwitch = screen.getByTestId(
+      'toggle-microphone-1-switch'
+    );
+    fireEvent.click(microphone1ToggleSwitch);
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message:
+          'Cannot connect to selected microphone with noise suppression enabled, please change input in settings',
         severity: 'error',
       })
     );

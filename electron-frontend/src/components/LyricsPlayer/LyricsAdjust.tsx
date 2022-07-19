@@ -50,8 +50,8 @@ const LyricsAdjust = () => {
         .then(({ error }) => {
           if (error) {
             setAlertMessage({
-              message: 'Error updating lyrics file',
-              severity: 'warning',
+              message: 'Failed to update lyrics file',
+              severity: 'error',
             });
             return false;
           }
@@ -63,7 +63,7 @@ const LyricsAdjust = () => {
           return true;
         })
         .catch((error) => {
-          setAlertMessage({ message: error.message, severity: 'error' });
+          setAlertMessage({ message: error, severity: 'error' });
         });
     } else {
       setAlertMessage({ message: 'No lyrics file found', severity: 'info' });

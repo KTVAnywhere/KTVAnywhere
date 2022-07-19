@@ -195,12 +195,40 @@ describe('Lyrics adjust', () => {
 });
 
 describe('Lyrics adjust exceptions', () => {
+  global.window.electron = mockedElectron;
   afterAll(() => {
     jest.restoreAllMocks();
     jest.resetAllMocks();
     jest.clearAllMocks();
   });
-  test('update lyrics file failure', async () => {
+  test('adjust lyrics but song does not have lyrics file', () => {
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[2],
+    });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+
+    render(
+      <AlertMessageProvider>
+        <LyricsProvider>
+          <LyricsAdjust />
+        </LyricsProvider>
+      </AlertMessageProvider>
+    );
+
+    const tickButton = screen.getByRole('button', { name: /saveOffset/i });
+    fireEvent.click(tickButton);
+
+    expect(mockSetAlertMessage).toBeCalledWith({
+      message: 'No lyrics file found',
+      severity: 'info',
+    });
+  });
+  test('adjust lyrics file failure 1', async () => {
     const mockWrite = jest.fn().mockResolvedValue({ error: new Error() });
     global.window.electron = {
       ...mockedElectron,
@@ -232,8 +260,46 @@ describe('Lyrics adjust exceptions', () => {
 
     await waitFor(() =>
       expect(mockSetAlertMessage).toBeCalledWith({
-        message: 'Error updating lyrics file',
-        severity: 'warning',
+        message: 'Failed to update lyrics file',
+        severity: 'error',
+      })
+    );
+  });
+  test('adjust lyrics file failure 2', async () => {
+    const exampleErrorMessage = 'something failed when adjusting lyrics';
+    const mockWrite = jest.fn().mockRejectedValue(exampleErrorMessage);
+    global.window.electron = {
+      ...mockedElectron,
+      file: {
+        ...mockedElectron.file,
+        write: mockWrite,
+      },
+    };
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+    });
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+
+    render(
+      <AlertMessageProvider>
+        <LyricsProvider>
+          <LyricsAdjust />
+        </LyricsProvider>
+      </AlertMessageProvider>
+    );
+
+    const tickButton = screen.getByRole('button', { name: /saveOffset/i });
+    fireEvent.click(tickButton);
+
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: exampleErrorMessage,
+        severity: 'error',
       })
     );
   });
@@ -660,6 +726,39 @@ describe('Audio player exceptions', () => {
     expect(mockSetAlertMessage).toBeCalledWith({
       message: `${songTestData[0].songPath} does not exist`,
       severity: 'error',
+    });
+  });
+  test('error loading song as file data cannot be read as buffer', async () => {
+    const exampleErrorMessage = 'cannot read file data';
+    global.window.electron = {
+      ...mockedElectron,
+      file: {
+        ...mockedElectron.file,
+        readAsBuffer: jest.fn().mockRejectedValue(exampleErrorMessage),
+        ifFileExists: jest.fn().mockReturnValue(true),
+      },
+    };
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[0],
+    });
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    render(
+      <AudioStatusProvider>
+        <AlertMessageProvider>
+          <AudioPlayer />
+        </AlertMessageProvider>
+      </AudioStatusProvider>
+    );
+    await waitFor(() => {
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `Error loading song: ${exampleErrorMessage}`,
+        severity: 'error',
+      });
     });
   });
 });

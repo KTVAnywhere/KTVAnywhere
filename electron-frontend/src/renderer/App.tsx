@@ -28,10 +28,9 @@ import {
   SongStagingDialog,
   SongStagingDialogProvider,
 } from '../components/SongUpload';
-import {
+import AlertMessage, {
   AlertMessageProvider,
   useAlertMessage,
-  AlertMessage,
 } from '../components/AlertMessage';
 import { AudioStatusProvider } from '../components/AudioStatus.context';
 import AudioPlayer from '../components/AudioPlayer';

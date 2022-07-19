@@ -9,6 +9,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import Card from '@mui/material/Card';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
@@ -137,7 +138,7 @@ export const QueueList = () => {
   };
 
   return (
-    <Container>
+    <Container sx={{ height: 'calc(100vh - 245px)' }}>
       <Typography
         variant="h5"
         align="center"
@@ -179,114 +180,122 @@ export const QueueList = () => {
         </Tooltip>
       )}
       {queueItems.length > 0 ? (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="songsQueue">
-            {(provided) => (
-              <List
-                aria-label="data"
-                sx={{
-                  width: '280px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'stretch',
-                }}
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                {queueItems.map((queueItem, index) => {
-                  return (
-                    <Draggable
-                      key={queueItem.queueItemId}
-                      draggableId={queueItem.queueItemId}
-                      index={index}
-                    >
-                      {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
-                      {(provided) => (
-                        <ListItem
-                          ref={provided.innerRef}
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...provided.dragHandleProps}
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...provided.draggableProps}
-                          data-testid="draggable-queue-item"
-                          sx={{ px: 0 }}
+        <AutoSizer>
+          {({ height }) => (
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="songsQueue">
+                {(provided) => (
+                  <List
+                    aria-label="data"
+                    sx={{
+                      width: '300px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'stretch',
+                      height,
+                      overflowY: 'scroll',
+                    }}
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    {queueItems.map((queueItem, index) => {
+                      return (
+                        <Draggable
+                          key={queueItem.queueItemId}
+                          draggableId={queueItem.queueItemId}
+                          index={index}
                         >
-                          <Card
-                            sx={{
-                              width: 1,
-                            }}
-                          >
-                            <DragIndicatorIcon
-                              sx={{
-                                position: 'absolute',
-                                top: '40%',
-                                right: 0,
-                              }}
-                            />
-                            <CardContent sx={{ height: '70px' }}>
-                              <Typography noWrap variant="h5">
-                                {queueItem.song.songName}
-                              </Typography>
-                              <Typography noWrap>
-                                {queueItem.song.artist}
-                              </Typography>
-                            </CardContent>
-                            <CardActions
-                              sx={{
-                                display: 'flex',
-                                justifyContent: 'flex-start',
-                              }}
+                          {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
+                          {(provided) => (
+                            <ListItem
+                              ref={provided.innerRef}
+                              // eslint-disable-next-line react/jsx-props-no-spreading
+                              {...provided.dragHandleProps}
+                              // eslint-disable-next-line react/jsx-props-no-spreading
+                              {...provided.draggableProps}
+                              data-testid="draggable-queue-item"
+                              sx={{ px: 0 }}
                             >
-                              <Tooltip title="Play song" placement="top">
-                                <IconButton
-                                  aria-label="play"
-                                  onClick={() => playSong(index)}
-                                  data-testid="play-now-button"
+                              <Card
+                                sx={{
+                                  width: 1,
+                                }}
+                              >
+                                <DragIndicatorIcon
+                                  sx={{
+                                    position: 'absolute',
+                                    top: '40%',
+                                    right: 0,
+                                  }}
+                                />
+                                <CardContent sx={{ height: '70px' }}>
+                                  <Typography noWrap variant="h5">
+                                    {queueItem.song.songName}
+                                  </Typography>
+                                  <Typography noWrap>
+                                    {queueItem.song.artist}
+                                  </Typography>
+                                </CardContent>
+                                <CardActions
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-start',
+                                  }}
                                 >
-                                  <PlayArrowIcon fontSize="medium" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Up" placement="top">
-                                <IconButton
-                                  aria-label="up"
-                                  data-testid="move-song-up-in-queue-button"
-                                  onClick={() => shiftSongUp(index)}
-                                >
-                                  <KeyboardArrowUpIcon fontSize="medium" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="First" placement="top">
-                                <IconButton
-                                  aria-label="first"
-                                  data-testid="send-to-front-of-queue-button"
-                                  onClick={() => sendSongToFrontOfQueue(index)}
-                                >
-                                  <KeyboardDoubleArrowUpIcon fontSize="medium" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Delete" placement="top">
-                                <IconButton
-                                  aria-label="delete"
-                                  onClick={() => deleteSongFromQueue(index)}
-                                  color="error"
-                                  data-testid="delete-song-from-queue-button"
-                                >
-                                  <DeleteIcon fontSize="medium" />
-                                </IconButton>
-                              </Tooltip>
-                            </CardActions>
-                          </Card>
-                        </ListItem>
-                      )}
-                    </Draggable>
-                  );
-                })}
-                {provided.placeholder}
-              </List>
-            )}
-          </Droppable>
-        </DragDropContext>
+                                  <Tooltip title="Play song" placement="top">
+                                    <IconButton
+                                      aria-label="play"
+                                      onClick={() => playSong(index)}
+                                      data-testid="play-now-button"
+                                    >
+                                      <PlayArrowIcon fontSize="medium" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title="Up" placement="top">
+                                    <IconButton
+                                      aria-label="up"
+                                      data-testid="move-song-up-in-queue-button"
+                                      onClick={() => shiftSongUp(index)}
+                                    >
+                                      <KeyboardArrowUpIcon fontSize="medium" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title="First" placement="top">
+                                    <IconButton
+                                      aria-label="first"
+                                      data-testid="send-to-front-of-queue-button"
+                                      onClick={() =>
+                                        sendSongToFrontOfQueue(index)
+                                      }
+                                    >
+                                      <KeyboardDoubleArrowUpIcon fontSize="medium" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title="Delete" placement="top">
+                                    <IconButton
+                                      aria-label="delete"
+                                      onClick={() => deleteSongFromQueue(index)}
+                                      color="error"
+                                      data-testid="delete-song-from-queue-button"
+                                    >
+                                      <DeleteIcon fontSize="medium" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </CardActions>
+                              </Card>
+                            </ListItem>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {provided.placeholder}
+                  </List>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </AutoSizer>
       ) : (
         <Typography
           textAlign="center"

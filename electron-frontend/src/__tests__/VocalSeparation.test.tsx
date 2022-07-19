@@ -10,7 +10,7 @@ import {
 import SongList from '../components/SongList';
 import { songListTestData } from '../__testsData__/testData';
 
-describe('Process song with spleeter', () => {
+describe('Process song with spleeter and basic pitch', () => {
   const mockSetOpenSong = jest.fn();
   const mockSongsStatus: string[] = [];
   const mockSetSongsStatus = jest.fn();
@@ -58,7 +58,7 @@ describe('Process song with spleeter', () => {
     jest.clearAllMocks();
   });
 
-  test('click process button will enqueue the song into the queue containing songs to be processed with spleeter', () => {
+  test('click process button will enqueue the song into the queue containing songs to be processed', () => {
     jest.spyOn(SongsStatusContext, 'useSongsStatus').mockReturnValue({
       songsStatus: mockSongsStatus,
       setSongsStatus: mockSetSongsStatus,

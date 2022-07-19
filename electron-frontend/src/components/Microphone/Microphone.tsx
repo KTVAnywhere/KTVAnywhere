@@ -440,7 +440,6 @@ const MicrophoneMenu = ({
 
   const getMicrophoneMedia = async (audioInputId: string) => {
     let microphoneSource = null;
-
     try {
       microphoneSource = await navigator.mediaDevices
         .getUserMedia({
@@ -460,16 +459,15 @@ const MicrophoneMenu = ({
 
   const getMicrophoneMediaWithRnnoise = async (audioInputId: string) => {
     let microphoneSource = null;
-    const assetsPath = window.electron.file.getAssetsPath();
-    const processor = new NoiseSuppressionProcessor(assetsPath);
-    const constraints = {
-      sampleRate: { ideal: 48000 },
-      sampleSize: { ideal: 480 },
-      channelCount: { exact: 1 },
-      deviceId: audioInputId,
-    };
-
     try {
+      const assetsPath = window.electron.file.getAssetsPath();
+      const processor = new NoiseSuppressionProcessor(assetsPath);
+      const constraints = {
+        sampleRate: { ideal: 48000 },
+        sampleSize: { ideal: 480 },
+        channelCount: { exact: 1 },
+        deviceId: audioInputId,
+      };
       microphoneSource = await navigator.mediaDevices
         .getUserMedia({
           audio: constraints,
@@ -482,7 +480,7 @@ const MicrophoneMenu = ({
     } catch (err) {
       setAlertMessage({
         message:
-          'Cannot connect to selected microphone, please change input in settings',
+          'Cannot connect to selected microphone with noise suppression enabled, please change input in settings',
         severity: 'error',
       });
     }
