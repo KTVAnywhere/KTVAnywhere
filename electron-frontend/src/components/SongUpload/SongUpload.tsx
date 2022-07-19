@@ -45,12 +45,17 @@ const SongUploadButton = ({ setUploadedSongs }: SongUploadProps) => {
         setUploadedSongs(results);
         return setOpenUploadDialog(true);
       })
-      .catch((error) =>
-        setAlertMessage({
-          message: `Upload error: ${error}`,
-          severity: 'error',
-        })
-      );
+      .catch((error) => {
+        if (
+          error.message !==
+          "Error invoking remote method 'dialog:openFiles': Error: Cancelled file selection"
+        ) {
+          setAlertMessage({
+            message: `Upload error: ${error}`,
+            severity: 'error',
+          });
+        }
+      });
   };
   return (
     <Button

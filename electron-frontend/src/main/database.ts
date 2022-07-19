@@ -188,6 +188,8 @@ export const queueItemFunctions = {
 
     store.set('queueItems', newQueue);
   },
+  getQueueLength: (store: Store<QueueItemsType>) =>
+    store.get('queueItems').length,
 };
 
 export const configFunctions = {

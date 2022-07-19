@@ -1,4 +1,5 @@
-import { AlertMessageProvider, useAlertMessage } from './Alert.context';
 import AlertMessage from './AlertMessage';
+import { AlertMessageProvider, useAlertMessage } from './Alert.context';
 
-export { AlertMessage, AlertMessageProvider, useAlertMessage };
+export default AlertMessage;
+export { AlertMessageProvider, useAlertMessage };

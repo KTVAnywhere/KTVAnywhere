@@ -23,7 +23,7 @@ const ConfirmationDialog = () => {
           <Typography>{confirmationMessage.message}</Typography>
         )}
         {typeof confirmationMessage.message === 'object' && (
-          <Typography>{confirmationMessage.message}</Typography>
+          <>{confirmationMessage.message}</>
         )}
       </DialogContent>
       <DialogActions>

@@ -49,6 +49,7 @@ declare global {
           deleteQueueItem(queueItemId: string): void;
           getAllQueueItems(): QueueItemProps[];
           setAllQueueItems(queueItems: QueueItemProps[]): void;
+          getQueueLength(): number;
           shuffleQueue(): void;
           onChange(
             callback: (_event: IpcRenderer, results: QueueItemProps[]) => void

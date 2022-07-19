@@ -77,12 +77,17 @@ const Song = ({ song, setSong }: SongComponentProps) => {
         setCurrSong(result);
         return setSong(result);
       })
-      .catch((error) =>
-        setAlertMessage({
-          message: `Error uploading file: ${error}`,
-          severity: 'error',
-        })
-      );
+      .catch((error) => {
+        if (
+          error.message !==
+          "Error invoking remote method 'dialog:openFile': Error: Cancelled file selection"
+        ) {
+          setAlertMessage({
+            message: `Error uploading file: ${error}`,
+            severity: 'error',
+          });
+        }
+      });
   };
 
   const getLyrics = async () => {
@@ -115,7 +120,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
   };
 
   return (
-    <Container sx={{ pt: '5%', width: 1 }}>
+    <Container sx={{ pt: '5%', width: 0.9 }}>
       <Container disableGutters>
         <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText

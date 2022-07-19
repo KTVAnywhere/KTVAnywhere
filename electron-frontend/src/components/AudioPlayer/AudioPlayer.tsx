@@ -22,7 +22,7 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import { useEffect, useState } from 'react';
-import { DequeueSong, GetQueueLength } from '../SongsQueue';
+import { DequeueSong } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
 import { useConfirmation } from '../ConfirmationDialog';
@@ -57,8 +57,7 @@ const ProgressBar = () => {
         item
         sx={{
           width: '87%',
-          pl: '1%',
-          pr: '1%',
+          px: '1%',
         }}
       >
         <Slider
@@ -336,7 +335,10 @@ export const AudioPlayer = () => {
     if (source) {
       setIsPlaying(true);
       reconnectNodes();
-    } else if (!currentSong && GetQueueLength() > 0) {
+    } else if (
+      !currentSong &&
+      window.electron.store.queueItems.getQueueLength() > 0
+    ) {
       const song = DequeueSong();
       if (song) {
         loadSong(song, song.songPath, false, true, () => {
@@ -415,7 +417,7 @@ export const AudioPlayer = () => {
   };
 
   const endSong = () => {
-    if (GetQueueLength() > 0) {
+    if (window.electron.store.queueItems.getQueueLength() > 0) {
       if (!isLoading) {
         const song = DequeueSong();
         if (song) {

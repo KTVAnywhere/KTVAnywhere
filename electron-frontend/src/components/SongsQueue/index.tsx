@@ -3,7 +3,7 @@ import {
   QueueItemProps,
   EnqueueSong,
   DequeueSong,
-  GetQueueLength,
+  QueueNotFull,
   MAX_QUEUE_LENGTH,
 } from './SongsQueue';
 
@@ -12,6 +12,6 @@ export {
   QueueItemProps,
   EnqueueSong,
   DequeueSong,
-  GetQueueLength,
+  QueueNotFull,
   MAX_QUEUE_LENGTH,
 };

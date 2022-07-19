@@ -28,10 +28,9 @@ import {
   SongStagingDialog,
   SongStagingDialogProvider,
 } from '../components/SongUpload';
-import {
+import AlertMessage, {
   AlertMessageProvider,
   useAlertMessage,
-  AlertMessage,
 } from '../components/AlertMessage';
 import { AudioStatusProvider } from '../components/AudioStatus.context';
 import AudioPlayer from '../components/AudioPlayer';
@@ -81,9 +80,7 @@ const MainPage = () => {
       }
     );
 
-    return () => {
-      processSongUnsubscribe();
-    };
+    return () => processSongUnsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -179,11 +176,12 @@ const MainPage = () => {
         </Container>
         <Stack
           direction="row"
-          spacing={-1}
+          spacing={1}
           sx={{ position: 'fixed', bottom: 10, left: 20, p: 0 }}
         >
           <Tooltip title="Settings">
             <IconButton
+              sx={{ p: 0 }}
               data-testid="settings-button"
               onClick={() => setShowSettings(true)}
             >

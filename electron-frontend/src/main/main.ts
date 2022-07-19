@@ -293,6 +293,7 @@ app
       getAllQueueItems,
       setAllQueueItems,
       shuffleQueue,
+      getQueueLength,
     } = queueItemFunctions;
     const {
       getAudioStatusConfig,
@@ -386,16 +387,17 @@ app
     ipcMain.on('store:deleteQueueItem', async (_, queueItemId) => {
       deleteQueueItem(queueItemsStore, queueItemId);
     });
-
     ipcMain.on('store:getAllQueueItems', async (event) => {
       event.returnValue = getAllQueueItems(queueItemsStore);
     });
-
     ipcMain.on('store:setAllQueueItems', async (_, queueItems) => {
       setAllQueueItems(queueItemsStore, queueItems);
     });
     ipcMain.on('store:shuffleQueue', async () => {
       shuffleQueue(queueItemsStore);
+    });
+    ipcMain.on('store:getQueueLength', async (event) => {
+      event.returnValue = getQueueLength(queueItemsStore);
     });
 
     queueItemsStore.onDidChange('queueItems', (results) =>

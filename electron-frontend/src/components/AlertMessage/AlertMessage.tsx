@@ -34,6 +34,7 @@ const AlertMessage = () => {
             color="inherit"
             size="small"
             onClick={() => setShowAlertMessage(false)}
+            data-testid="close-alert-message-button"
           >
             Close
           </Button>

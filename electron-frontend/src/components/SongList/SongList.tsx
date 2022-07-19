@@ -19,7 +19,7 @@ import QueueIcon from '@mui/icons-material/Queue';
 import LoadingButton from '@mui/lab/LoadingButton';
 import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { SongProps, useSongDialog, useSongsStatus } from '../Song';
-import { EnqueueSong, GetQueueLength, MAX_QUEUE_LENGTH } from '../SongsQueue';
+import { EnqueueSong, QueueNotFull, MAX_QUEUE_LENGTH } from '../SongsQueue';
 import { useAlertMessage } from '../AlertMessage';
 import { useAudioStatus } from '../AudioStatus.context';
 import { useConfirmation } from '../ConfirmationDialog';
@@ -67,7 +67,7 @@ const SongCard = ({
   };
 
   const enqueueSong = () => {
-    if (GetQueueLength() <= MAX_QUEUE_LENGTH) {
+    if (QueueNotFull()) {
       EnqueueSong(song);
     } else {
       setAlertMessage({
@@ -159,9 +159,7 @@ const SongList = ({
         setSongList(results);
       }
     );
-    return () => {
-      songsUnsubscribe();
-    };
+    return () => songsUnsubscribe();
   }, []);
 
   useEffect(() => {
@@ -227,19 +225,17 @@ const SongList = ({
         </Typography>
       ) : (
         <AutoSizer>
-          {({ height }) => {
-            return (
-              <FixedSizeList
-                height={height}
-                width="305px"
-                itemSize={140}
-                itemData={searchResults}
-                itemCount={searchResults.length}
-              >
-                {listItems}
-              </FixedSizeList>
-            );
-          }}
+          {({ height }) => (
+            <FixedSizeList
+              height={height}
+              width="305px"
+              itemSize={140}
+              itemData={searchResults}
+              itemCount={searchResults.length}
+            >
+              {listItems}
+            </FixedSizeList>
+          )}
         </AutoSizer>
       )}
     </Container>

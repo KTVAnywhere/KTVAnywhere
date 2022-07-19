@@ -110,6 +110,9 @@ contextBridge.exposeInMainWorld('electron', {
       shuffleQueue() {
         ipcRenderer.send('store:shuffleQueue');
       },
+      getQueueLength() {
+        return ipcRenderer.sendSync('store:getQueueLength');
+      },
       onChange: (
         callback: (_event: IpcRendererEvent, results: QueueItemProps[]) => void
       ) => {

@@ -1,10 +1,15 @@
 import '@testing-library/jest-dom';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import { AudioContext } from 'standardized-audio-context-mock';
-import mockedElectron, { mockedAudioStatus } from '../__testsData__/mocks';
+import mockedElectron, {
+  mockedAudioStatus,
+  mockedAlertMessage,
+} from '../__testsData__/mocks';
 import { songTestData, testGraph } from '../__testsData__/testData';
 import * as AudioStatusContext from '../components/AudioStatus.context';
 import { AudioStatusProvider } from '../components/AudioStatus.context';
+import { AlertMessageProvider } from '../components/AlertMessage';
+import * as AlertContext from '../components/AlertMessage';
 import PitchGraph from '../components/PitchGraph';
 
 describe('Pitch graph', () => {
@@ -86,5 +91,51 @@ describe('Pitch graph', () => {
     );
     const graph = screen.queryByTestId('pitch-graph');
     await waitFor(() => expect(graph).not.toBeInTheDocument());
+  });
+});
+
+describe('Pitch graph exceptions', () => {
+  global.window.AudioContext = AudioContext as any;
+  global.window.electron = mockedElectron;
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.clearAllMocks();
+  });
+
+  test('read graph data error', async () => {
+    const exampleErrorMessage = 'graph file not found';
+    const mockRead = jest.fn().mockRejectedValue(exampleErrorMessage);
+    global.window.electron = {
+      ...mockedElectron,
+      file: {
+        ...mockedElectron.file,
+        read: mockRead,
+        ifFileExists: jest.fn().mockReturnValue(true),
+      },
+    };
+    const mockSetAlertMessage = jest.fn();
+    jest.spyOn(AlertContext, 'useAlertMessage').mockReturnValue({
+      ...mockedAlertMessage,
+      setAlertMessage: mockSetAlertMessage,
+    });
+    jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
+      ...mockedAudioStatus,
+      currentSong: songTestData[1],
+    });
+    render(
+      <AlertMessageProvider>
+        <AudioStatusProvider>
+          <PitchGraph />
+        </AudioStatusProvider>
+      </AlertMessageProvider>
+    );
+    await waitFor(() =>
+      expect(mockSetAlertMessage).toBeCalledWith({
+        message: `Error reading graph data: ${exampleErrorMessage}`,
+        severity: 'error',
+      })
+    );
   });
 });
