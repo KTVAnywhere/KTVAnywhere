@@ -120,7 +120,7 @@ const Song = ({ song, setSong }: SongComponentProps) => {
   };
 
   return (
-    <Container sx={{ pt: '5%', width: 1 }}>
+    <Container sx={{ pt: '5%', width: 0.9 }}>
       <Container disableGutters>
         <Typography sx={{ fontWeight: 600 }}>Name: </Typography>
         <EditText

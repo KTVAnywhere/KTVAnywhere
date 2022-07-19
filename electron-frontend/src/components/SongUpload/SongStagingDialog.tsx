@@ -100,7 +100,13 @@ const SongStagingDialog = ({
   };
 
   return (
-    <Dialog scroll="paper" open={open} onClose={cancelUpload} maxWidth="md">
+    <Dialog
+      scroll="paper"
+      open={open}
+      onClose={cancelUpload}
+      maxWidth="sm"
+      fullWidth
+    >
       <DialogTitle>Upload songs</DialogTitle>
       <DialogContent dividers>
         <List>
