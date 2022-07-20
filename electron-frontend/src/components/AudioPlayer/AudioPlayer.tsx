@@ -355,11 +355,16 @@ export const AudioPlayer = () => {
   };
 
   const toggleLyrics = () => {
+    let updatedSong;
+    if (currentSong) {
+      updatedSong = window.electron.store.songs.getSong(currentSong.songId);
+      setCurrentSong(updatedSong);
+    }
     if (
       !lyricsEnabled &&
       !(
-        currentSong?.lyricsPath &&
-        window.electron.file.ifFileExists(currentSong?.lyricsPath)
+        updatedSong?.lyricsPath &&
+        window.electron.file.ifFileExists(updatedSong?.lyricsPath)
       )
     ) {
       setAlertMessage({
@@ -373,11 +378,17 @@ export const AudioPlayer = () => {
   };
 
   const toggleGraph = () => {
+    let updatedSong;
+    if (currentSong) {
+      updatedSong = window.electron.store.songs.getSong(currentSong.songId);
+      setCurrentSong(updatedSong);
+    }
+
     if (
       !graphEnabled &&
       !(
-        currentSong?.graphPath &&
-        window.electron.file.ifFileExists(currentSong?.graphPath)
+        updatedSong?.graphPath &&
+        window.electron.file.ifFileExists(updatedSong?.graphPath)
       )
     ) {
       setAlertMessage({
@@ -399,15 +410,19 @@ export const AudioPlayer = () => {
 
   const disableVocals = () => {
     if (currentSong) {
-      if (currentSong.accompanimentPath === '') {
+      const updatedSong = window.electron.store.songs.getSong(
+        currentSong.songId
+      );
+      setCurrentSong(updatedSong);
+      if (updatedSong.accompanimentPath === '') {
         setAlertMessage({
           message: 'Song must be processed for vocals to be turned off',
           severity: 'info',
         });
       } else {
         loadSong(
-          currentSong,
-          currentSong.accompanimentPath,
+          updatedSong,
+          updatedSong.accompanimentPath,
           true,
           isPlaying,
           () => setIsPlayingVocals(false)
