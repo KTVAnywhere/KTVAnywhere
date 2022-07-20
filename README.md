@@ -22,7 +22,7 @@ While karaoke has been around for many years, casual singers usually go to karao
 
 ### Proposed features
 
-- Pitch graph and scoring
+- User pitch detection and scoring
 
 ## Technologies
 
@@ -38,9 +38,6 @@ KTV Anywhere uses the following technlogies:
 ## Installation
 
 Download and install the latest release from the [releases page].
-
-#### FFMPEG installation instructions (Windows)
-
 
 
 ### Installation for development
@@ -58,7 +55,7 @@ Setup
 ```sh
 git clone https://github.com/weiquany/KTVAnywhere.git
 cd ./KTVAnywhere/electron-frontend
-npm install                                     # node modules
+npm install --legacy-peer-deps			# node modules
 python -m pip install -r 'requirements.txt'     # python libraries
 ```
 
