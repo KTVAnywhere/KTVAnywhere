@@ -498,6 +498,7 @@ describe('Audio player', () => {
   test('toggle vocals button should turn off vocals when clicked and when song accompanimentPath exist', async () => {
     const mockIfFileExists = jest.fn().mockReturnValue(true);
     window.electron.file.ifFileExists = mockIfFileExists;
+    window.electron.store.songs.getSong = () => songTestData[1];
     const mockReadAsBuffer = jest.fn();
     window.electron.file.readAsBuffer = mockReadAsBuffer;
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
@@ -633,6 +634,7 @@ describe('Audio player exceptions', () => {
   });
   test('disable vocals when song not processed', async () => {
     const mockSetAlertMessage = jest.fn();
+    window.electron.store.songs.getSong = () => songTestData[0];
     jest.spyOn(AudioStatusContext, 'useAudioStatus').mockReturnValue({
       ...mockedAudioStatus,
       currentSong: songTestData[0],
