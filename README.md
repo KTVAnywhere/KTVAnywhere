@@ -34,6 +34,7 @@ KTV Anywhere uses the following technlogies:
 - [SoundTouchJS] - For the pitch shifting functionality
 - [Basic Pitch] - For audio to pitch conversion
 - [RNNoise] - For microphone noise suppression
+- [NetEase Cloud Music] - For their lyrics database
 
 ## Installation
 
@@ -91,6 +92,7 @@ Spotted a bug? Please create a post on the [issues page]
 [soundtouchjs]: https://github.com/cutterbl/SoundTouchJS
 [basic pitch]: https://github.com/spotify/basic-pitch
 [rnnoise]: https://github.com/xiph/rnnoise
+[NetEase Cloud Music]: https://music.163.com/
 [nodejs]: https://nodejs.org/en/
 [python]: https://www.python.org/
 [ffmpeg]: https://ffmpeg.org/
