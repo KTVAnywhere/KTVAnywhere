@@ -1,10 +1,14 @@
-# KTV Anywhere
+<div align="center">
+  <h1 style="color:blue;">KTV Anywhere</h1>
+  <img src="./electron-frontend/assets/icon.svg" title="icon" width="200" style="padding: 0;">
+  <h3>A karaoke song system for everyone</h3>
+  <p>Available for Windows OS</p>
+  
+  [![Electron](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml/badge.svg)](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml)
+</div>
 
-#### A karaoke song system for everyone
 
-[![Electron](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml/badge.svg)](https://github.com/weiquany/KTVAnywhere/actions/workflows/main.yml)
-
-Available for Windows OS
+![screenshot](https://user-images.githubusercontent.com/43949290/180750018-e9b8a54b-3a2f-4ad8-8022-df9a610ef2cf.png)
 
 ## Aim
 
