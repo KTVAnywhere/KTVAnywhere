@@ -2,10 +2,12 @@ def demucs_separate(source, output):
     from demucs import separate
     from os import path, rmdir
     import shutil
+    import multiprocessing
 
+    cores = multiprocessing.cpu_count()
     model = "htdemucs"
     naming_format = "{stem}.{ext}"
-    separate.main(['{}'.format(source), "-o", '{}'.format(output), "--filename", naming_format, "--two-stems=vocals", "--mp3", "--mp3-bitrate=64000", "-j=4"])
+    separate.main(['{}'.format(source), "-o", '{}'.format(output), "--filename", naming_format, "--two-stems=vocals", "--mp3", "--mp3-bitrate=64000", "-j={}".format(cores)])
     shutil.move(path.join(output, model, "vocals.mp3"), path.join(output, "vocals.mp3"))
     shutil.move(path.join(output, model, "no_vocals.mp3"), path.join(output, "accompaniment.mp3"))
     rmdir(path.join(output, model))
@@ -37,12 +39,11 @@ def process_song(source, output, songId):
     except Exception as e:
         exception_message = '{}'.format(e)
         error_list = exception_message.split('\n')
-        sys.stderr.write(exception_message)
 
-        error_message = exception_message
+        error_message = 'generic error message'
         if ("[Errno 2] No such file or directory: '.\\\\htdemucs\\\\vocals.mp3'" in error_list):
             error_message = 'input file does not exist'
-        elif (error_list[0] == 'ffmpeg binary not found'):
+        elif ('When trying to load using ffmpeg, got the following error: FFmpeg is not installed.' in error_list):
             error_message = 'ffmpeg binary not found'
 
         sys.stdout.write(error_message)
@@ -52,4 +53,6 @@ if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
     import sys
+    sys.stdin.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding='utf-8')
     process_song(sys.argv[1], sys.argv[2], sys.argv[3])

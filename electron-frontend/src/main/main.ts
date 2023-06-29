@@ -187,7 +187,11 @@ app
               graphPath: path.join(songFolder, 'graph.json'),
               songId: song.songId,
             });
-          } else if (messages.includes('ffmpeg binary not found')) {
+          } else if (
+            messages.includes(
+              'When trying to load using ffmpeg, got the following error: FFmpeg is not installed.'
+            )
+          ) {
             mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
