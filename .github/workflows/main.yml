@@ -6,6 +6,9 @@ on:
     paths:
       - electron-frontend/**
 
+permissions:
+  contents: write
+  
 jobs:
   release:
     runs-on: ${{ matrix.os }}
