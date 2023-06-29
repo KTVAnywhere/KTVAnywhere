@@ -1,5 +1,5 @@
 import pathlib
-from process_song import spleeter, basicpitch, process_song
+from process_song import demucs_separate, basicpitch, process_song
 from tempfile import TemporaryDirectory
 from os.path import exists, join
 import json
@@ -10,7 +10,7 @@ DATA_PATH = pathlib.Path(__file__).parent / 'data'
 
 def test_spleeter() -> None:
     with TemporaryDirectory() as output_path:
-        spleeter(DATA_PATH / 'audio.wav', output_path)
+        demucs_separate(DATA_PATH / 'audio.wav', output_path)
         assert exists(join(output_path, 'vocals.mp3'))
         assert exists(join(output_path, 'accompaniment.mp3'))
 

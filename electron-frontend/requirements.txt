@@ -1,5 +1,5 @@
-PyInstaller==5.1
+PyInstaller==5.13.0
 pytest==7.1.2
-setuptools==56.0.0
-spleeter==2.3.0
-git+https://github.com/spotify/basic-pitch@main
+setuptools>=56.0.0
+basic_pitch==0.2.6
+git+https://github.com/facebookresearch/demucs#egg=demucs

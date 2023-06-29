@@ -1,9 +1,15 @@
-def spleeter(source, output):
-    from spleeter.separator import Separator
-    separator = Separator('spleeter:2stems')
-    naming_format = "{instrument}.{codec}"
-    separator.separate_to_file('{}'.format(source), '{}'.format(
-        output), codec="mp3", bitrate="128k", filename_format=naming_format)
+def demucs_separate(source, output):
+    from demucs import separate
+    from os import path, rmdir
+    import shutil
+
+    model = "htdemucs"
+    naming_format = "{stem}.{ext}"
+    separate.main(['{}'.format(source), "-o", '{}'.format(output), "--filename", naming_format, "--two-stems=vocals", "--mp3", "--mp3-bitrate=64000", "-j=4"])
+    shutil.move(path.join(output, model, "vocals.mp3"), path.join(output, "vocals.mp3"))
+    shutil.move(path.join(output, model, "no_vocals.mp3"), path.join(output, "accompaniment.mp3"))
+    rmdir(path.join(output, model))
+
 
 
 def basicpitch(source, output):
@@ -25,22 +31,21 @@ def process_song(source, output, songId):
     import sys
     from os import path
     try:
-        spleeter(source, output)
+        demucs_separate(source, output)
         basicpitch(path.join(output, 'vocals.mp3'), output)
         sys.stdout.write('done processing {}'.format(songId))
     except Exception as e:
         exception_message = '{}'.format(e)
         error_list = exception_message.split('\n')
+        sys.stderr.write(exception_message)
 
-        error_message = 'generic error message'
-        if (len(error_list) >= 2 and error_list[len(error_list) - 2] == '{}: No such file or directory\r'.format(source)):
+        error_message = exception_message
+        if ("[Errno 2] No such file or directory: '.\\\\htdemucs\\\\vocals.mp3'" in error_list):
             error_message = 'input file does not exist'
         elif (error_list[0] == 'ffmpeg binary not found'):
             error_message = 'ffmpeg binary not found'
 
         sys.stdout.write(error_message)
-    except:
-        sys.stdout.write('generic error message')
 
 
 if __name__ == "__main__":
