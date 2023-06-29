@@ -6,8 +6,7 @@ on:
     paths:
       - electron-frontend/**
 
-permissions:
-  contents: write
+permissions: write-all
   
 jobs:
   release:
