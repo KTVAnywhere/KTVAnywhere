@@ -41,11 +41,10 @@ def process_song(source, output, songId):
         error_list = exception_message.split('\n')
 
         error_message = 'generic error message'
-        if ("[Errno 2] No such file or directory: '.\\\\htdemucs\\\\vocals.mp3'" in error_list):
+        test_string = "[Errno 2]"
+        for err in error_list:
+          if (len(err) >= len(test_string) and err[:len(test_string)] == test_string):
             error_message = 'input file does not exist'
-        elif ('When trying to load using ffmpeg, got the following error: FFmpeg is not installed.' in error_list):
-            error_message = 'ffmpeg binary not found'
-
         sys.stdout.write(error_message)
 
 

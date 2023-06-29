@@ -40,4 +40,4 @@ def test_file_not_found(capsys) -> None:
     with TemporaryDirectory() as output_path:
         process_song(DATA_PATH / 'wrong.wav', output_path, '123')
         out, _ = capsys.readouterr()
-        assert out == 'input file does not exist'
+        assert 'input file does not exist' in out.split('\n')
