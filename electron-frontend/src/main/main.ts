@@ -179,14 +179,15 @@ app
             ]);
 
         processSongProcess?.stdout.on('data', (message: string) => {
-          if (`${message}` === `done processing ${song.songId}`) {
+          const messages = `${message}`.split(/\r?\n/);
+          if (messages.includes(`done processing ${song.songId}`)) {
             mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: path.join(songFolder, 'vocals.mp3'),
               accompanimentPath: path.join(songFolder, 'accompaniment.mp3'),
               graphPath: path.join(songFolder, 'graph.json'),
               songId: song.songId,
             });
-          } else if (`${message}` === 'ffmpeg binary not found') {
+          } else if (messages.includes('ffmpeg binary not found')) {
             mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
@@ -196,7 +197,7 @@ app
                 'Processing failed: FFMPEG binary not found, Fix: add FFMPEG binary to path'
               ),
             });
-          } else if (`${message}` === 'input file does not exist') {
+          } else if (messages.includes('input file does not exist')) {
             mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
@@ -206,7 +207,7 @@ app
                 `Processing failed: ${song.songPath} does not exist`
               ),
             });
-          } else if (`${message}` === 'generic error message') {
+          } else if (messages.includes('generic error message')) {
             mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: '',
               accompanimentPath: '',
@@ -424,4 +425,4 @@ app
       mainWindow?.webContents.send('store:onSettingsChange', results)
     );
   })
-  .catch(console.error);
+  .catch((e) => console.error(`error ${e}`));
