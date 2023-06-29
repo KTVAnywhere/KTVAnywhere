@@ -179,7 +179,8 @@ app
             ]);
 
         processSongProcess?.stdout.on('data', (message: string) => {
-          if (`${message}` === `done processing ${song.songId}`) {
+          const messages = `${message}`.split(/\r?\n/);
+          if (messages.includes(`done processing ${song.songId}`)) {
             mainWindow?.webContents.send('preprocess:processResult', {
               vocalsPath: path.join(songFolder, 'vocals.mp3'),
               accompanimentPath: path.join(songFolder, 'accompaniment.mp3'),
@@ -424,4 +425,4 @@ app
       mainWindow?.webContents.send('store:onSettingsChange', results)
     );
   })
-  .catch(console.error);
+  .catch((e) => console.error(`error ${e}`));
