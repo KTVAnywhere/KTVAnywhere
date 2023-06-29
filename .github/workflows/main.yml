@@ -6,10 +6,10 @@ on:
     paths:
       - electron-frontend/**
 
-permissions: write-all
   
 jobs:
   release:
+    permissions: write-all
     runs-on: ${{ matrix.os }}
 
     strategy:
