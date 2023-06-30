@@ -1,9 +1,17 @@
-def spleeter(source, output):
-    from spleeter.separator import Separator
-    separator = Separator('spleeter:2stems')
-    naming_format = "{instrument}.{codec}"
-    separator.separate_to_file('{}'.format(source), '{}'.format(
-        output), codec="mp3", bitrate="128k", filename_format=naming_format)
+def demucs_separate(source, output):
+    from demucs import separate
+    from os import path, rmdir
+    import shutil
+    import multiprocessing
+
+    cores = multiprocessing.cpu_count()
+    model = "htdemucs"
+    naming_format = "{stem}.{ext}"
+    separate.main(['{}'.format(source), "-o", '{}'.format(output), "--filename", naming_format, "--two-stems=vocals", "--mp3", "--mp3-bitrate=64000", "-j={}".format(cores)])
+    shutil.move(path.join(output, model, "vocals.mp3"), path.join(output, "vocals.mp3"))
+    shutil.move(path.join(output, model, "no_vocals.mp3"), path.join(output, "accompaniment.mp3"))
+    rmdir(path.join(output, model))
+
 
 
 def basicpitch(source, output):
@@ -25,7 +33,7 @@ def process_song(source, output, songId):
     import sys
     from os import path
     try:
-        spleeter(source, output)
+        demucs_separate(source, output)
         basicpitch(path.join(output, 'vocals.mp3'), output)
         sys.stdout.write('done processing {}'.format(songId))
     except Exception as e:
@@ -33,18 +41,17 @@ def process_song(source, output, songId):
         error_list = exception_message.split('\n')
 
         error_message = 'generic error message'
-        if (len(error_list) >= 2 and error_list[len(error_list) - 2] == '{}: No such file or directory\r'.format(source)):
+        test_string = "[Errno 2]"
+        for err in error_list:
+          if (len(err) >= len(test_string) and err[:len(test_string)] == test_string):
             error_message = 'input file does not exist'
-        elif (error_list[0] == 'ffmpeg binary not found'):
-            error_message = 'ffmpeg binary not found'
-
         sys.stdout.write(error_message)
-    except:
-        sys.stdout.write('generic error message')
 
 
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
     import sys
+    sys.stdin.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding='utf-8')
     process_song(sys.argv[1], sys.argv[2], sys.argv[3])
