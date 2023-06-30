@@ -34,7 +34,7 @@ KTV Anywhere uses the following technlogies:
 
 - [Electron] - Cross-platform desktop deployment
 - [ReactJS] - For the application's frontend
-- [spleeter] - For the vocal separation feature
+- [demucs] - For the vocal separation feature
 - [SoundTouchJS] - For the pitch shifting functionality
 - [Basic Pitch] - For audio to pitch conversion
 - [RNNoise] - For microphone noise suppression
@@ -85,14 +85,16 @@ Spotted a bug? Please create a post on the [issues page]
 
 >[1] Rachel M. Bittner, Juan José Bosch, David Rubinstein, Gabriel Meseguer-Brocal, and Sebastian Ewert. *A Lightweight Instrument-Agnostic Model for Polyphonic Note Transcription and Multipitch Estimation.* Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP), 2022. 
 <br/><br/>
->[2] Romain Hennequin, Anis Khlif, Felix Voituret, and Manuel Moussallam. *[Spleeter: a fast and efficient music source separation tool with pre-trained models.]* Journal of Open Source Software, 5, pp. 2154, 2020
+>[2] Rouard, Simon, Francisco Massa, and Alexandre Défossez. *[Hybrid transformers for music source separation.]* ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2023.
+<br/><br/>
+>[3] Défossez, Alexandre. *[Hybrid spectrogram and waveform source separation.]* arXiv preprint arXiv:2111.03600 (2021).
 
 [releases page]: https://github.com/weiquany/KTVAnywhere/releases
 [issues page]: https://github.com/weiquany/KTVAnywhere/issues
 [wiki page: ffmpeg installation instructions]: https://github.com/weiquany/KTVAnywhere/wiki/FFMPEG-Installation-instructions-for-Windows
 [electron]: https://www.electronjs.org/
 [reactjs]: https://reactjs.org/
-[spleeter]: https://github.com/deezer/spleeter
+[demucs]: https://github.com/facebookresearch/demucs
 [soundtouchjs]: https://github.com/cutterbl/SoundTouchJS
 [basic pitch]: https://github.com/spotify/basic-pitch
 [rnnoise]: https://github.com/xiph/rnnoise
@@ -100,4 +102,5 @@ Spotted a bug? Please create a post on the [issues page]
 [nodejs]: https://nodejs.org/en/
 [python]: https://www.python.org/
 [ffmpeg]: https://ffmpeg.org/
-[Spleeter: a fast and efficient music source separation tool with pre-trained models.]: https://joss.theoj.org/papers/10.21105/joss.02154
+[Hybrid transformers for music source separation.]: https://arxiv.org/pdf/2211.08553.pdf
+[Hybrid spectrogram and waveform source separation.]: https://arxiv.org/pdf/2111.03600.pdf

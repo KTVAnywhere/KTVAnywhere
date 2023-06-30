@@ -8,7 +8,7 @@ from pytest import approx
 DATA_PATH = pathlib.Path(__file__).parent / 'data'
 
 
-def test_spleeter() -> None:
+def test_audio_separation() -> None:
     with TemporaryDirectory() as output_path:
         demucs_separate(DATA_PATH / 'audio.wav', output_path)
         assert exists(join(output_path, 'vocals.mp3'))
