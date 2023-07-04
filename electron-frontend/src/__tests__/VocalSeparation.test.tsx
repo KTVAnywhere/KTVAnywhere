@@ -10,7 +10,7 @@ import {
 import SongList from '../components/SongList';
 import { songListTestData } from '../__testsData__/testData';
 
-describe('Process song with spleeter and basic pitch', () => {
+describe('Process song with audio separation and basic pitch', () => {
   const mockSetOpenSong = jest.fn();
   const mockSongsStatus: string[] = [];
   const mockSetSongsStatus = jest.fn();
